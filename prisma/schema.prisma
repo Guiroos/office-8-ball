@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id          String  @id @db.Text
+  name        String  @unique @db.Text
+  displayName String  @map("display_name") @db.Text
+  matches     Match[]
+
+  @@map("teams")
+}
+
+model Match {
+  id           String   @id @db.Text
+  winnerTeamId String   @map("winner_team_id") @db.Text
+  playedAt     DateTime @default(now()) @map("played_at") @db.Timestamptz(6)
+  note         String?  @db.Text
+  winnerTeam   Team     @relation(fields: [winnerTeamId], references: [id])
+
+  @@index([winnerTeamId])
+  @@map("matches")
+}
