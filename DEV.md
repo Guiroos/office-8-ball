@@ -3,7 +3,22 @@
 ## Objective
 This file records the technical decisions and implementation changes taken while bootstrapping the project.
 
-It complements the product-oriented [PRD.md](/home/guiroos/Documentos/Projects/office-8-ball/PRD.md) with engineering context.
+It complements the product-oriented [PRD.md](/Users/guiroos/Documents/projects/office-8-ball/PRD.md) with engineering context.
+
+## Current Implementation Snapshot
+
+- The app is implemented as a single `Next.js` application with `App Router`.
+- `Prisma` is already the active data access layer.
+- The current UI still uses `CSS Modules`; the `Tailwind + shadcn/ui` migration has not happened yet.
+- Authentication is still intentionally absent.
+- The API supports optional `note` on match creation, but the dashboard UI still submits only `winnerTeamId`.
+
+## Change Log From Earlier Iterations
+
+- The project moved from direct SQL access to `Prisma`.
+- The repository now includes `schema.prisma`, migrations, Prisma seed, and a shared Prisma client.
+- The app kept the local in-memory fallback even after introducing Prisma, so developers can still run the app without Neon.
+- The roadmap item "introduce Prisma" is no longer future work; it is part of the current implementation.
 
 ## Key Decisions
 
@@ -34,38 +49,40 @@ It complements the product-oriented [PRD.md](/home/guiroos/Documentos/Projects/o
   - in-memory data is temporary and resets when the server restarts
 
 ### Data Access Approach
-- No ORM was introduced in the initial version.
-- The project uses `@neondatabase/serverless` directly.
+- `Prisma` was introduced as the database access layer.
+- The project no longer uses direct SQL queries in the application layer.
 - Reasoning:
-  - lower setup cost
-  - fewer moving parts in the first iteration
-  - enough for the current schema and API surface
+  - centralizes schema and migrations
+  - reduces maintenance cost for future model changes
+  - prepares the project for upcoming auth and multi-league features
 
 ## Implemented Architecture
 
 ### Frontend
-- Single main screen implemented in [dashboard.tsx](/home/guiroos/Documentos/Projects/office-8-ball/src/components/dashboard.tsx).
-- Main route is [page.tsx](/home/guiroos/Documentos/Projects/office-8-ball/src/app/page.tsx).
-- Styling lives in [dashboard.module.css](/home/guiroos/Documentos/Projects/office-8-ball/src/components/dashboard.module.css) and [globals.css](/home/guiroos/Documentos/Projects/office-8-ball/src/app/globals.css).
-- Layout metadata was updated in [layout.tsx](/home/guiroos/Documentos/Projects/office-8-ball/src/app/layout.tsx).
+- Single main screen implemented in [dashboard.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/components/dashboard.tsx).
+- Main route is [page.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/app/page.tsx).
+- Styling lives in [dashboard.module.css](/Users/guiroos/Documents/projects/office-8-ball/src/components/dashboard.module.css) and [globals.css](/Users/guiroos/Documents/projects/office-8-ball/src/app/globals.css).
+- Layout metadata was updated in [layout.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/app/layout.tsx).
 
 ### Backend/API
 - `GET /api/scoreboard`
-  - implemented in [route.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/app/api/scoreboard/route.ts)
+  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/scoreboard/route.ts)
   - returns aggregated scoreboard data
 - `GET /api/matches`
-  - implemented in [route.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/app/api/matches/route.ts)
+  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/matches/route.ts)
   - returns recent matches ordered by date descending
 - `POST /api/matches`
-  - implemented in [route.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/app/api/matches/route.ts)
+  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/matches/route.ts)
   - validates `winnerTeamId`
   - accepts optional `note`
   - creates a new match record
 
 ### Shared Domain Layer
-- Team definitions and win messages live in [constants.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/lib/constants.ts).
-- Shared types live in [types.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/lib/types.ts).
-- Data access, schema initialization, scoreboard aggregation and fallback behavior live in [data.ts](/home/guiroos/Documentos/Projects/office-8-ball/src/lib/data.ts).
+- Team definitions and win messages live in [constants.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/constants.ts).
+- Shared types live in [types.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/types.ts).
+- Data access, scoreboard aggregation and fallback behavior live in [data.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/data.ts).
+- Prisma client setup lives in [prisma.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/prisma.ts).
+- Prisma schema and migrations live under [prisma/schema.prisma](/Users/guiroos/Documents/projects/office-8-ball/prisma/schema.prisma) and [prisma/migrations](/Users/guiroos/Documents/projects/office-8-ball/prisma/migrations).
 
 ## Current Data Model
 
@@ -80,7 +97,7 @@ It complements the product-oriented [PRD.md](/home/guiroos/Documentos/Projects/o
 - `played_at`
 - `note`
 
-Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects/office-8-ball/db/schema.sql).
+The database schema is now managed through Prisma in [schema.prisma](/Users/guiroos/Documents/projects/office-8-ball/prisma/schema.prisma).
 
 ## Behavioral Decisions
 - The score is derived from the match history, not stored separately.
@@ -108,9 +125,9 @@ Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects
 - The UI does not fake a successful score update if saving fails.
 
 ## Environment and Config
-- Example environment file added in [.env.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.example).
-- Preview example file added in [.env.preview.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.preview.example).
-- Production example file added in [.env.production.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.production.example).
+- Example environment file added in [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example).
+- Preview example file added in [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example).
+- Production example file added in [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example).
 - Supported values:
   - `DATABASE_URL`
   - `NEXT_PUBLIC_APP_ENV`
@@ -119,7 +136,7 @@ Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects
 
 #### Local development
 - File:
-  - copy [.env.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.example) to `.env.local`
+  - copy [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example) to `.env.local`
 - Values:
   - `DATABASE_URL=`
     - leave empty if you want in-memory mode
@@ -128,7 +145,7 @@ Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects
 
 #### Preview / sandbox
 - File reference:
-  - [.env.preview.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.preview.example)
+  - [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example)
 - Values to configure in Vercel Preview environment:
   - `DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require`
     - recommended: use a separate Neon database or branch for preview
@@ -136,7 +153,7 @@ Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects
 
 #### Production
 - File reference:
-  - [.env.production.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.production.example)
+  - [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example)
 - Values to configure in Vercel Production environment:
   - `DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require`
     - recommended: use the main production Neon database
@@ -171,16 +188,26 @@ Schema bootstrap SQL was added in [schema.sql](/home/guiroos/Documentos/Projects
   - a plain async fetch path is clearer for the current component
 
 ## Verification Performed
+- `npm run prisma:generate`
 - `npm run lint`
 - `npx tsc --noEmit`
-- `npm run build`
+- `npm run prisma:deploy`
+- `npm run prisma:seed`
 
-All of the above passed after the implementation adjustments.
+Results after the Prisma migration:
+- `npm run prisma:generate` passed
+- `npm run lint` passed
+- `npx tsc --noEmit` passed
+- `npm run prisma:deploy` completed after baselining the existing Neon schema
+- `npm run prisma:seed` passed
+- `npm run build` could not be validated in this environment because the local Node version is `18.20.8`, while `next@16.1.6` requires Node `>=20.9.0`
 
 ## Next Steps to Make the App Fully Work
 
+This section is intentionally operational, not a statement that the app is unimplemented. The current app already works locally and the remaining steps below are about validation, shared persistence, deployment, and polish.
+
 ### 1. Run the app locally right now
-- Copy [.env.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.example) to `.env.local`
+- Copy [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example) to `.env.local`
 - Keep `DATABASE_URL` empty for the first run if needed
 - Run `npm run dev`
 - Open `http://localhost:3000`
@@ -194,7 +221,8 @@ All of the above passed after the implementation adjustments.
 - Create a free Neon project
 - Copy the Postgres connection string
 - Put that value into `DATABASE_URL` in `.env.local`
-- Apply the SQL from [schema.sql](/home/guiroos/Documentos/Projects/office-8-ball/db/schema.sql) to the Neon database
+- Run `npm run prisma:deploy`
+- Run `npm run prisma:seed`
 - Restart the local app
 - Validate that match data now persists across server restarts
 
@@ -207,8 +235,8 @@ All of the above passed after the implementation adjustments.
 ### 4. Prepare deployment in Vercel
 - Push the repository to GitHub
 - Import the project into Vercel
-- Add the Preview values from [.env.preview.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.preview.example) to the Vercel Preview environment
-- Add the Production values from [.env.production.example](/home/guiroos/Documentos/Projects/office-8-ball/.env.production.example) to the Vercel Production environment
+- Add the Preview values from [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example) to the Vercel Preview environment
+- Add the Production values from [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example) to the Vercel Production environment
 - Deploy the project
 
 ### 5. Validate production behavior
@@ -222,11 +250,11 @@ All of the above passed after the implementation adjustments.
 
 ### 6. Finish the first useful polish items
 - Add a small input for optional match notes in the UI
-- Add a simple empty-state message for first-time production use
+- Add a persistence mode indicator in the UI only if it improves debugging without harming the simple UX
 - Add a safe reset mechanism only if there is a real need for it
-- Optionally show which persistence mode is active:
-  - in-memory
-  - Neon
+
+Already implemented since earlier notes:
+- the dashboard already has an empty-state message for first-time use
 
 ### Recommended Order
 - First make it work locally without Neon

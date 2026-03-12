@@ -1,5 +1,16 @@
 # PRD - Office 8 Ball
 
+## Status Note
+
+This document remains the product intent for `v1`.
+
+Implementation status relative to this PRD:
+- the single-screen scoreboard flow is implemented
+- current score, leader, streak, and history are implemented
+- the API supports optional match `note`
+- the dashboard UI still does not expose note entry
+- authentication and multi-team support remain intentionally out of scope for `v1`
+
 ## Product Summary
 Internal web app to track office pool matches between two fixed teams:
 
