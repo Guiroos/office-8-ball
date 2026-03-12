@@ -1,6 +1,5 @@
-import { neon } from "@neondatabase/serverless";
-
 import { TEAMS, WIN_MESSAGES } from "@/lib/constants";
+import { prisma } from "@/lib/prisma";
 import type {
   CreateMatchResponse,
   MatchRecord,
@@ -9,15 +8,6 @@ import type {
   TeamId,
   TeamScore,
 } from "@/lib/types";
-
-type DatabaseRow = {
-  id: string;
-  winner_team_id: TeamId;
-  winner_name: string;
-  winner_roster: string;
-  played_at: string | Date;
-  note: string | null;
-};
 
 type MatchInsert = {
   winnerTeamId: TeamId;
@@ -33,7 +23,7 @@ const memoryState: {
 };
 
 declare global {
-  var __office8ballSchemaReady: Promise<void> | undefined;
+  var __office8ballSeedReady: Promise<void> | undefined;
 }
 
 function getRandomWinMessage(teamId: TeamId) {
@@ -41,62 +31,57 @@ function getRandomWinMessage(teamId: TeamId) {
   return choices[Math.floor(Math.random() * choices.length)];
 }
 
-function getSql() {
-  const databaseUrl = process.env.DATABASE_URL;
-  return databaseUrl ? neon(databaseUrl) : null;
+function hasDatabaseUrl() {
+  return Boolean(process.env.DATABASE_URL);
 }
 
-async function ensureSchema() {
-  const sql = getSql();
-
-  if (!sql) {
+async function ensureSeedData() {
+  if (!hasDatabaseUrl()) {
     return;
   }
 
-  if (!global.__office8ballSchemaReady) {
-    global.__office8ballSchemaReady = (async () => {
-      await sql`
-        CREATE TABLE IF NOT EXISTS teams (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL UNIQUE,
-          display_name TEXT NOT NULL
-        );
-      `;
-
-      await sql`
-        CREATE TABLE IF NOT EXISTS matches (
-          id TEXT PRIMARY KEY,
-          winner_team_id TEXT NOT NULL REFERENCES teams(id),
-          played_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-          note TEXT
-        );
-      `;
-
+  if (!global.__office8ballSeedReady) {
+    global.__office8ballSeedReady = (async () => {
       for (const team of TEAMS) {
-        await sql`
-          INSERT INTO teams (id, name, display_name)
-          VALUES (${team.id}, ${team.name}, ${team.displayName})
-          ON CONFLICT (id) DO UPDATE
-          SET
-            name = EXCLUDED.name,
-            display_name = EXCLUDED.display_name;
-        `;
+        await prisma.team.upsert({
+          where: { id: team.id },
+          update: {
+            name: team.name,
+            displayName: team.displayName,
+          },
+          create: {
+            id: team.id,
+            name: team.name,
+            displayName: team.displayName,
+          },
+        });
       }
     })();
   }
 
-  await global.__office8ballSchemaReady;
+  await global.__office8ballSeedReady;
 }
 
-function normalizeDbMatches(rows: DatabaseRow[]) {
-  return rows.map((row) => ({
-    id: row.id,
-    winnerTeamId: row.winner_team_id,
-    winnerName: row.winner_name,
-    winnerRoster: row.winner_roster,
-    playedAt: new Date(row.played_at).toISOString(),
-    note: row.note,
-  }));
+function normalizeDbMatches(
+  rows: Array<{
+    id: string;
+    winnerTeamId: string;
+    playedAt: Date;
+    note: string | null;
+  }>,
+) {
+  return rows.map((row) => {
+    const team = teamMap.get(row.winnerTeamId as TeamId);
+
+    return {
+      id: row.id,
+      winnerTeamId: row.winnerTeamId as TeamId,
+      winnerName: team?.displayName ?? row.winnerTeamId,
+      winnerRoster: team?.roster ?? row.winnerTeamId,
+      playedAt: row.playedAt.toISOString(),
+      note: row.note,
+    };
+  });
 }
 
 function computeScoreboard(matches: MatchRecord[]): ScoreboardData {
@@ -148,47 +133,12 @@ function computeScoreboard(matches: MatchRecord[]): ScoreboardData {
 }
 
 async function getDatabaseMatches(limit?: number): Promise<MatchRecord[]> {
-  await ensureSchema();
+  await ensureSeedData();
 
-  const sql = getSql();
-
-  if (!sql) {
-    return [];
-  }
-
-  const rows =
-    typeof limit === "number"
-      ? ((await sql`
-          SELECT
-            m.id,
-            m.winner_team_id,
-            t.display_name AS winner_name,
-            CASE
-              WHEN t.id = 'frontend' THEN 'Gui + Jean'
-              ELSE 'Adair + Richard'
-            END AS winner_roster,
-            m.played_at,
-            m.note
-          FROM matches m
-          INNER JOIN teams t ON t.id = m.winner_team_id
-          ORDER BY m.played_at DESC
-          LIMIT ${limit};
-        `) as DatabaseRow[])
-      : ((await sql`
-          SELECT
-            m.id,
-            m.winner_team_id,
-            t.display_name AS winner_name,
-            CASE
-              WHEN t.id = 'frontend' THEN 'Gui + Jean'
-              ELSE 'Adair + Richard'
-            END AS winner_roster,
-            m.played_at,
-            m.note
-          FROM matches m
-          INNER JOIN teams t ON t.id = m.winner_team_id
-          ORDER BY m.played_at DESC;
-        `) as DatabaseRow[]);
+  const rows = await prisma.match.findMany({
+    orderBy: { playedAt: "desc" },
+    ...(typeof limit === "number" ? { take: limit } : {}),
+  });
 
   return normalizeDbMatches(rows);
 }
@@ -202,13 +152,13 @@ function getMemoryMatches(limit?: number) {
 }
 
 export async function listMatches(limit = 12) {
-  const sql = getSql();
-  return sql ? getDatabaseMatches(limit) : getMemoryMatches(limit);
+  return hasDatabaseUrl() ? getDatabaseMatches(limit) : getMemoryMatches(limit);
 }
 
 export async function getScoreboard() {
-  const sql = getSql();
-  const matches = sql ? await getDatabaseMatches() : getMemoryMatches();
+  const matches = hasDatabaseUrl()
+    ? await getDatabaseMatches()
+    : getMemoryMatches();
   return computeScoreboard(matches);
 }
 
@@ -233,9 +183,8 @@ export async function createMatch(
   input: MatchInsert,
 ): Promise<CreateMatchResponse> {
   const createdMatch = createMatchRecord(input);
-  const sql = getSql();
 
-  if (!sql) {
+  if (!hasDatabaseUrl()) {
     memoryState.matches.unshift(createdMatch);
     return {
       match: createdMatch,
@@ -243,17 +192,16 @@ export async function createMatch(
     };
   }
 
-  await ensureSchema();
+  await ensureSeedData();
 
-  await sql`
-    INSERT INTO matches (id, winner_team_id, played_at, note)
-    VALUES (
-      ${createdMatch.id},
-      ${createdMatch.winnerTeamId},
-      ${createdMatch.playedAt},
-      ${createdMatch.note}
-    );
-  `;
+  await prisma.match.create({
+    data: {
+      id: createdMatch.id,
+      winnerTeamId: createdMatch.winnerTeamId,
+      playedAt: new Date(createdMatch.playedAt),
+      note: createdMatch.note,
+    },
+  });
 
   return {
     match: createdMatch,
