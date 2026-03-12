@@ -1,0 +1,292 @@
+.page {
+  display: grid;
+  gap: 24px;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.hero,
+.scoreboardPanel,
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(49, 37, 27, 0.12);
+}
+
+.hero {
+  display: grid;
+  gap: 18px;
+  align-items: end;
+  padding: 28px;
+  background:
+    linear-gradient(135deg, rgba(255, 252, 246, 0.88), rgba(226, 209, 178, 0.74)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='rgba(32,25,19,0.08)' stroke-width='2'%3E%3Ccircle cx='110' cy='110' r='86'/%3E%3Ccircle cx='110' cy='110' r='54'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.heroCopy h1 {
+  margin-top: 10px;
+  font-family: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
+  font-size: clamp(4rem, 10vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kicker,
+.sectionLabel,
+.teamLabel,
+.badge,
+.leaderPill,
+.metaCard span,
+.insightCard span {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+}
+
+.kicker,
+.sectionLabel,
+.teamLabel,
+.metaCard span,
+.insightCard span,
+.matchMeta span,
+.matchMeta small {
+  color: var(--muted);
+}
+
+.description,
+.heroAside p,
+.teamSlogan,
+.emptyState p,
+.insightCard p,
+.matchRow p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.heroAside {
+  display: grid;
+  gap: 12px;
+  max-width: 28rem;
+  justify-self: end;
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(255, 249, 240, 0.7);
+  border: 1px solid rgba(32, 25, 19, 0.08);
+}
+
+.badge,
+.leaderPill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(32, 25, 19, 0.08);
+}
+
+.scoreboardPanel {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+  background: var(--surface);
+  color: #fff7eb;
+}
+
+.scoreSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: end;
+  justify-content: space-between;
+}
+
+.scoreSummary h2,
+.panelHeader h2 {
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.metaCard {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid rgba(255, 247, 235, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 247, 235, 0.06);
+}
+
+.metaCard strong {
+  font-size: 2rem;
+}
+
+.metaCard small {
+  color: rgba(255, 247, 235, 0.7);
+}
+
+.teamsGrid,
+.lowerGrid {
+  display: grid;
+  gap: 20px;
+}
+
+.teamCard {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  color: var(--foreground);
+}
+
+.teamCard[data-team="frontend"] {
+  background: var(--frontend-soft);
+}
+
+.teamCard[data-team="backend"] {
+  background: var(--backend-soft);
+}
+
+.teamCard[data-leading="true"] {
+  outline: 3px solid rgba(215, 162, 40, 0.75);
+}
+
+.teamHeader {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.teamHeader h3 {
+  font-size: 1.5rem;
+}
+
+.leaderPill {
+  background: rgba(215, 162, 40, 0.18);
+  color: #6f4a00;
+}
+
+.scoreValue {
+  font-family: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
+  font-size: clamp(4rem, 14vw, 6rem);
+  line-height: 0.9;
+}
+
+.winButton {
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease, opacity 150ms ease;
+  color: #fff;
+}
+
+.teamCard[data-team="frontend"] .winButton {
+  background: var(--frontend);
+}
+
+.teamCard[data-team="backend"] .winButton {
+  background: var(--backend);
+}
+
+.winButton:hover:enabled {
+  transform: translateY(-1px);
+}
+
+.winButton:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.lowerGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel {
+  background: rgba(255, 251, 244, 0.82);
+  padding: 24px;
+}
+
+.panelHeader {
+  margin-bottom: 20px;
+}
+
+.matchList,
+.insightStack {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+}
+
+.matchRow,
+.insightCard,
+.emptyState {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.matchRow {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.matchMeta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  text-align: right;
+}
+
+.insightCard {
+  display: grid;
+  gap: 8px;
+}
+
+.insightCard strong {
+  font-size: 1.1rem;
+}
+
+@media (min-width: 720px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
+  }
+
+  .teamsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719px) {
+  .page {
+    padding: 16px;
+  }
+
+  .scoreboardPanel,
+  .panel,
+  .hero {
+    padding: 18px;
+  }
+
+  .lowerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .matchRow {
+    flex-direction: column;
+  }
+
+  .matchMeta {
+    justify-items: start;
+    text-align: left;
+  }
+}
