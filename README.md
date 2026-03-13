@@ -13,6 +13,12 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - `POST /api/matches`
 - Current UI supports one-click winner registration and recent history display.
 - The API already supports optional `note`, but the current UI does not expose note entry yet.
+- Local validation currently passes:
+  - `npm run test`
+  - `npm run lint`
+  - `npx tsc --noEmit`
+  - `npm run build`
+- An automated test suite is now configured with `Vitest` + Testing Library.
 
 ## Stack
 - Next.js App Router
@@ -20,12 +26,14 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
 - Neon Postgres for persistence
 - Prisma ORM for database access
 - In-memory fallback when `DATABASE_URL` is not configured
+- Vitest + Testing Library for unit and integration tests
 
 ## Local Development
 1. Copy `.env.example` to `.env.local`.
 2. Add `DATABASE_URL` when you are ready to connect Neon.
 3. Run `npm run dev`.
-4. Open `http://localhost:3000`.
+4. Run `npm run test` to verify the local test suite.
+5. Open `http://localhost:3000`.
 
 If `DATABASE_URL` is missing, the app still works locally with temporary in-memory data.
 
@@ -50,11 +58,25 @@ Example body:
 }
 ```
 
+## Testing
+- `npm run test`
+- `npm run test:watch`
+- `npm run test:coverage`
+
+Current coverage focus:
+- domain logic in memory mode
+- API route contracts
+- dashboard behavior with mocked `fetch`
+
+Not covered yet:
+- Prisma-backed integration tests
+- browser E2E tests
+
 ## Database
-The Prisma schema lives in [prisma/schema.prisma](/Users/guiroos/Documents/projects/office-8-ball/prisma/schema.prisma).
-The initial migration lives in [prisma/migrations/0001_init/migration.sql](/Users/guiroos/Documents/projects/office-8-ball/prisma/migrations/0001_init/migration.sql).
+The Prisma schema lives in `prisma/schema.prisma`.
+The initial migration lives in `prisma/migrations/0001_init/migration.sql`.
 
 ## Documentation Notes
-- [AGENTS.md](/Users/guiroos/Documents/projects/office-8-ball/AGENTS.md) is the fast-start guide for AI agents.
-- [DEV.md](/Users/guiroos/Documents/projects/office-8-ball/DEV.md) records technical decisions and changes that happened during implementation.
-- [ROADMAP.md](/Users/guiroos/Documents/projects/office-8-ball/ROADMAP.md) tracks planned phases and now marks what is already done.
+- `AGENTS.md` is the fast-start guide for AI agents.
+- `DEV.md` records technical decisions and changes that happened during implementation.
+- `ROADMAP.md` tracks planned phases and marks what is already done versus still future work.
