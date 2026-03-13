@@ -154,6 +154,9 @@ Common commands:
 
 ```bash
 npm run dev
+npm run test
+npm run test:watch
+npm run test:coverage
 npm run lint
 npx tsc --noEmit
 npm run prisma:generate
@@ -163,7 +166,7 @@ npm run prisma:seed
 
 Notes:
 - `postinstall` runs `prisma generate`
-- older docs mention a local Node mismatch for `next@16`; verify runtime compatibility before relying on `npm run build`
+- `npm run build` has been validated successfully in the current project state
 
 ## Working Rules For Agents
 
@@ -233,7 +236,8 @@ If the task is product-directional, also read:
 ## Known Gaps
 
 As of the current code state:
-- there are no automated tests in the repository
+- there is an initial automated test suite with `Vitest` + Testing Library
+- the current test suite does not yet cover Prisma-backed integration or browser E2E flows
 - the UI does not allow entering match notes yet
 - auth is planned but not implemented
 - Tailwind/shadcn migration is planned but not implemented
