@@ -128,7 +128,7 @@ describe("Dashboard", () => {
     render(<Dashboard />);
 
     expect(
-      await screen.findByText("Nao foi possivel carregar o placar."),
+      await screen.findByText("Não foi possível carregar o placar."),
     ).toBeInTheDocument();
     expect(screen.getByText("Falha ao sincronizar a mesa.")).toBeInTheDocument();
   });
@@ -161,9 +161,9 @@ describe("Dashboard", () => {
 
     render(<Dashboard />);
 
-    await screen.findByRole("button", { name: "Vitoria Frontend" });
+    await screen.findByRole("button", { name: "Vitória Frontend" });
 
-    await userEvent.click(screen.getByRole("button", { name: "Vitoria Frontend" }));
+    await userEvent.click(screen.getByRole("button", { name: "Vitória Frontend" }));
 
     await waitFor(() => {
       expect(screen.getByText(createMatchResponse.message)).toBeInTheDocument();
