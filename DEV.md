@@ -9,7 +9,7 @@ It complements the product-oriented `PRD.md` with engineering context.
 
 - The app is implemented as a single `Next.js` application with `App Router`.
 - `Prisma` is already the active data access layer.
-- The current UI still uses `CSS Modules`; the `Tailwind + shadcn/ui` migration has not happened yet.
+- The dashboard now uses `Tailwind CSS` with local `shadcn/ui`-style components.
 - Authentication is still intentionally absent.
 - The API supports optional `note` on match creation, but the dashboard UI still submits only `winnerTeamId`.
 - Automated tests now use `Vitest` + Testing Library.
@@ -62,7 +62,8 @@ It complements the product-oriented `PRD.md` with engineering context.
 ### Frontend
 - Single main screen implemented in `src/components/dashboard.tsx`.
 - Main route is `src/app/page.tsx`.
-- Styling lives in `src/components/dashboard.module.css` and `src/app/globals.css`.
+- Global styling lives in `src/app/globals.css`.
+- Shared UI primitives now live under `src/components/ui/`.
 - Layout metadata was updated in `src/app/layout.tsx`.
 
 ### Backend/API
@@ -183,6 +184,10 @@ The database schema is now managed through Prisma in `prisma/schema.prisma`.
 - Reasoning:
   - the build environment could not fetch remote font assets reliably
   - local/system font stacks keep the build deterministic
+- The visual refresh used local `shadcn/ui`-style components instead of depending on generated defaults as final design.
+- Reasoning:
+  - keeps control of the component code inside the repo
+  - avoids turning the dashboard into a generic SaaS admin screen
 - `useEffectEvent` was initially considered but removed.
 - Reasoning:
   - it added avoidable lint friction for this simple data-loading flow

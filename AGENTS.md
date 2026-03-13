@@ -39,6 +39,7 @@ The project is a single `Next.js` App Router application.
 High-level structure:
 - `src/app/page.tsx`: home page entrypoint
 - `src/components/dashboard.tsx`: main client UI
+- `src/components/ui/*`: shared UI primitives used by the dashboard
 - `src/app/api/scoreboard/route.ts`: scoreboard API
 - `src/app/api/matches/route.ts`: matches read/create API
 - `src/lib/data.ts`: main business logic and persistence switching
@@ -110,7 +111,7 @@ Current UI characteristics:
 - single-screen dashboard
 - client component with fetch-based loading
 - no optimistic scoreboard update before persistence succeeds
-- uses CSS Modules, not Tailwind
+- uses Tailwind CSS with local `shadcn/ui`-style components
 - uses playful Portuguese copy in the interface
 
 The main screen loads:
@@ -240,7 +241,7 @@ As of the current code state:
 - the current test suite does not yet cover Prisma-backed integration or browser E2E flows
 - the UI does not allow entering match notes yet
 - auth is planned but not implemented
-- Tailwind/shadcn migration is planned but not implemented
+- the Tailwind/shadcn visual foundation is implemented on the main dashboard
 
 ## Safe Change Checklist
 

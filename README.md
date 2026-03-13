@@ -4,6 +4,7 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
 
 ## Current Status
 - `v1` is implemented as a single-screen Next.js app.
+- The main dashboard now uses `Tailwind CSS` + local `shadcn/ui`-style components.
 - Persistence supports two modes:
   - `Prisma + Neon/Postgres` when `DATABASE_URL` is configured
   - in-memory fallback for local development when `DATABASE_URL` is missing
@@ -22,6 +23,8 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
 
 ## Stack
 - Next.js App Router
+- Tailwind CSS
+- local shadcn/ui-style components
 - Vercel for hosting
 - Neon Postgres for persistence
 - Prisma ORM for database access

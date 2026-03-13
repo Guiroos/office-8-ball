@@ -14,14 +14,14 @@ O objetivo e reduzir custo de manutencao agora sem bloquear a evolucao futura do
 ## Status atual
 
 - Fase 1: concluida
-- Fase 2: nao iniciada
+- Fase 2: concluida
 - Fase 3: nao iniciada
 - Fase 4: nao iniciada
 
 ## Mudancas em relacao ao plano original
 
 - `Prisma`, que antes era planejado como proxima etapa, ja foi implementado no codigo.
-- O projeto ainda usa `CSS Modules` na UI principal. A migracao para `Tailwind + shadcn/ui` continua futura.
+- A UI principal agora usa `Tailwind CSS` com componentes locais no estilo `shadcn/ui`.
 - A leitura segue publica e a escrita segue sem autenticacao, como esperado para o estado pre-`Auth.js`.
 - O dominio continua fixo em dois times globais, sem `League`, `Workspace` ou contas de usuario.
 
@@ -39,12 +39,12 @@ Status: concluida
 
 ## Fase 2: Tailwind + shadcn/ui
 
-Status: nao iniciada
+Status: concluida
 
-- [ ] Instalar e configurar `tailwindcss` e `shadcn/ui`.
-- [ ] Reescrever o dashboard atual com componentes reutilizaveis.
-- [ ] Remover a dependencia principal de CSS Modules da tela principal.
-- [ ] Manter visual limpo, profissional e responsivo.
+- [x] Instalar e configurar `tailwindcss` e `shadcn/ui`.
+- [x] Reescrever o dashboard atual com componentes reutilizaveis.
+- [x] Remover a dependencia principal de CSS Modules da tela principal.
+- [x] Manter visual limpo, profissional e responsivo.
 
 ## Fase 3: Login e autorizacao
 
