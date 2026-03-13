@@ -3,7 +3,7 @@
 ## Objective
 This file records the technical decisions and implementation changes taken while bootstrapping the project.
 
-It complements the product-oriented [PRD.md](/Users/guiroos/Documents/projects/office-8-ball/PRD.md) with engineering context.
+It complements the product-oriented `PRD.md` with engineering context.
 
 ## Current Implementation Snapshot
 
@@ -12,6 +12,7 @@ It complements the product-oriented [PRD.md](/Users/guiroos/Documents/projects/o
 - The current UI still uses `CSS Modules`; the `Tailwind + shadcn/ui` migration has not happened yet.
 - Authentication is still intentionally absent.
 - The API supports optional `note` on match creation, but the dashboard UI still submits only `winnerTeamId`.
+- Automated tests now use `Vitest` + Testing Library.
 
 ## Change Log From Earlier Iterations
 
@@ -59,30 +60,30 @@ It complements the product-oriented [PRD.md](/Users/guiroos/Documents/projects/o
 ## Implemented Architecture
 
 ### Frontend
-- Single main screen implemented in [dashboard.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/components/dashboard.tsx).
-- Main route is [page.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/app/page.tsx).
-- Styling lives in [dashboard.module.css](/Users/guiroos/Documents/projects/office-8-ball/src/components/dashboard.module.css) and [globals.css](/Users/guiroos/Documents/projects/office-8-ball/src/app/globals.css).
-- Layout metadata was updated in [layout.tsx](/Users/guiroos/Documents/projects/office-8-ball/src/app/layout.tsx).
+- Single main screen implemented in `src/components/dashboard.tsx`.
+- Main route is `src/app/page.tsx`.
+- Styling lives in `src/components/dashboard.module.css` and `src/app/globals.css`.
+- Layout metadata was updated in `src/app/layout.tsx`.
 
 ### Backend/API
 - `GET /api/scoreboard`
-  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/scoreboard/route.ts)
+  - implemented in `src/app/api/scoreboard/route.ts`
   - returns aggregated scoreboard data
 - `GET /api/matches`
-  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/matches/route.ts)
+  - implemented in `src/app/api/matches/route.ts`
   - returns recent matches ordered by date descending
 - `POST /api/matches`
-  - implemented in [route.ts](/Users/guiroos/Documents/projects/office-8-ball/src/app/api/matches/route.ts)
+  - implemented in `src/app/api/matches/route.ts`
   - validates `winnerTeamId`
   - accepts optional `note`
   - creates a new match record
 
 ### Shared Domain Layer
-- Team definitions and win messages live in [constants.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/constants.ts).
-- Shared types live in [types.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/types.ts).
-- Data access, scoreboard aggregation and fallback behavior live in [data.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/data.ts).
-- Prisma client setup lives in [prisma.ts](/Users/guiroos/Documents/projects/office-8-ball/src/lib/prisma.ts).
-- Prisma schema and migrations live under [prisma/schema.prisma](/Users/guiroos/Documents/projects/office-8-ball/prisma/schema.prisma) and [prisma/migrations](/Users/guiroos/Documents/projects/office-8-ball/prisma/migrations).
+- Team definitions and win messages live in `src/lib/constants.ts`.
+- Shared types live in `src/lib/types.ts`.
+- Data access, scoreboard aggregation and fallback behavior live in `src/lib/data.ts`.
+- Prisma client setup lives in `src/lib/prisma.ts`.
+- Prisma schema and migrations live under `prisma/schema.prisma` and `prisma/migrations`.
 
 ## Current Data Model
 
@@ -97,7 +98,7 @@ It complements the product-oriented [PRD.md](/Users/guiroos/Documents/projects/o
 - `played_at`
 - `note`
 
-The database schema is now managed through Prisma in [schema.prisma](/Users/guiroos/Documents/projects/office-8-ball/prisma/schema.prisma).
+The database schema is now managed through Prisma in `prisma/schema.prisma`.
 
 ## Behavioral Decisions
 - The score is derived from the match history, not stored separately.
@@ -125,9 +126,9 @@ The database schema is now managed through Prisma in [schema.prisma](/Users/guir
 - The UI does not fake a successful score update if saving fails.
 
 ## Environment and Config
-- Example environment file added in [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example).
-- Preview example file added in [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example).
-- Production example file added in [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example).
+- Example environment file added in `.env.example`.
+- Preview example file added in `.env.preview.example`.
+- Production example file added in `.env.production.example`.
 - Supported values:
   - `DATABASE_URL`
   - `NEXT_PUBLIC_APP_ENV`
@@ -136,7 +137,7 @@ The database schema is now managed through Prisma in [schema.prisma](/Users/guir
 
 #### Local development
 - File:
-  - copy [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example) to `.env.local`
+  - copy `.env.example` to `.env.local`
 - Values:
   - `DATABASE_URL=`
     - leave empty if you want in-memory mode
@@ -145,7 +146,7 @@ The database schema is now managed through Prisma in [schema.prisma](/Users/guir
 
 #### Preview / sandbox
 - File reference:
-  - [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example)
+  - `.env.preview.example`
 - Values to configure in Vercel Preview environment:
   - `DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require`
     - recommended: use a separate Neon database or branch for preview
@@ -153,7 +154,7 @@ The database schema is now managed through Prisma in [schema.prisma](/Users/guir
 
 #### Production
 - File reference:
-  - [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example)
+  - `.env.production.example`
 - Values to configure in Vercel Production environment:
   - `DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require`
     - recommended: use the main production Neon database
@@ -188,26 +189,47 @@ The database schema is now managed through Prisma in [schema.prisma](/Users/guir
   - a plain async fetch path is clearer for the current component
 
 ## Verification Performed
-- `npm run prisma:generate`
+- `npm run test`
 - `npm run lint`
 - `npx tsc --noEmit`
+- `npm run build`
+
+Current local results:
+- `npm run test` passed
+- `npm run lint` passed
+- `npx tsc --noEmit` passed
+- `npm run build` passed
+
+Database-specific commands still depend on a configured `DATABASE_URL`:
+- `npm run prisma:generate`
 - `npm run prisma:deploy`
 - `npm run prisma:seed`
 
-Results after the Prisma migration:
-- `npm run prisma:generate` passed
-- `npm run lint` passed
-- `npx tsc --noEmit` passed
-- `npm run prisma:deploy` completed after baselining the existing Neon schema
-- `npm run prisma:seed` passed
-- `npm run build` could not be validated in this environment because the local Node version is `18.20.8`, while `next@16.1.6` requires Node `>=20.9.0`
+## Testing Status
+- The repository now has a lightweight automated test suite.
+- Stack:
+  - `Vitest`
+  - `@testing-library/react`
+  - `@testing-library/jest-dom`
+  - `jsdom`
+- Commands:
+  - `npm run test`
+  - `npm run test:watch`
+  - `npm run test:coverage`
+- Current scope:
+  - domain logic in memory mode
+  - API route behavior
+  - dashboard UI behavior with mocked `fetch`
+- Not covered yet:
+  - Prisma-backed integration tests
+  - end-to-end browser flows
 
 ## Next Steps to Make the App Fully Work
 
 This section is intentionally operational, not a statement that the app is unimplemented. The current app already works locally and the remaining steps below are about validation, shared persistence, deployment, and polish.
 
 ### 1. Run the app locally right now
-- Copy [.env.example](/Users/guiroos/Documents/projects/office-8-ball/.env.example) to `.env.local`
+- Copy `.env.example` to `.env.local`
 - Keep `DATABASE_URL` empty for the first run if needed
 - Run `npm run dev`
 - Open `http://localhost:3000`
@@ -235,8 +257,8 @@ This section is intentionally operational, not a statement that the app is unimp
 ### 4. Prepare deployment in Vercel
 - Push the repository to GitHub
 - Import the project into Vercel
-- Add the Preview values from [.env.preview.example](/Users/guiroos/Documents/projects/office-8-ball/.env.preview.example) to the Vercel Preview environment
-- Add the Production values from [.env.production.example](/Users/guiroos/Documents/projects/office-8-ball/.env.production.example) to the Vercel Production environment
+- Add the Preview values from `.env.preview.example` to the Vercel Preview environment
+- Add the Production values from `.env.production.example` to the Vercel Production environment
 - Deploy the project
 
 ### 5. Validate production behavior
