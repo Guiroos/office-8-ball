@@ -9,7 +9,8 @@ Implementation status relative to this PRD:
 - current score, leader, streak, and history are implemented
 - the API supports optional match `note`
 - the dashboard UI still does not expose note entry
-- authentication and multi-team support remain intentionally out of scope for `v1`
+- credentials authentication is now implemented
+- multi-team support remains intentionally out of scope for `v1`
 
 ## Product Summary
 Internal web app to track office pool matches between two fixed teams:
@@ -27,7 +28,6 @@ The product should make it easy to register winners of each match, keep a shared
 - Keep the architecture simple and low-cost.
 
 ## Non-Goals
-- User authentication in v1.
 - Support for more than two teams in v1.
 - Admin panel or dynamic team management.
 - Complex ranking systems beyond simple win counts and streaks.
@@ -58,7 +58,7 @@ The product should make it easy to register winners of each match, keep a shared
   - win difference
 
 ### Data Model
-Two tables are enough for v1.
+Three tables are enough for v1.
 
 #### `teams`
 - `id`
@@ -74,6 +74,15 @@ Seed with two fixed rows:
 - `winner_team_id`
 - `played_at`
 - `note` nullable
+
+#### `users`
+- `id`
+- `username`
+- `email`
+- `password_hash`
+- `display_name` nullable
+- `created_at`
+- `updated_at`
 
 ## Technical Direction
 
@@ -117,6 +126,7 @@ Behavior:
 ## UI Requirements
 - Single-page experience for v1
 - Mobile-friendly and desktop-friendly layout
+- Login and signup entry screen before the scoreboard
 - Fast winner registration flow
 - Clear visual distinction between Frontend and Backend teams
 - Playful copy without harming usability
@@ -153,7 +163,7 @@ Suggested sections:
 
 ## Constraints and Assumptions
 - Exactly two teams exist in v1.
-- No login is required.
+- Login is required for `/scoreboard`.
 - Usage volume is small and internal.
 - The free tiers of Vercel and Neon are expected to be sufficient for v1.
 - The product should prioritize simplicity over extensibility in the first release.
