@@ -26,3 +26,15 @@ model Match {
   @@index([winnerTeamId])
   @@map("matches")
 }
+
+model User {
+  id           String   @id @db.Text
+  username     String   @unique @db.Text
+  email        String   @unique @db.Text
+  passwordHash String   @map("password_hash") @db.Text
+  displayName  String?  @map("display_name") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+}
