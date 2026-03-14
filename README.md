@@ -86,6 +86,7 @@ Example body:
 - `npm run test`
 - `npm run test:watch`
 - `npm run test:coverage`
+- `npm run typecheck`
 
 Current coverage focus:
 - domain logic in memory mode
@@ -97,6 +98,14 @@ Current coverage focus:
 Not covered yet:
 - Prisma-backed integration tests
 - browser E2E tests
+
+## CI/CD And Repository Protection
+- GitHub Actions validates pull requests with `CI`, `Dependency Review`, and `CodeQL`.
+- Dependabot is configured for weekly updates to `npm` dependencies and GitHub Actions.
+- Vercel remains the source of truth for preview and deployment builds.
+- Recommended repository settings are to require PRs for `main`, require the `CI`, `Dependency Review`, and `CodeQL` checks, enable secret scanning and push protection, and keep Vercel Deployment Checks aligned with the required GitHub checks.
+
+Operational details and follow-up recommendations live in `techspec/github-operations.md`.
 
 ## Database
 The Prisma schema lives in `prisma/schema.prisma`.

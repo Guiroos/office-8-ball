@@ -36,6 +36,7 @@ When sources disagree, use this priority:
 
 Practical note:
 - `techspec/` is now the main home for technical documentation and next-step analysis.
+- GitHub operational hardening, CI and repository protection now live in `techspec/github-operations.md`.
 
 ## Current Architecture
 
@@ -179,6 +180,18 @@ Prefer short corrections over broad doc rewrites.
 
 Use this as the default review map before editing:
 
+### GitHub Actions or repository operations changes
+
+Read:
+
+1. `techspec/github-operations.md`
+2. `README.md`
+3. `package.json`
+4. `.github/workflows/*`
+
+Constraint:
+- keep Vercel as the deployment platform; use GitHub for validation and repository protection
+
 ### Scoreboard or match-history changes
 
 Read:
@@ -232,7 +245,7 @@ Common commands:
 ```bash
 npm run lint
 npm run test
-npx tsc --noEmit
+npm run typecheck
 npm run build
 ```
 
