@@ -14,6 +14,9 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/office_8_ball_ci
+      NEXTAUTH_SECRET: ci-test-secret
 
     steps:
       - name: Checkout repository
