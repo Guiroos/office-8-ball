@@ -1,8 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+let currentUser: { id: string; username: string; email: string } | null = {
+  id: "user-1",
+  username: "gui.dev",
+  email: "gui@office8ball.dev",
+};
+
+vi.mock("@/lib/auth", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
+
+  return {
+    ...actual,
+    getAuthenticatedUser: vi.fn(async () => currentUser),
+  };
+});
+
 describe("/api/matches", () => {
   beforeEach(() => {
     delete process.env.DATABASE_URL;
+    currentUser = {
+      id: "user-1",
+      username: "gui.dev",
+      email: "gui@office8ball.dev",
+    };
     vi.resetModules();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-12T10:00:00.000Z"));
@@ -81,5 +101,18 @@ describe("/api/matches", () => {
       error: "note must be a string with at most 140 characters.",
     });
     expect(response.status).toBe(400);
+  });
+
+  it("rejects unauthenticated access", async () => {
+    currentUser = null;
+
+    const route = await import("@/app/api/matches/route");
+
+    const response = await route.GET();
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Autenticacao obrigatoria.",
+    });
+    expect(response.status).toBe(401);
   });
 });

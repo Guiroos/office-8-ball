@@ -17,7 +17,7 @@ export function DashboardHero({
   environmentLabel: string;
 }) {
   return (
-    <Card className="overflow-hidden bg-[linear-gradient(135deg,rgba(255,252,246,0.88),rgba(226,209,178,0.74))]">
+    <Card className="overflow-hidden bg-[image:var(--hero-gradient)]">
       <CardContent className="grid gap-6 px-6 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(19rem,0.9fr)] lg:items-end">
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-3">
@@ -41,7 +41,7 @@ export function DashboardHero({
           </div>
         </div>
 
-        <div className="grid gap-4 rounded-[26px] border border-white/40 bg-white/55 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-sm">
+        <div className="grid gap-4 rounded-[26px] border border-[color:var(--border-strong)] bg-[color:var(--surface-muted)] p-5 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-foreground)]">
@@ -53,15 +53,15 @@ export function DashboardHero({
                   : getLeadLabel(scoreboard)}
               </p>
             </div>
-            <div className="rounded-full bg-black/6 p-3 text-[color:var(--foreground)]">
+            <div className="rounded-full bg-[color:var(--surface-emphasis)] p-3 text-[color:var(--foreground)]">
               <Trophy className="size-5" />
             </div>
           </div>
 
-          <Separator className="bg-black/8" />
+          <Separator className="bg-[color:var(--border)]" />
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-[20px] border border-black/6 bg-white/55 p-4">
+            <div className="rounded-[20px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
                 Total
               </p>
@@ -73,7 +73,7 @@ export function DashboardHero({
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-black/6 bg-white/55 p-4">
+            <div className="rounded-[20px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
                 Streak
               </p>

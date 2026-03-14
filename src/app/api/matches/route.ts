@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getAuthenticatedUser, getAuthRequiredResponse } from "@/lib/auth";
 import { TEAMS } from "@/lib/constants";
 import { createMatch, listMatches } from "@/lib/data";
 import type {
@@ -13,12 +14,24 @@ function isValidTeamId(value: unknown): value is TeamId {
 }
 
 export async function GET() {
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    return getAuthRequiredResponse();
+  }
+
   const matches = await listMatches();
 
   return NextResponse.json<MatchesResponse>({ matches });
 }
 
 export async function POST(request: Request) {
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    return getAuthRequiredResponse();
+  }
+
   const payload = (await request.json().catch(() => null)) as
     | { winnerTeamId?: unknown; note?: unknown }
     | null;
