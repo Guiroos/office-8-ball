@@ -1,31 +1,116 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #efe4ce;
+  --background-subtle: #f6eddd;
   --background-strong: #dbc6a3;
   --foreground: #1f1b17;
+  --foreground-soft: #382d24;
   --foreground-inverse: #fff9ef;
   --muted-foreground: #6a5a4b;
-  --card: rgba(255, 251, 245, 0.84);
-  --card-strong: rgba(32, 27, 23, 0.9);
-  --card-strong-foreground: #fff6e7;
+  --surface: rgba(255, 251, 245, 0.84);
+  --surface-muted: rgba(255, 255, 255, 0.58);
+  --surface-emphasis: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(32, 27, 23, 0.9);
+  --surface-strong-muted: rgba(255, 255, 255, 0.06);
+  --surface-strong-foreground: #fff6e7;
+  --surface-strong-foreground-muted: rgba(255, 246, 231, 0.72);
+  --surface-success: #edf4ea;
+  --surface-danger: #fff1ef;
+  --surface-brand: rgba(18, 43, 32, 0.74);
+  --card: var(--surface);
+  --card-strong: var(--surface-strong);
+  --card-strong-foreground: var(--surface-strong-foreground);
   --border: rgba(43, 33, 26, 0.12);
   --border-strong: rgba(43, 33, 26, 0.24);
+  --border-inverse: rgba(255, 255, 255, 0.14);
   --ring: rgba(199, 149, 31, 0.9);
+  --danger: #9f3d31;
   --frontend: #166657;
   --frontend-soft: #d7f0e7;
   --backend: #9f3d31;
   --backend-soft: #f5ddd8;
   --gold: #c7951f;
   --gold-soft: rgba(199, 149, 31, 0.16);
+  --hero-gradient: linear-gradient(135deg, rgba(255, 252, 246, 0.88), rgba(226, 209, 178, 0.74));
+  --brand-gradient: linear-gradient(135deg, rgba(22, 102, 87, 0.96), rgba(10, 45, 39, 0.92));
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.46), transparent 34%),
+    radial-gradient(circle at 85% 0%, rgba(199, 149, 31, 0.18), transparent 26%),
+    linear-gradient(135deg, #f6eddd 0%, #e9deca 46%, #d8c29f 100%);
+  --page-grid: rgba(255, 255, 255, 0.06);
   --shadow-lg: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-button: 0 14px 30px rgba(13, 18, 14, 0.18);
+  --shadow-brand: 0 20px 45px rgba(19, 74, 50, 0.28);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #07110d;
+  --background-subtle: #0c1914;
+  --background-strong: #13241d;
+  --foreground: #edf2e7;
+  --foreground-soft: #dbe4d5;
+  --foreground-inverse: #0b1510;
+  --muted-foreground: #9eb2a6;
+  --surface: rgba(11, 22, 17, 0.86);
+  --surface-muted: rgba(255, 255, 255, 0.06);
+  --surface-emphasis: rgba(17, 33, 26, 0.86);
+  --surface-strong: rgba(235, 242, 231, 0.1);
+  --surface-strong-muted: rgba(255, 255, 255, 0.08);
+  --surface-strong-foreground: #f7f8f2;
+  --surface-strong-foreground-muted: rgba(247, 248, 242, 0.72);
+  --surface-success: rgba(24, 58, 44, 0.58);
+  --surface-danger: rgba(99, 36, 29, 0.38);
+  --surface-brand: rgba(12, 33, 24, 0.82);
+  --border: rgba(214, 229, 219, 0.12);
+  --border-strong: rgba(214, 229, 219, 0.2);
+  --border-inverse: rgba(255, 255, 255, 0.14);
+  --ring: rgba(229, 188, 84, 0.88);
+  --danger: #e59b90;
+  --frontend: #3fc49d;
+  --frontend-soft: rgba(63, 196, 157, 0.16);
+  --backend: #d86f61;
+  --backend-soft: rgba(216, 111, 97, 0.18);
+  --gold: #e5bc54;
+  --gold-soft: rgba(229, 188, 84, 0.18);
+  --hero-gradient: linear-gradient(135deg, rgba(16, 31, 24, 0.92), rgba(27, 47, 39, 0.86));
+  --brand-gradient: linear-gradient(135deg, rgba(18, 67, 56, 0.94), rgba(7, 19, 15, 0.98));
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(69, 118, 96, 0.22), transparent 30%),
+    radial-gradient(circle at 85% 0%, rgba(229, 188, 84, 0.12), transparent 24%),
+    linear-gradient(150deg, #08110d 0%, #0b1712 42%, #13241d 100%);
+  --page-grid: rgba(255, 255, 255, 0.05);
+  --shadow-lg: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-button: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --shadow-brand: 0 20px 45px rgba(0, 0, 0, 0.28);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
   --color-foreground: var(--foreground);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-foreground-inverse: var(--foreground-inverse);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-emphasis: var(--surface-emphasis);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-strong-foreground: var(--surface-strong-foreground);
+  --color-surface-success: var(--surface-success);
+  --color-surface-danger: var(--surface-danger);
   --color-card: var(--card);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-danger: var(--danger);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-frontend: var(--frontend);
+  --color-frontend-soft: var(--frontend-soft);
+  --color-backend: var(--backend);
+  --color-backend-soft: var(--backend-soft);
 }
 
 * {
@@ -42,10 +127,7 @@ body {
 body {
   margin: 0;
   color: var(--foreground);
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.46), transparent 34%),
-    radial-gradient(circle at 85% 0%, rgba(199, 149, 31, 0.18), transparent 26%),
-    linear-gradient(135deg, #f6eddd 0%, #e9deca 46%, #d8c29f 100%);
+  background: var(--page-gradient);
   font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -57,8 +139,8 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(var(--page-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--page-grid) 1px, transparent 1px);
   background-size: 24px 24px;
   mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
   opacity: 0.22;

@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)] shadow-[0_12px_30px_rgba(13,18,14,0.18)] hover:-translate-y-0.5",
+          "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-button)] hover:-translate-y-0.5 hover:bg-[color:var(--foreground-soft)]",
         ghost:
-          "bg-transparent text-[color:var(--foreground)] hover:bg-white/60",
+          "border border-[color:var(--border)] bg-[color:var(--surface-muted)] text-[color:var(--foreground)] hover:bg-[color:var(--surface-emphasis)]",
         frontend:
-          "bg-[color:var(--frontend)] text-white shadow-[0_14px_30px_rgba(12,74,63,0.26)] hover:-translate-y-0.5",
+          "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-button)] hover:-translate-y-0.5 hover:brightness-110",
         backend:
-          "bg-[color:var(--backend)] text-white shadow-[0_14px_30px_rgba(124,45,36,0.24)] hover:-translate-y-0.5",
+          "bg-[color:var(--backend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-button)] hover:-translate-y-0.5 hover:brightness-110",
       },
       size: {
         default: "h-11 px-5",
