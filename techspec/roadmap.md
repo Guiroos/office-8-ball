@@ -23,6 +23,10 @@ Prioridade: alta
 - Avaliar rate limit como etapa posterior, sem aumentar complexidade prematuramente
 - Confirmar no backend qualquer regra de permissao futura; nao depender apenas da UI
 
+Nota:
+- a base operacional de repositorio, CI, CodeQL, Dependabot e review de dependencias agora esta documentada em `github-operations.md`
+- os proximos passos aqui ficam restritos a gaps ainda nao implementados no codigo ou na configuracao
+
 ### 2. Consolidacao do sistema de tema
 
 Prioridade: media
@@ -37,6 +41,7 @@ Prioridade: media
 
 - Considerar testes integrados com Prisma real
 - Considerar cobertura E2E para login e scoreboard
+- Avaliar `SonarQube Cloud` para code smells e quality gate de maintainability
 - Manter contratos de API e fluxo da UI sincronizados em qualquer evolucao
 
 ### 4. Expansao de dominio
