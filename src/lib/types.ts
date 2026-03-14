@@ -47,3 +47,18 @@ export type CreateMatchResponse = {
   match: MatchRecord;
   message: string;
 };
+
+export type SessionUser = {
+  id: string;
+  username: string;
+  email: string;
+};
+
+export type RegisterUserResponse = {
+  user: SessionUser;
+};
+
+export type ApiErrorResponse = {
+  error: string;
+  fieldErrors?: Partial<Record<"username" | "email" | "password", string>>;
+};

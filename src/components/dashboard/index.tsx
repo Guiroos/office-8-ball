@@ -1,12 +1,15 @@
 "use client";
 
-import { Swords } from "lucide-react";
+import { LogOut, Swords } from "lucide-react";
 import { startTransition } from "react";
+import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { TEAMS } from "@/lib/constants";
+import type { SessionUser } from "@/lib/types";
 
 import { DashboardHero } from "./dashboard-hero";
 import { DashboardSidebar } from "./dashboard-sidebar";
@@ -40,8 +43,8 @@ function TeamScoreCard({
         backgroundColor: team.accentSoft,
         color: "var(--foreground)",
         outline: isLeader
-          ? "3px solid rgba(199, 149, 31, 0.75)"
-          : "1px solid rgba(43, 33, 26, 0.08)",
+          ? "3px solid var(--gold)"
+          : "1px solid var(--border)",
       }}
     >
       <CardContent className="space-y-6 p-6">
@@ -59,7 +62,7 @@ function TeamScoreCard({
           </div>
 
           {isLeader ? (
-            <Badge className="border-[color:var(--gold)] bg-[color:var(--gold-soft)] text-[color:#6f4a00]">
+            <Badge className="border-[color:var(--gold)] bg-[color:var(--gold-soft)] text-[color:var(--foreground-soft)]">
               líder
             </Badge>
           ) : null}
@@ -101,7 +104,7 @@ function TeamScoreCard({
   );
 }
 
-export function Dashboard() {
+export function Dashboard({ user }: { user?: SessionUser }) {
   const {
     scoreboard,
     matches,
@@ -119,53 +122,85 @@ export function Dashboard() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+      {user ? (
+        <div className="flex flex-col gap-3 rounded-[24px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-5 py-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
+              Sessao ativa
+            </p>
+            <p className="mt-1 text-lg font-semibold text-[color:var(--foreground)]">
+              {user.username}
+            </p>
+            <p className="text-sm text-[color:var(--muted-foreground)]">{user.email}</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <ThemeToggle className="h-11 rounded-[18px] px-4" />
+            <Button
+              variant="ghost"
+              className="h-11 rounded-[18px] px-4"
+              onClick={() => {
+                void signOut({ callbackUrl: "/login" });
+              }}
+            >
+              <LogOut className="size-4" />
+              Sair
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <DashboardHero
         loading={loading}
         scoreboard={scoreboard}
         environmentLabel={getEnvironmentLabel()}
       />
 
-      <Card className="overflow-hidden border-white/10 bg-[color:var(--card-strong)] text-[color:var(--card-strong-foreground)]">
+      <Card className="overflow-hidden border-[color:var(--border-inverse)] bg-[color:var(--surface-strong)] text-[color:var(--surface-strong-foreground)]">
         <CardContent className="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <CardHeader className="gap-3">
-              <Badge className="border-white/15 bg-white/6 text-white/70">Placar atual</Badge>
+              <Badge className="border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground-muted)]">
+                Placar atual
+              </Badge>
               <CardTitle>Frontend vs Backend</CardTitle>
-              <CardDescription className="max-w-xl text-white/72">
+              <CardDescription className="max-w-xl text-[color:var(--surface-strong-foreground-muted)]">
                 Registro rápido, sem rodeio e sem update otimista antes da persistência
                 fechar.
               </CardDescription>
             </CardHeader>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[22px] border border-white/10 bg-white/6 p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
                   Liderança
                 </p>
                 <p className="mt-2 text-lg font-semibold">{getLeaderName(scoreboard)}</p>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
                   {scoreboard?.leadBy ? `${scoreboard.leadBy} de vantagem` : "sem folga"}
                 </p>
               </div>
 
-              <div className="rounded-[22px] border border-white/10 bg-white/6 p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
                   Ritmo
                 </p>
                 <p className="mt-2 text-lg font-semibold">
                   {loading ? "Carregando..." : "Mesa pronta"}
                 </p>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
                   {submittingTeamId ? "gravando partida" : "aguardando a próxima treta"}
                 </p>
               </div>
 
-              <div className="rounded-[22px] border border-white/10 bg-white/6 p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
                   Ambiente
                 </p>
                 <p className="mt-2 text-lg font-semibold">{getEnvironmentLabel()}</p>
-                <p className="mt-1 text-sm text-white/55">mesma interface, clima diferente</p>
+                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
+                  mesma interface, clima diferente
+                </p>
               </div>
             </div>
           </div>
