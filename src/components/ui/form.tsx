@@ -35,7 +35,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         aria-invalid={invalid || ariaInvalid ? true : undefined}
         className={cn(
-          "h-13 w-full rounded-[20px] border bg-[color:var(--surface-emphasis)] px-4 text-[color:var(--foreground)] outline-none transition disabled:cursor-not-allowed disabled:bg-[color:var(--surface-muted)]",
+          "h-13 w-full rounded-[var(--radius-md)] border bg-[color:var(--surface-emphasis)] px-4 text-[color:var(--foreground)] outline-none transition disabled:cursor-not-allowed disabled:bg-[color:var(--surface-muted)]",
           invalid
             ? "border-[color:var(--danger)] focus:border-[color:var(--danger)] focus:ring-2 focus:ring-[color:var(--backend-soft)]"
             : "border-[color:var(--border)] focus:border-[color:var(--frontend)] focus:ring-2 focus:ring-[color:var(--frontend-soft)]",

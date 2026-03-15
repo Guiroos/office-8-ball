@@ -169,6 +169,21 @@ describe("Dashboard", () => {
       expect(screen.getByText(createMatchResponse.message)).toBeInTheDocument();
     });
 
+    const frontendCard = screen
+      .getByRole("button", { name: "Vitória Frontend" })
+      .closest("[data-team='frontend']");
+    const backendCard = screen
+      .getByRole("button", { name: "Vitória Backend" })
+      .closest("[data-team='backend']");
+
+    expect(frontendCard).toHaveAttribute("data-leader", "true");
+    expect(frontendCard).toHaveClass("bg-[color:var(--frontend-soft)]");
+    expect(frontendCard).toHaveClass("ring-[color:var(--gold)]");
+    expect(frontendCard).not.toHaveAttribute("style");
+    expect(backendCard).toHaveAttribute("data-leader", "false");
+    expect(backendCard).toHaveClass("bg-[color:var(--backend-soft)]");
+    expect(backendCard).not.toHaveAttribute("style");
+
     expect(await screen.findByText("Frontend lidera por 1.")).toBeInTheDocument();
     expect(await screen.findByText("1x")).toBeInTheDocument();
     expect(screen.queryByText("Nenhuma partida registrada ainda.")).not.toBeInTheDocument();

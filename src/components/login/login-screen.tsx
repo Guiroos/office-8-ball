@@ -56,7 +56,7 @@ const INITIAL_TOUCHED_FIELDS = {
 };
 
 const SEGMENT_BUTTON_BASE_CLASS =
-  "rounded-[18px] px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed";
+  "rounded-[var(--radius-sm)] px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed";
 
 export function LoginScreen({
   authAvailable,
@@ -272,13 +272,13 @@ export function LoginScreen({
   return (
     <main className="min-h-screen overflow-x-clip bg-[image:var(--brand-gradient)]">
       <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-        <header className="flex flex-none items-center justify-between gap-4 rounded-[28px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-[color:var(--surface-strong-foreground)] shadow-[var(--shadow-brand)] backdrop-blur-xl sm:px-6">
+        <header className="flex flex-none items-center justify-between gap-4 rounded-[var(--radius-xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-[color:var(--surface-strong-foreground)] shadow-[var(--shadow-brand)] backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-full border border-[color:var(--gold-soft)] bg-[color:var(--surface-strong-muted)] text-[color:var(--gold)]">
+            <div className="flex size-11 items-center justify-center rounded-[var(--radius-pill)] border border-[color:var(--gold-soft)] bg-[color:var(--surface-strong-muted)] text-[color:var(--gold)]">
               <LockKeyhole className="size-5" />
             </div>
             <div>
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[color:var(--surface-strong-foreground-muted)]">
+              <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-[color:var(--surface-strong-foreground-muted)]">
                 Office 8 Ball
               </p>
               <h1 className="text-lg font-black tracking-[-0.03em] text-[color:var(--surface-strong-foreground)] sm:text-xl">
@@ -291,13 +291,13 @@ export function LoginScreen({
             <p className="hidden max-w-xs text-right text-sm text-[color:var(--surface-strong-foreground-muted)] lg:block">
               A mesa continua verde, agora com acesso controlado.
             </p>
-            <ThemeToggle className="h-11 rounded-[18px] border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground)] hover:bg-[color:var(--surface-muted)]" />
+            <ThemeToggle className="h-11 rounded-[var(--radius-sm)] border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground)] hover:bg-[color:var(--surface-muted)]" />
           </div>
         </header>
 
         <section className="flex min-h-0 flex-1 py-4 lg:py-5">
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
-            <aside className="relative hidden min-h-0 overflow-hidden rounded-[32px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[0_28px_80px_rgba(2,10,7,0.38)] lg:flex">
+            <aside className="relative hidden min-h-0 overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[var(--shadow-brand)] lg:flex">
               <Image
                 src="/login/login-onboarding.png"
                 alt="Mesa de sinuca estilizada representando a rivalidade entre frontend e backend."
@@ -308,11 +308,11 @@ export function LoginScreen({
               <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(5,15,10,0.78)_0%,rgba(7,20,14,0.24)_45%,rgba(179,143,71,0.12)_100%)]" />
               <div className="relative flex h-full flex-col justify-between p-8 text-[color:var(--surface-strong-foreground)] xl:p-10">
                 <div className="max-w-md space-y-5">
-                  <span className="inline-flex rounded-full border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--surface-strong-foreground-muted)]">
+                  <span className="inline-flex rounded-[var(--radius-pill)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] px-4 py-2 text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
                     Frontend vs Backend
                   </span>
                   <div className="space-y-4">
-                    <h2 className="font-['Copperplate','Impact','Arial_Narrow_Bold',sans-serif] text-[clamp(3rem,4vw,4.8rem)] leading-[0.95] tracking-[0.02em] text-[color:var(--surface-strong-foreground)]">
+                    <h2 className="[font-family:var(--font-display)] text-[length:var(--text-display-md)] leading-[0.95] tracking-[0.02em] text-[color:var(--surface-strong-foreground)]">
                       A mesa abre antes do deploy.
                     </h2>
                     <p className="max-w-md text-base leading-7 text-[color:var(--surface-strong-foreground-muted)]">
@@ -326,7 +326,7 @@ export function LoginScreen({
                   {TRUST_SIGNALS.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-4 py-3 backdrop-blur-sm"
+                      className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-4 py-3 backdrop-blur-sm"
                     >
                       <p className="text-sm font-medium text-[color:var(--surface-strong-foreground)]">
                         {item}
@@ -338,15 +338,15 @@ export function LoginScreen({
             </aside>
 
             <section className="flex min-h-0 items-center justify-center">
-              <div className="w-full max-w-[540px] rounded-[32px] border border-[color:var(--border)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow-lg)] sm:p-8 lg:p-9">
+              <div className="w-full max-w-[540px] rounded-[var(--radius-2xl)] border border-[color:var(--border)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow-lg)] sm:p-8 lg:p-9">
                 <div className="space-y-6">
                   <div className="space-y-4">
-                    <span className="inline-flex rounded-full border border-[color:var(--border)] bg-[color:var(--surface-success)] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--frontend)]">
+                    <span className="inline-flex rounded-[var(--radius-pill)] border border-[color:var(--border)] bg-[color:var(--surface-success)] px-4 py-2 text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--frontend)]">
                       Entrar no salao
                     </span>
 
                     <div className="space-y-3">
-                      <h2 className="text-[clamp(2rem,4vw,2.75rem)] font-black leading-none tracking-[-0.05em] text-[color:var(--foreground)]">
+                      <h2 className="text-[length:var(--text-display-sm)] font-black leading-none tracking-[-0.05em] text-[color:var(--foreground)]">
                         {isRegisterMode
                           ? "Crie a conta basica para liberar a mesa."
                           : "Entre para registrar a proxima vitoria."}
@@ -358,12 +358,12 @@ export function LoginScreen({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 rounded-[24px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-2">
+                  <div className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-2">
                     <button
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         !isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-button)]"
+                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)]"
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("login")}
@@ -375,7 +375,7 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-button)]"
+                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)]"
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("register")}
@@ -450,7 +450,7 @@ export function LoginScreen({
                       </FieldError>
                     </Field>
 
-                    <div className="flex items-center justify-between gap-4 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--surface-success)] px-4 py-3 text-sm text-[color:var(--foreground-soft)]">
+                    <div className="flex items-center justify-between gap-4 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-success)] px-4 py-3 text-sm text-[color:var(--foreground-soft)]">
                       <span>
                         {authAvailable
                           ? "Sessao local pronta para liberar o placar."
@@ -465,7 +465,7 @@ export function LoginScreen({
                     </div>
 
                     {generalError ? (
-                      <div className="rounded-[20px] border border-[color:var(--backend-soft)] bg-[color:var(--surface-danger)] px-4 py-3 text-sm text-[color:var(--danger)]">
+                      <div className="rounded-[var(--radius-md)] border border-[color:var(--backend-soft)] bg-[color:var(--surface-danger)] px-4 py-3 text-sm text-[color:var(--danger)]">
                         {generalError}
                       </div>
                     ) : null}
@@ -473,16 +473,16 @@ export function LoginScreen({
                     <Button
                       type="submit"
                       size="lg"
-                      className="h-14 w-full rounded-[20px] text-base shadow-[var(--shadow-brand)]"
+                      className="h-14 w-full rounded-[var(--radius-md)] text-base shadow-[var(--shadow-brand)]"
                       disabled={isSubmitDisabled}
                     >
                       {submitLabel}
                     </Button>
                   </form>
 
-                  <div className="rounded-[24px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
+                  <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex size-9 items-center justify-center rounded-full bg-[color:var(--surface-success)] text-[color:var(--frontend)]">
+                      <div className="mt-0.5 flex size-9 items-center justify-center rounded-[var(--radius-pill)] bg-[color:var(--surface-success)] text-[color:var(--frontend)]">
                         <ShieldCheck className="size-4" />
                       </div>
                       <div className="space-y-1">
@@ -501,7 +501,7 @@ export function LoginScreen({
           </div>
         </section>
 
-        <footer className="flex flex-none flex-col items-center justify-between gap-3 rounded-[28px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-sm text-[color:var(--surface-strong-foreground-muted)] backdrop-blur-xl sm:flex-row sm:px-6">
+        <footer className="flex flex-none flex-col items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-sm text-[color:var(--surface-strong-foreground-muted)] backdrop-blur-xl sm:flex-row sm:px-6">
           <p>Office 8 Ball agora separa preview visual de acesso real com sessao.</p>
           <div className="flex items-center gap-3 text-[color:var(--gold)]">
             <span className="h-2 w-2 rounded-full bg-current" />

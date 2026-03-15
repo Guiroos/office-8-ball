@@ -32,7 +32,6 @@ Ferramentas atuais:
 
 - nao ha testes integrados com Prisma real
 - nao ha E2E de navegador para `/login` e `/scoreboard`
-- nao ha cobertura dedicada para o script inline de tema em `src/app/layout.tsx`
 
 ## Validacao minima por tipo de mudanca
 
@@ -60,6 +59,13 @@ Ferramentas atuais:
 - `npm run lint`
 - `npm run typecheck`
 - `npm run build`
+
+### Sistema de tema
+
+- `npm run test -- src/components/theme/theme-core.test.ts`
+- `npm run test -- src/components/theme/theme-provider.test.tsx`
+- `npm run test -- src/components/theme/theme-toggle.test.tsx`
+- `npm run test -- src/components/dashboard.test.tsx`
 
 ## Regras praticas
 

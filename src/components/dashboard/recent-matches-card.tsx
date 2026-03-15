@@ -15,7 +15,7 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
         </CardHeader>
 
         {matches.length === 0 ? (
-          <div className="rounded-[22px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-5">
+          <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-5">
             <strong className="block text-lg font-semibold">
               Nenhuma partida registrada ainda.
             </strong>
@@ -29,7 +29,7 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
               {matches.map((match) => (
                 <li
                   key={match.id}
-                  className="grid gap-3 rounded-[22px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="grid gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <div className="space-y-1">
                     <strong className="block text-lg font-semibold">{match.winnerName}</strong>

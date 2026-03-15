@@ -1,5 +1,6 @@
 "use client";
 
+import { cva } from "class-variance-authority";
 import { LogOut, Swords } from "lucide-react";
 import { startTransition } from "react";
 import { signOut } from "next-auth/react";
@@ -16,6 +17,34 @@ import { DashboardSidebar } from "./dashboard-sidebar";
 import { getEnvironmentLabel, getLeaderName } from "./dashboard-utils";
 import { RecentMatchesCard } from "./recent-matches-card";
 import { useDashboardData } from "./use-dashboard-data";
+
+const teamScoreCardVariants = cva(
+  "overflow-hidden border shadow-none text-[color:var(--foreground)]",
+  {
+    variants: {
+      team: {
+        frontend: "bg-[color:var(--frontend-soft)]",
+        backend: "bg-[color:var(--backend-soft)]",
+      },
+      leader: {
+        true: "border-[color:var(--gold)] ring-2 ring-[color:var(--gold)]",
+        false: "border-[color:var(--border)]",
+      },
+    },
+  },
+);
+
+const teamScoreBadgeVariants = cva(
+  "hidden rounded-[var(--radius-pill)] p-3 lg:block",
+  {
+    variants: {
+      team: {
+        frontend: "bg-[color:var(--frontend)]",
+        backend: "bg-[color:var(--backend)]",
+      },
+    },
+  },
+);
 
 function TeamScoreCard({
   teamId,
@@ -38,19 +67,17 @@ function TeamScoreCard({
 
   return (
     <Card
-      className="overflow-hidden border-none shadow-none"
-      style={{
-        backgroundColor: team.accentSoft,
-        color: "var(--foreground)",
-        outline: isLeader
-          ? "3px solid var(--gold)"
-          : "1px solid var(--border)",
-      }}
+      className={teamScoreCardVariants({
+        team: team.id,
+        leader: isLeader,
+      })}
+      data-leader={isLeader}
+      data-team={team.id}
     >
       <CardContent className="space-y-6 p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
               {team.displayName}
             </p>
             <div>
@@ -70,18 +97,15 @@ function TeamScoreCard({
 
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
               Vitórias
             </p>
-            <p className="font-['Copperplate','Impact','Arial_Narrow_Bold',sans-serif] text-[clamp(4rem,12vw,6rem)] leading-none tracking-[0.03em]">
+            <p className="[font-family:var(--font-display)] text-[length:var(--text-score)] leading-none tracking-[0.03em]">
               {wins}
             </p>
           </div>
 
-          <div
-            className="hidden rounded-full p-3 lg:block"
-            style={{ backgroundColor: team.accent }}
-          >
+          <div className={teamScoreBadgeVariants({ team: team.id })}>
             <Swords className="size-5 text-white" />
           </div>
         </div>
@@ -123,9 +147,9 @@ export function Dashboard({ user }: { user?: SessionUser }) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
       {user ? (
-        <div className="flex flex-col gap-3 rounded-[24px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-5 py-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-5 py-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
               Sessao ativa
             </p>
             <p className="mt-1 text-lg font-semibold text-[color:var(--foreground)]">
@@ -135,10 +159,10 @@ export function Dashboard({ user }: { user?: SessionUser }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <ThemeToggle className="h-11 rounded-[18px] px-4" />
+            <ThemeToggle className="h-11 rounded-[var(--radius-sm)] px-4" />
             <Button
               variant="ghost"
-              className="h-11 rounded-[18px] px-4"
+              className="h-11 rounded-[var(--radius-sm)] px-4"
               onClick={() => {
                 void signOut({ callbackUrl: "/login" });
               }}
@@ -171,8 +195,8 @@ export function Dashboard({ user }: { user?: SessionUser }) {
             </CardHeader>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
+              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
                   Liderança
                 </p>
                 <p className="mt-2 text-lg font-semibold">{getLeaderName(scoreboard)}</p>
@@ -181,8 +205,8 @@ export function Dashboard({ user }: { user?: SessionUser }) {
                 </p>
               </div>
 
-              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
+              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
                   Ritmo
                 </p>
                 <p className="mt-2 text-lg font-semibold">
@@ -193,8 +217,8 @@ export function Dashboard({ user }: { user?: SessionUser }) {
                 </p>
               </div>
 
-              <div className="rounded-[22px] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--surface-strong-foreground-muted)]">
+              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
+                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
                   Ambiente
                 </p>
                 <p className="mt-2 text-lg font-semibold">{getEnvironmentLabel()}</p>

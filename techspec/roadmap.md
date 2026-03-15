@@ -27,14 +27,6 @@ Nota:
 - a base operacional de repositorio, CI, CodeQL, Dependabot e review de dependencias agora esta documentada em `github-operations.md`
 - os proximos passos aqui ficam restritos a gaps ainda nao implementados no codigo ou na configuracao
 
-### 2. Consolidacao do sistema de tema
-
-Prioridade: media
-
-- Tornar `useTheme()` estrito novamente
-- Padronizar escala minima de radius, sombra e tipografia
-- Remover dependencias de `style` inline onde a semantica de componente for suficiente
-
 ### 3. Fechar gaps de qualidade
 
 Prioridade: media

@@ -41,7 +41,7 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - `src/components/dashboard/*`
   - tela principal de placar, historico e registro de vitoria
 - `src/components/theme/*`
-  - provider, toggle e comportamento de tema
+  - provider, toggle, helper compartilhado de bootstrap/resolve e comportamento de tema
 - `src/components/ui/*`
   - primitives locais reutilizaveis
 

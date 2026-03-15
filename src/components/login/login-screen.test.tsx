@@ -8,6 +8,14 @@ const pushMock = vi.fn();
 const refreshMock = vi.fn();
 const signInMock = vi.fn();
 
+vi.mock("@/components/theme/theme-toggle", () => ({
+  ThemeToggle: ({ className }: { className?: string }) => (
+    <button type="button" className={className}>
+      Tema
+    </button>
+  ),
+}));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: pushMock,
