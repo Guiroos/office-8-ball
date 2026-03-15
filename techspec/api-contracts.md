@@ -139,5 +139,6 @@ Erros:
 
 - O dashboard busca `/api/scoreboard` e `/api/matches` separadamente
 - Apos registrar vitoria, a UI reconsulta ambos os endpoints
+- A UI atual renderiza `note` no historico quando esse dado ja existe
 - A UI atual ainda nao envia `note`, embora a API aceite esse campo
 - Mudancas de wire shape exigem atualizacao coordenada entre API e dashboard
