@@ -200,6 +200,22 @@ describe("LoginScreen", () => {
     fetchMock.mockRestore();
   });
 
+  it("shows a generic wait message when login is rate limited", async () => {
+    const user = userEvent.setup();
+    signInMock.mockResolvedValue({ ok: false, error: "AuthRateLimited" });
+
+    render(<LoginScreen authAvailable />);
+
+    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Senha"), "secret123");
+    await user.click(screen.getAllByRole("button", { name: "Entrar" })[1]);
+
+    expect(
+      await screen.findByText("Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente."),
+    ).toBeInTheDocument();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
   it("keeps auth disabled when DATABASE_URL is unavailable", () => {
     render(<LoginScreen authAvailable={false} />);
 

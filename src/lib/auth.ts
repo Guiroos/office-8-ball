@@ -5,10 +5,21 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
 
 import {
+  AUTH_RATE_LIMIT_ERROR,
+  buildAuthRateLimitKey,
+  clearAuthRateLimit,
+  getAuthRateLimitStatus,
+  registerAuthFailure,
+} from "@/lib/auth-rate-limit";
+import {
   validateLoginPayload,
 } from "@/lib/auth-validation";
 import { prisma } from "@/lib/prisma";
 import type { ApiErrorResponse, SessionUser } from "@/lib/types";
+
+type AuthRequestLike = {
+  headers?: Record<string, string | string[] | undefined>;
+};
 
 const AUTH_DISABLED_SECRET = "auth-disabled-no-database";
 const AUTH_UNAVAILABLE_DATABASE_ERROR =
@@ -108,7 +119,7 @@ export function getAuthOptions(): NextAuthOptions {
           email: { label: "Email", type: "email" },
           password: { label: "Senha", type: "password" },
         },
-        async authorize(credentials) {
+        async authorize(credentials, request) {
           if (!isAuthAvailable()) {
             return null;
           }
@@ -123,19 +134,44 @@ export function getAuthOptions(): NextAuthOptions {
           }
 
           const { email, password } = validation.data;
+          const rateLimitKey = buildAuthRateLimitKey({
+            action: "login",
+            email,
+            headers: (request as AuthRequestLike | undefined)?.headers,
+          });
+          const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);
+
+          if (rateLimitStatus.blocked) {
+            throw new Error(AUTH_RATE_LIMIT_ERROR);
+          }
+
           const user = await prisma.user.findUnique({
             where: { email },
           });
 
           if (!user) {
+            const failure = await registerAuthFailure(rateLimitKey);
+
+            if (failure.blocked) {
+              throw new Error(AUTH_RATE_LIMIT_ERROR);
+            }
+
             return null;
           }
 
           const isPasswordValid = await compare(password, user.passwordHash);
 
           if (!isPasswordValid) {
+            const failure = await registerAuthFailure(rateLimitKey);
+
+            if (failure.blocked) {
+              throw new Error(AUTH_RATE_LIMIT_ERROR);
+            }
+
             return null;
           }
+
+          await clearAuthRateLimit(rateLimitKey);
 
           return {
             id: user.id,

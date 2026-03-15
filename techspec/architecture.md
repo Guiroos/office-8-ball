@@ -11,6 +11,7 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - Persistencia primaria em `Prisma + Postgres`
 - Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
 - Autenticacao por credenciais com `Auth.js`
+- Protecao contra brute force em auth persistida via Prisma
 - `middleware.ts` na raiz protege `/scoreboard` no nivel de roteamento
 - `NEXTAUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
 - Testes automatizados com `Vitest` + Testing Library
@@ -57,13 +58,15 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - schemas `zod`, normalizacao e mapeamento de erros
 - `src/lib/auth.ts`
   - configuracao e helpers de auth
+- `src/lib/auth-rate-limit.ts`
+  - estado e regras de rate limit por `email + ip`
 - `middleware.ts`
   - protecao de rota para `/scoreboard` com `withAuth`
 
 ### Persistencia
 
 - `prisma/schema.prisma`
-  - schema atual do banco
+  - schema atual do banco, incluindo `auth_rate_limits`
 - `prisma/seed.mjs`
   - seed dos dois times fixos
 - `src/lib/prisma.ts`
@@ -85,6 +88,6 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 
 ## Proximos passos relacionados
 
-- Implementar protecao contra brute force no auth sem aumentar complexidade prematuramente
 - Manter a documentacao tecnica sincronizada com o estado do codigo
+- Priorizar testes integrados com Prisma real para validar auth e rate limit sem mocks
 - So considerar expansao de dominio apos fechar os gaps operacionais do v1
