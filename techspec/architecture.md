@@ -11,6 +11,7 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - Persistencia primaria em `Prisma + Postgres`
 - Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
 - Autenticacao por credenciais com `Auth.js`
+- `middleware.ts` na raiz protege `/scoreboard` no nivel de roteamento
 - `NEXTAUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
 - Testes automatizados com `Vitest` + Testing Library
 
@@ -56,6 +57,8 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - schemas `zod`, normalizacao e mapeamento de erros
 - `src/lib/auth.ts`
   - configuracao e helpers de auth
+- `middleware.ts`
+  - protecao de rota para `/scoreboard` com `withAuth`
 
 ### Persistencia
 
