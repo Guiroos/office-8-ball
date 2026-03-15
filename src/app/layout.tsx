@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
@@ -38,7 +39,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
-        <ThemeProvider storageKey={THEME_STORAGE_KEY}>{children}</ThemeProvider>
+        <ThemeProvider storageKey={THEME_STORAGE_KEY}>
+          {children}
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );
