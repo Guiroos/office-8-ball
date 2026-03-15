@@ -43,6 +43,7 @@ Practical note:
 
 ### Routes
 
+- `middleware.ts`: route-level auth protection for `/scoreboard`
 - `src/app/page.tsx`: redirects by session state
 - `src/app/login/page.tsx`: login/signup page
 - `src/app/scoreboard/page.tsx`: main scoreboard page
@@ -129,7 +130,7 @@ Important:
 - The scoreboard UI fetches `/api/scoreboard` and `/api/matches`
 - After registering a win, the UI re-fetches both endpoints
 - The UI intentionally does not apply optimistic scoreboard updates before persistence succeeds
-- With `DATABASE_URL`, `/scoreboard` and the scoreboard APIs require an authenticated session
+- With `DATABASE_URL`, `middleware.ts` protects `/scoreboard` and the page/API layers also validate session
 - Without `DATABASE_URL`, auth stays disabled and the local scoreboard flow can still run only for development fallback
 - The login screen handles both `entrar` and `criar conta`
 - The login screen validates locally before submit and only calls auth endpoints when the current mode is valid

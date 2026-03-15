@@ -10,7 +10,8 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Login com `email + password`
 - Cadastro com `username + email + password`
 - Usuarios persistidos via Prisma em `users`
-- Rotas de scoreboard e APIs relacionadas exigem sessao autenticada
+- O fluxo autenticado real e `/scoreboard`
+- As APIs de scoreboard exigem sessao autenticada quando auth esta disponivel
 
 ## Fluxo funcional
 
@@ -19,6 +20,9 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Os schemas `zod` sao compartilhados entre frontend e backend
 - Erros locais aparecem por blur ou tentativa de submit
 - Erros remotos continuam aparecendo como field errors ou erro geral de submit
+- `/` redireciona para `/scoreboard` quando ha sessao e para `/login` quando nao ha
+- `middleware.ts` na raiz protege `/scoreboard` com `withAuth` quando `DATABASE_URL` esta configurado
+- `/scoreboard` tambem redireciona para `/login` quando nao existe usuario autenticado
 - Apos login bem-sucedido, o usuario segue para `/scoreboard`
 
 ## Dependencias de ambiente
@@ -48,11 +52,14 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 
 ## Pontos tecnicos relevantes
 
+- `middleware.ts` protege `/scoreboard` no nivel de roteamento e usa `/login` como `signIn`
 - `src/lib/auth-validation.ts` e a referencia para regras de campos
 - `src/lib/auth.ts` centraliza configuracao e helpers de sessao
-- `middleware.ts` protege o acesso a `/scoreboard`
+- `src/app/page.tsx` decide o redirecionamento inicial por sessao
+- `src/app/scoreboard/page.tsx` reforca a protecao do fluxo principal por redirecionamento server-side
 - `src/app/api/auth/register/route.ts` persiste o usuario
 - `src/app/api/auth/[...nextauth]/route.ts` executa o login por credenciais
+- `src/app/api/scoreboard/route.ts` e `src/app/api/matches/route.ts` retornam `401` sem sessao valida
 
 ## Gaps conhecidos
 
