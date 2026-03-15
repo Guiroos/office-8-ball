@@ -16,7 +16,7 @@ Use this file as the default operating guide for AI agents working in this repo.
 - The real functional flow today is the authenticated scoreboard at `/scoreboard`.
 - `/login` is the real login/signup entry screen.
 - `/login` uses a branded full-page layout with header, footer, and a desktop-first two-column composition.
-- Visual theme tokens live in `src/app/globals.css` and support shared light/dark styling across login and dashboard.
+- Visual theme tokens live in `src/app/globals.css`, including the shared foundation scale for radius, shadow, and type across login and dashboard.
 - `/` redirects by session state.
 
 ## Product Context
@@ -58,7 +58,7 @@ Practical note:
 - `src/components/dashboard/use-dashboard-data.ts`: fetch/load/register-win flow
 - `src/components/dashboard/*`: scoreboard subcomponents
 - `src/components/login/login-screen.tsx`: branded login/signup UI connected to real auth
-- `src/components/theme/*`: app-wide theme provider and theme toggle
+- `src/components/theme/*`: app-wide theme provider, toggle, shared theme helpers, and theme tests
 - `src/components/ui/*`: local UI primitives
 
 ### Domain And Persistence

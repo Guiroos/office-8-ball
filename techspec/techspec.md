@@ -14,7 +14,7 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
 - Persistencia em `Prisma + Postgres` com fallback em memoria para desenvolvimento local
 - Autenticacao por credenciais com `Auth.js` e usuarios salvos via Prisma
 - Fluxo principal atual em `/login` -> `/scoreboard`
-- Sistema de tema compartilhado entre login e dashboard
+- Sistema de tema compartilhado entre login e dashboard, com foundation tokens e bootstrap inicial consistente
 
 ## Invariantes
 
