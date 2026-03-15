@@ -30,8 +30,13 @@ Para auth funcionar de verdade, o ambiente precisa de:
 
 Sem `DATABASE_URL`:
 
-- o fallback em memoria ainda permite usar o placar localmente
+- o fallback em memoria continua sendo apenas do placar
 - login e signup permanecem indisponiveis
+
+Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
+
+- o ambiente passa a ser tratado como configuracao invalida de auth
+- o app nao deve cair em secret implicito para cookies ou sessao
 
 ## Regras e limites atuais
 
@@ -51,12 +56,11 @@ Sem `DATABASE_URL`:
 
 ## Gaps conhecidos
 
-- Ainda faltam endurecimentos operacionais de auth em ambientes reais
 - Nao ha rate limit para tentativas de login
 - Nao ha papeis ou permissoes de backend alem da exigencia de sessao
 
 ## Proximos passos relacionados
 
-- Garantir configuracao segura e consistente em preview/producao
+- Monitorar o auth endurecido em preview/producao com `NEXTAUTH_SECRET` obrigatorio
 - Definir se o produto precisara de RBAC antes de expandir o dominio
 - Evitar qualquer extensao de auth que complique o v1 sem necessidade real
