@@ -38,6 +38,8 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
   - estado atual do sistema de tema, gaps e ordem recomendada de evolucao
 - `github-operations.md`
   - workflows, checks obrigatorios, integracao com Vercel e endurecimento operacional do repositorio
+- `git-conventions.md`
+  - branch principal, naming de branches, Conventional Commits e fluxo oficial de release por tag
 - `roadmap.md`
   - proximos passos tecnicos e evolucao planejada
 
@@ -53,6 +55,8 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
   - leia `theme-system.md`
 - Se a mudanca mexe em CI, GitHub Actions, checks de PR, Dependabot ou integracao operacional com Vercel:
   - leia `github-operations.md`
+- Se a mudanca mexe em fluxo de branch, convencao de commit, versionamento ou release:
+  - leia `git-conventions.md`
 - Se a mudanca precisa ser posicionada na evolucao tecnica futura:
   - leia `roadmap.md`
 

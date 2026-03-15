@@ -11,19 +11,29 @@ O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plat
 ### Workflows ativos
 
 - `CI`
-  - roda em `pull_request` e `push` para `main`
+  - roda em `pull_request` e `push` para `master`
   - executa `npm ci`, `prisma generate`, `lint`, `typecheck`, `test:coverage` e `build`
 - `Dependency Review`
   - roda em `pull_request`
   - analisa dependencias novas ou alteradas no PR
 - `CodeQL`
-  - roda em `pull_request`, `push` para `main` e agenda semanal
+  - roda em `pull_request`, `push` para `master` e agenda semanal
   - faz code scanning para `javascript-typescript`
+- `Deploy Production Tag`
+  - roda em `push` de tags `v*` e por `workflow_dispatch`
+  - usa `Vercel CLI` para publicar em producao a partir da tag liberada
 
 ### Automacao de updates
 
 - `Dependabot` atualiza dependencias `npm` semanalmente
 - `Dependabot` tambem atualiza `github-actions` semanalmente
+
+### Publicacao na Vercel
+
+- `vercel.json` define `git.deploymentEnabled: false`
+- commits e merges nao geram deploy automatico na Vercel
+- a publicacao de producao acontece apenas pelo workflow `Deploy Production Tag`
+- o fluxo de preview automatico por branch/PR deixa de existir com essa configuracao
 
 ## Contratos operacionais
 
@@ -39,15 +49,16 @@ Se algum nome mudar, o ruleset do GitHub e os Deployment Checks da Vercel tambem
 
 1. O autor abre um PR.
 2. O GitHub executa `CI`, `Dependency Review` e `CodeQL`.
-3. A Vercel cria o preview deploy do PR.
-4. O merge em `main` so deve ocorrer com os checks obrigatorios verdes.
-5. A Vercel promove a branch aprovada de acordo com a configuracao do projeto.
+3. O merge em `master` so deve ocorrer com os checks obrigatorios verdes.
+4. Quando a release estiver pronta, o time cria uma tag `vX.Y.Z`.
+5. O GitHub executa `Deploy Production Tag`.
+6. A Vercel publica a producao a partir da tag liberada.
 
 ## Configuracoes manuais recomendadas
 
 ### GitHub
 
-Configurar ruleset ou branch protection para `main` com:
+Configurar ruleset ou branch protection para `master` com:
 
 - PR obrigatorio para merge
 - checks obrigatorios:
@@ -63,16 +74,19 @@ Ativar tambem:
 - secret scanning
 - push protection
 
+As convencoes de branch naming, commits e releases ficam centralizadas em `techspec/git-conventions.md`.
+
 ### Vercel
 
 Manter:
 
-- preview deploy automatico por PR
-- build/deploy gerenciado pela propria Vercel
+- projeto conectado ao repositorio
+- build/deploy de producao acionado por GitHub Actions com `Vercel CLI`
 
 Configurar:
 
-- Deployment Checks dependentes dos checks obrigatorios do GitHub
+- `VERCEL_TOKEN`, `VERCEL_ORG_ID` e `VERCEL_PROJECT_ID` como secrets do GitHub Actions
+- automatic Git deployments desabilitados no projeto via `vercel.json`
 
 ## Limites e proximos passos
 

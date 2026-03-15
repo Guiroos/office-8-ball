@@ -101,11 +101,15 @@ Not covered yet:
 
 ## CI/CD And Repository Protection
 - GitHub Actions validates pull requests with `CI`, `Dependency Review`, and `CodeQL`.
+- Production deploy now happens only from Git tags `v*` through the `Deploy Production Tag` workflow.
 - Dependabot is configured for weekly updates to `npm` dependencies and GitHub Actions.
-- Vercel remains the source of truth for preview and deployment builds.
-- Recommended repository settings are to require PRs for `main`, require the `CI`, `Dependency Review`, and `CodeQL` checks, enable secret scanning and push protection, and keep Vercel Deployment Checks aligned with the required GitHub checks.
+- Vercel automatic Git deployments are disabled in `vercel.json`.
+- Vercel remains the hosting platform, but production publication is controlled by GitHub Actions plus Vercel CLI.
+- The protected integration branch is `master`.
+- Recommended repository settings are to require PRs for `master`, require the `CI`, `Dependency Review`, and `CodeQL` checks, enable secret scanning and push protection, and keep Vercel Deployment Checks aligned with the required GitHub checks.
 
 Operational details and follow-up recommendations live in `techspec/github-operations.md`.
+Git workflow, branch naming, commits, and release conventions live in `techspec/git-conventions.md`.
 
 ## Database
 The Prisma schema lives in `prisma/schema.prisma`.
