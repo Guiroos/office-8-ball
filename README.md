@@ -118,4 +118,4 @@ The initial migration lives in `prisma/migrations/0001_init/migration.sql`.
 ## Documentation Notes
 - `AGENTS.md` is the fast-start guide for AI agents.
 - `techspec/techspec.md` is the central index for technical documentation.
-- `techspec/architecture.md`, `techspec/scoreboard.md`, `techspec/auth.md`, `techspec/theme-system.md`, and `techspec/roadmap.md` split the living technical docs by domain.
+- `techspec/architecture.md`, `techspec/scoreboard.md`, `techspec/auth.md`, `techspec/runtime-environments.md`, `techspec/api-contracts.md`, `techspec/testing-strategy.md`, `techspec/persistence-and-migrations.md`, `techspec/theme-system.md`, and `techspec/roadmap.md` split the living technical docs by domain.
