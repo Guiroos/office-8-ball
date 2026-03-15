@@ -94,6 +94,11 @@ function renderWithThemeProvider() {
   );
 }
 
+function ThemeConsumerWithoutProvider() {
+  useTheme();
+  return null;
+}
+
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.classList.remove("dark");
@@ -108,6 +113,16 @@ afterEach(() => {
 });
 
 describe("ThemeProvider", () => {
+  it("throws when useTheme is consumed outside the provider", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect(() => render(<ThemeConsumerWithoutProvider />)).toThrow(
+      "useTheme must be used within a ThemeProvider.",
+    );
+
+    consoleError.mockRestore();
+  });
+
   it("starts in system mode and resolves from the system preference", () => {
     createMatchMediaController(true);
 

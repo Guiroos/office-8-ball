@@ -9,8 +9,14 @@ import {
   type ReactNode,
 } from "react";
 
-type ThemeMode = "light" | "dark" | "system";
-type ResolvedTheme = "light" | "dark";
+import {
+  applyResolvedTheme,
+  getSystemTheme,
+  readStoredTheme,
+  resolveTheme,
+  type ResolvedTheme,
+  type ThemeMode,
+} from "./theme-core";
 
 type ThemeContextValue = {
   theme: ThemeMode;
@@ -19,43 +25,14 @@ type ThemeContextValue = {
   toggleTheme: () => void;
 };
 
-const DEFAULT_THEME_CONTEXT: ThemeContextValue = {
-  theme: "system",
-  resolvedTheme: "light",
-  setTheme: () => {},
-  toggleTheme: () => {},
-};
-
-const ThemeContext = createContext<ThemeContextValue>(DEFAULT_THEME_CONTEXT);
-
-function isThemeMode(value: string | null): value is ThemeMode {
-  return value === "light" || value === "dark" || value === "system";
-}
-
-function resolveTheme(theme: ThemeMode, systemTheme: ResolvedTheme): ResolvedTheme {
-  return theme === "system" ? systemTheme : theme;
-}
-
-function applyResolvedTheme(theme: ResolvedTheme) {
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  document.documentElement.style.colorScheme = theme;
-}
-
-function getSystemTheme(): ResolvedTheme {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getStoredTheme(storageKey: string): ThemeMode {
   if (typeof window === "undefined") {
     return "system";
   }
 
-  const storedTheme = localStorage.getItem(storageKey);
-  return isThemeMode(storedTheme) ? storedTheme : "system";
+  return readStoredTheme(localStorage.getItem(storageKey));
 }
 
 export function ThemeProvider({
@@ -80,7 +57,7 @@ export function ThemeProvider({
         return;
       }
 
-      setThemeState(isThemeMode(event.newValue) ? event.newValue : "system");
+      setThemeState(readStoredTheme(event.newValue));
     };
 
     mediaQuery.addEventListener("change", handleSystemThemeChange);
@@ -125,5 +102,11 @@ export function ThemeProvider({
 }
 
 export function useTheme() {
-  return useContext(ThemeContext);
+  const context = useContext(ThemeContext);
+
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider.");
+  }
+
+  return context;
 }
