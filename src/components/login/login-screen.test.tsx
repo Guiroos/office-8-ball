@@ -206,12 +206,14 @@ describe("LoginScreen", () => {
     render(
       <LoginScreen
         authAvailable={false}
-        authUnavailableReason="Autenticacao indisponivel sem NEXTAUTH_SECRET configurado."
+        authUnavailableReason="Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login."
       />,
     );
 
     expect(
-      screen.getAllByText("Autenticacao indisponivel sem NEXTAUTH_SECRET configurado."),
+      screen.getAllByText(
+        "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
+      ),
     ).toHaveLength(2);
   });
 });

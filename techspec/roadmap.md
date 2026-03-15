@@ -14,13 +14,13 @@ Organizar os proximos passos tecnicos do projeto sem misturar backlog futuro com
 
 ## Proximos passos priorizados
 
-### 1. Endurecimento operacional de auth
+### 1. Protecao contra brute force no auth
 
 Prioridade: alta
 
-- Exigir configuracao segura e consistente de `NEXTAUTH_SECRET` em ambientes reais
-- Revisar headers de seguranca e operacao apenas sob HTTPS
-- Avaliar rate limit como etapa posterior, sem aumentar complexidade prematuramente
+- A base de configuracao segura de `NEXTAUTH_SECRET` ja esta endurecida no codigo
+- A operacao sob HTTPS e cookies seguros ja esta tratada no runtime de auth
+- Implementar rate limit como proxima etapa de protecao sem aumentar complexidade prematuramente
 - Confirmar no backend qualquer regra de permissao futura; nao depender apenas da UI
 
 Nota:

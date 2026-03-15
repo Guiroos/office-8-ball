@@ -104,6 +104,7 @@ Important:
 - In-memory data disappears on server restart
 - Local success without `DATABASE_URL` does not prove shared persistence works
 - Login/signup require `DATABASE_URL` because users persist only in Postgres
+- If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, treat auth as invalid configuration rather than a disabled feature
 
 ### Match Creation
 
@@ -128,7 +129,8 @@ Important:
 - The scoreboard UI fetches `/api/scoreboard` and `/api/matches`
 - After registering a win, the UI re-fetches both endpoints
 - The UI intentionally does not apply optimistic scoreboard updates before persistence succeeds
-- `/scoreboard` and the scoreboard APIs require an authenticated session
+- With `DATABASE_URL`, `/scoreboard` and the scoreboard APIs require an authenticated session
+- Without `DATABASE_URL`, auth stays disabled and the local scoreboard flow can still run only for development fallback
 - The login screen handles both `entrar` and `criar conta`
 - The login screen validates locally before submit and only calls auth endpoints when the current mode is valid
 - Field errors appear after blur or submit attempt; API conflicts still return remote field errors
