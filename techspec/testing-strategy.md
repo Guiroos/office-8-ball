@@ -26,6 +26,7 @@ Ferramentas atuais:
 - derivacao do placar a partir do historico
 - validacao de payloads e erros das rotas principais
 - fluxo de login/signup no nivel de componente
+- regras de rate limit de auth com mocks isolados
 - integracao da dashboard com `fetch` mockado
 
 ## Gaps reais
@@ -41,6 +42,7 @@ Ferramentas atuais:
 
 ### Auth, login ou protecao de rota
 
+- `npm run test -- src/lib/auth-rate-limit.test.ts`
 - `npm run test -- src/lib/auth.test.ts`
 - `npm run test -- src/lib/auth-validation.test.ts`
 - `npm run test -- src/app/api/auth/register/route.test.ts`

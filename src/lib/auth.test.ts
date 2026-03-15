@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const compareMock = vi.fn();
 const getServerSessionMock = vi.fn();
+const deleteManyMock = vi.fn();
+const findUniqueRateLimitMock = vi.fn();
+const findUniqueUserMock = vi.fn();
+const upsertMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
@@ -11,13 +16,18 @@ vi.mock("next-auth/providers/credentials", () => ({
 }));
 
 vi.mock("bcryptjs", () => ({
-  compare: vi.fn(),
+  compare: (...args: unknown[]) => compareMock(...args),
 }));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    authRateLimit: {
+      findUnique: (...args: unknown[]) => findUniqueRateLimitMock(...args),
+      upsert: (...args: unknown[]) => upsertMock(...args),
+      deleteMany: (...args: unknown[]) => deleteManyMock(...args),
+    },
     user: {
-      findUnique: vi.fn(),
+      findUnique: (...args: unknown[]) => findUniqueUserMock(...args),
     },
   },
 }));
@@ -28,6 +38,11 @@ describe("auth helpers", () => {
     delete process.env.NEXTAUTH_SECRET;
     delete process.env.NEXTAUTH_URL;
     getServerSessionMock.mockReset();
+    compareMock.mockReset();
+    deleteManyMock.mockReset();
+    findUniqueRateLimitMock.mockReset();
+    findUniqueUserMock.mockReset();
+    upsertMock.mockReset();
     vi.resetModules();
   });
 
@@ -115,6 +130,118 @@ describe("auth helpers", () => {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
+    });
+  });
+
+  it("blocks login when the limiter is already active", async () => {
+    process.env.DATABASE_URL = "postgres://local";
+    process.env.NEXTAUTH_SECRET = "test-secret";
+    findUniqueRateLimitMock.mockResolvedValue({
+      blockedUntil: new Date(Date.now() + 60_000),
+    });
+
+    const auth = await import("@/lib/auth");
+    const options = auth.getAuthOptions();
+    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+      ?.authorize;
+
+    await expect(
+      authorize?.(
+        {
+          email: "gui@office8ball.dev",
+          password: "secret123",
+        },
+        {
+          headers: { "x-forwarded-for": "203.0.113.10" },
+          action: "callback",
+          method: "POST",
+        },
+      ),
+    ).rejects.toThrow("AuthRateLimited");
+
+    expect(findUniqueUserMock).not.toHaveBeenCalled();
+  });
+
+  it("registers a failed login attempt when the password is invalid", async () => {
+    process.env.DATABASE_URL = "postgres://local";
+    process.env.NEXTAUTH_SECRET = "test-secret";
+    findUniqueRateLimitMock.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+    findUniqueUserMock.mockResolvedValue({
+      id: "user-1",
+      email: "gui@office8ball.dev",
+      username: "gui.dev",
+      passwordHash: "hashed-password",
+    });
+    compareMock.mockResolvedValue(false);
+
+    const auth = await import("@/lib/auth");
+    const options = auth.getAuthOptions();
+    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+      ?.authorize;
+
+    await expect(
+      authorize?.(
+        {
+          email: "gui@office8ball.dev",
+          password: "secret123",
+        },
+        {
+          headers: { "x-forwarded-for": "203.0.113.10" },
+          action: "callback",
+          method: "POST",
+        },
+      ),
+    ).resolves.toBeNull();
+
+    expect(upsertMock).toHaveBeenCalledWith({
+      where: { id: "login:gui@office8ball.dev:203.0.113.10" },
+      create: expect.objectContaining({
+        failCount: 1,
+      }),
+      update: expect.objectContaining({
+        failCount: 1,
+      }),
+    });
+  });
+
+  it("clears the limiter state after a successful login", async () => {
+    process.env.DATABASE_URL = "postgres://local";
+    process.env.NEXTAUTH_SECRET = "test-secret";
+    findUniqueRateLimitMock.mockResolvedValue(null);
+    findUniqueUserMock.mockResolvedValue({
+      id: "user-1",
+      email: "gui@office8ball.dev",
+      username: "gui.dev",
+      passwordHash: "hashed-password",
+    });
+    compareMock.mockResolvedValue(true);
+
+    const auth = await import("@/lib/auth");
+    const options = auth.getAuthOptions();
+    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+      ?.authorize;
+
+    await expect(
+      authorize?.(
+        {
+          email: "gui@office8ball.dev",
+          password: "secret123",
+        },
+        {
+          headers: { "x-forwarded-for": "203.0.113.10" },
+          action: "callback",
+          method: "POST",
+        },
+      ),
+    ).resolves.toEqual({
+      id: "user-1",
+      email: "gui@office8ball.dev",
+      name: "gui.dev",
+      username: "gui.dev",
+    });
+
+    expect(deleteManyMock).toHaveBeenCalledWith({
+      where: { id: "login:gui@office8ball.dev:203.0.113.10" },
     });
   });
 });

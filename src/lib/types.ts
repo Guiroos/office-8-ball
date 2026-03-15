@@ -61,4 +61,5 @@ export type RegisterUserResponse = {
 export type ApiErrorResponse = {
   error: string;
   fieldErrors?: Partial<Record<"username" | "email" | "password", string>>;
+  retryAfterSeconds?: number;
 };

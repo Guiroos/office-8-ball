@@ -14,29 +14,29 @@ Organizar os proximos passos tecnicos do projeto sem misturar backlog futuro com
 
 ## Proximos passos priorizados
 
-### 1. Protecao contra brute force no auth
+### 1. Fechar gaps de qualidade
 
 Prioridade: alta
 
+- O rate limit de auth ja foi implementado com estado persistido em Prisma
 - A base de configuracao segura de `NEXTAUTH_SECRET` ja esta endurecida no codigo
 - A operacao sob HTTPS e cookies seguros ja esta tratada no runtime de auth
-- Implementar rate limit como proxima etapa de protecao sem aumentar complexidade prematuramente
+- Priorizar testes integrados com Prisma real para auth e scoreboard
 - Confirmar no backend qualquer regra de permissao futura; nao depender apenas da UI
 
 Nota:
 - a base operacional de repositorio, CI, CodeQL, Dependabot e review de dependencias agora esta documentada em `github-operations.md`
 - os proximos passos aqui ficam restritos a gaps ainda nao implementados no codigo ou na configuracao
 
-### 3. Fechar gaps de qualidade
+### 2. Cobertura E2E minima
 
 Prioridade: media
 
-- Considerar testes integrados com Prisma real
 - Considerar cobertura E2E para login e scoreboard
 - Avaliar `SonarQube Cloud` para code smells e quality gate de maintainability
 - Manter contratos de API e fluxo da UI sincronizados em qualquer evolucao
 
-### 4. Expansao de dominio
+### 3. Expansao de dominio
 
 Prioridade: futura
 

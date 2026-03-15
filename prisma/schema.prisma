@@ -38,3 +38,19 @@ model User {
 
   @@map("users")
 }
+
+model AuthRateLimit {
+  id              String    @id @db.Text
+  action          String    @db.Text
+  email           String    @db.Text
+  ip              String    @db.Text
+  failCount       Int       @default(0) @map("fail_count")
+  blockLevel      Int       @default(0) @map("block_level")
+  windowStartedAt DateTime  @map("window_started_at") @db.Timestamptz(6)
+  blockedUntil    DateTime? @map("blocked_until") @db.Timestamptz(6)
+  lastFailedAt    DateTime? @map("last_failed_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([action, email])
+  @@map("auth_rate_limits")
+}

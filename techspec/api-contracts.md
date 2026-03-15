@@ -112,6 +112,7 @@ Regras:
 
 - validacao usa os schemas compartilhados de `src/lib/auth-validation.ts`
 - email e username devem ser unicos
+- quando auth esta habilitado, falhas repetidas usam rate limit por `email + ip`
 
 Sucesso:
 
@@ -132,8 +133,18 @@ Erros:
 
 - payload invalido retorna `400` com `fieldErrors` quando aplicavel
 - conflito de email ou username retorna `409`
+- bloqueio temporario por rate limit retorna `429` com `retryAfterSeconds`
 - auth indisponivel retorna `503` sem `DATABASE_URL`
 - auth configurado de forma invalida retorna `500` quando falta `NEXTAUTH_SECRET`
+
+Exemplo de bloqueio:
+
+```json
+{
+  "error": "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente.",
+  "retryAfterSeconds": 900
+}
+```
 
 ## Compatibilidade com a UI atual
 

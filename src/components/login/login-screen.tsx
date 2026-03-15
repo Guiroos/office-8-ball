@@ -9,6 +9,7 @@ import { type FormEvent, useState } from "react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel, Input } from "@/components/ui/form";
+import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit";
 import {
   getLoginFieldErrors,
   getRegisterFieldErrors,
@@ -203,7 +204,11 @@ export function LoginScreen({
     });
 
     if (!signInResult || signInResult.error) {
-      setGeneralError("Email ou senha invalidos.");
+      setGeneralError(
+        signInResult?.error === AUTH_RATE_LIMIT_ERROR
+          ? "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente."
+          : "Email ou senha invalidos.",
+      );
       throw new Error(signInResult?.error ?? "signin_failed");
     }
   }
