@@ -106,6 +106,7 @@ Not covered yet:
 ## CI/CD And Repository Protection
 - GitHub Actions validates pull requests with `CI`, `Dependency Review`, and `CodeQL`.
 - Production deploy now happens only from Git tags `v*` through the `Deploy Production Tag` workflow.
+- Before the production build, `Deploy Production Tag` runs `npm run prisma:deploy` against `DATABASE_URL`.
 - Dependabot is configured for weekly updates to `npm` dependencies and GitHub Actions.
 - Vercel automatic Git deployments are disabled in `vercel.json`.
 - Vercel remains the hosting platform, but production publication is controlled by GitHub Actions plus Vercel CLI.

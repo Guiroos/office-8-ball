@@ -161,12 +161,15 @@ Depois da tag:
 
 Para o workflow de producao funcionar, o repositorio precisa ter estes secrets configurados no GitHub:
 
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET`
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
 
 Com essa estrategia:
 
+- o workflow de producao aplica `prisma migrate deploy` antes do build na Vercel
 - a Vercel nao publica automaticamente a cada commit
 - a publicacao em producao fica amarrada a tags `v*`
 - previews automaticos por push e PR deixam de existir ate que o time crie um fluxo dedicado para isso
