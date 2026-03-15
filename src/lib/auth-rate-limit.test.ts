@@ -22,10 +22,10 @@ describe("auth rate limit helpers", () => {
   });
 
   it("uses the first forwarded ip and normalizes the email", async () => {
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
     expect(
-      module.buildAuthRateLimitKey({
+      authRateLimit.buildAuthRateLimitKey({
         action: "login",
         email: " GUI@office8ball.dev ",
         headers: {
@@ -41,10 +41,10 @@ describe("auth rate limit helpers", () => {
   });
 
   it("falls back to unknown ip when no headers are present", async () => {
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
     expect(
-      module.buildAuthRateLimitKey({
+      authRateLimit.buildAuthRateLimitKey({
         action: "register",
         email: "gui@office8ball.dev",
       }),
@@ -59,10 +59,10 @@ describe("auth rate limit helpers", () => {
     findUniqueMock.mockResolvedValue({
       blockedUntil: new Date("2026-03-15T12:05:30.000Z"),
     });
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
     await expect(
-      module.getAuthRateLimitStatus(
+      authRateLimit.getAuthRateLimitStatus(
         {
           id: "login:gui@office8ball.dev:unknown",
           action: "login",
@@ -80,10 +80,10 @@ describe("auth rate limit helpers", () => {
   it("starts a new failure window on the first failed attempt", async () => {
     const now = new Date("2026-03-15T12:00:00.000Z");
     findUniqueMock.mockResolvedValue(null);
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
     await expect(
-      module.registerAuthFailure(
+      authRateLimit.registerAuthFailure(
         {
           id: "login:gui@office8ball.dev:unknown",
           action: "login",
@@ -126,10 +126,10 @@ describe("auth rate limit helpers", () => {
       windowStartedAt: new Date("2026-03-15T11:55:00.000Z"),
       blockedUntil: null,
     });
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
     await expect(
-      module.registerAuthFailure(
+      authRateLimit.registerAuthFailure(
         {
           id: "login:gui@office8ball.dev:unknown",
           action: "login",
@@ -159,9 +159,9 @@ describe("auth rate limit helpers", () => {
   });
 
   it("clears the stored limiter state on success", async () => {
-    const module = await import("@/lib/auth-rate-limit");
+    const authRateLimit = await import("@/lib/auth-rate-limit");
 
-    await module.clearAuthRateLimit({
+    await authRateLimit.clearAuthRateLimit({
       id: "register:gui@office8ball.dev:unknown",
       action: "register",
       email: "gui@office8ball.dev",

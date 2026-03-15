@@ -1,5 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+type AuthorizeFn = (
+  credentials:
+    | {
+        email?: string;
+        password?: string;
+      }
+    | undefined,
+  request:
+    | {
+        headers?: Record<string, string | string[] | undefined>;
+        action?: string;
+        method?: string;
+      }
+    | undefined,
+) => Promise<unknown>;
+
 const compareMock = vi.fn();
 const getServerSessionMock = vi.fn();
 const deleteManyMock = vi.fn();
@@ -142,7 +158,7 @@ describe("auth helpers", () => {
 
     const auth = await import("@/lib/auth");
     const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
       ?.authorize;
 
     await expect(
@@ -176,7 +192,7 @@ describe("auth helpers", () => {
 
     const auth = await import("@/lib/auth");
     const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
       ?.authorize;
 
     await expect(
@@ -218,7 +234,7 @@ describe("auth helpers", () => {
 
     const auth = await import("@/lib/auth");
     const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: Function } | undefined)
+    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
       ?.authorize;
 
     await expect(
