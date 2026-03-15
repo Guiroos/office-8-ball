@@ -21,6 +21,7 @@ O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plat
   - faz code scanning para `javascript-typescript`
 - `Deploy Production Tag`
   - roda em `push` de tags `v*` e por `workflow_dispatch`
+  - aplica `prisma migrate deploy` usando `DATABASE_URL` antes do build
   - usa `Vercel CLI` para publicar em producao a partir da tag liberada
 
 ### Automacao de updates
@@ -85,7 +86,7 @@ Manter:
 
 Configurar:
 
-- `VERCEL_TOKEN`, `VERCEL_ORG_ID` e `VERCEL_PROJECT_ID` como secrets do GitHub Actions
+- `DATABASE_URL`, `NEXTAUTH_SECRET`, `VERCEL_TOKEN`, `VERCEL_ORG_ID` e `VERCEL_PROJECT_ID` como secrets do GitHub Actions
 - automatic Git deployments desabilitados no projeto via `vercel.json`
 
 ## Limites e proximos passos

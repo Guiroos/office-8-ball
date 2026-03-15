@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Apply Prisma migrations
+        run: npm run prisma:deploy
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
