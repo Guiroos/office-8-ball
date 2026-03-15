@@ -17,8 +17,12 @@ jobs:
   deploy:
     name: Deploy Production Tag
     runs-on: ubuntu-latest
+    environment: production
     timeout-minutes: 20
     env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXT_PUBLIC_APP_ENV: production
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
