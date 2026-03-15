@@ -10,24 +10,49 @@ import {
 import { prisma } from "@/lib/prisma";
 import type { ApiErrorResponse, SessionUser } from "@/lib/types";
 
-const AUTH_SECRET_FALLBACK = "auth-disabled-missing-secret";
+const AUTH_DISABLED_SECRET = "auth-disabled-no-database";
 const AUTH_UNAVAILABLE_DATABASE_ERROR =
   "Autenticacao indisponivel sem DATABASE_URL configurado.";
 const AUTH_UNAVAILABLE_SECRET_ERROR =
-  "Autenticacao indisponivel sem NEXTAUTH_SECRET configurado.";
+  "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.";
 const AUTH_REQUIRED_ERROR = "Autenticacao obrigatoria.";
 
+export function hasDatabaseUrl() {
+  return Boolean(process.env.DATABASE_URL?.trim());
+}
+
+export function hasAuthSecret() {
+  return Boolean(process.env.NEXTAUTH_SECRET?.trim());
+}
+
+function shouldUseSecureAuthCookies() {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.NEXTAUTH_URL?.startsWith("https://")
+  );
+}
+
 function getAuthSecret() {
-  return process.env.NEXTAUTH_SECRET?.trim() || AUTH_SECRET_FALLBACK;
+  if (!hasDatabaseUrl()) {
+    return AUTH_DISABLED_SECRET;
+  }
+
+  const secret = process.env.NEXTAUTH_SECRET?.trim();
+
+  if (!secret) {
+    throw new Error(AUTH_UNAVAILABLE_SECRET_ERROR);
+  }
+
+  return secret;
 }
 
 export function isAuthAvailable() {
-  return Boolean(process.env.DATABASE_URL && process.env.NEXTAUTH_SECRET?.trim());
+  return hasDatabaseUrl() && hasAuthSecret();
 }
 
 export function getAuthUnavailableError() {
-  if (process.env.DATABASE_URL) {
-    if (!process.env.NEXTAUTH_SECRET?.trim()) {
+  if (hasDatabaseUrl()) {
+    if (!hasAuthSecret()) {
       return AUTH_UNAVAILABLE_SECRET_ERROR;
     }
 
@@ -40,7 +65,7 @@ export function getAuthUnavailableError() {
 export function getAuthUnavailableResponse() {
   return NextResponse.json<ApiErrorResponse>(
     { error: getAuthUnavailableError() ?? AUTH_UNAVAILABLE_DATABASE_ERROR },
-    { status: 503 },
+    { status: hasDatabaseUrl() ? 500 : 503 },
   );
 }
 
@@ -51,86 +76,104 @@ export function getAuthRequiredResponse() {
   );
 }
 
-export const authOptions: NextAuthOptions = {
-  secret: getAuthSecret(),
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
-  },
-  providers: [
-    CredentialsProvider({
-      name: "Email e senha",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Senha", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!isAuthAvailable()) {
-          return null;
-        }
+export function getAuthOptions(): NextAuthOptions {
+  const useSecureCookies = shouldUseSecureAuthCookies();
 
-        const validation = validateLoginPayload({
-          email: String(credentials?.email ?? ""),
-          password: String(credentials?.password ?? ""),
-        });
-
-        if (!validation.data) {
-          return null;
-        }
-
-        const { email, password } = validation.data;
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!user) {
-          return null;
-        }
-
-        const isPasswordValid = await compare(password, user.passwordHash);
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.username,
-          username: user.username,
-        };
-      },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.username = user.username;
-      }
-
-      return token;
+  return {
+    secret: getAuthSecret(),
+    session: {
+      strategy: "jwt",
     },
-    async session({ session, token }) {
-      if (session.user && token.sub && token.email) {
-        session.user.id = token.sub;
-        session.user.email = token.email;
-        session.user.username = String(token.username ?? session.user.name ?? "");
-        session.user.name = session.user.username;
-      }
-
-      return session;
+    useSecureCookies,
+    cookies: {
+      sessionToken: {
+        name: useSecureCookies
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+        options: {
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
+          secure: useSecureCookies,
+        },
+      },
     },
-  },
-};
+    pages: {
+      signIn: "/login",
+    },
+    providers: [
+      CredentialsProvider({
+        name: "Email e senha",
+        credentials: {
+          email: { label: "Email", type: "email" },
+          password: { label: "Senha", type: "password" },
+        },
+        async authorize(credentials) {
+          if (!isAuthAvailable()) {
+            return null;
+          }
+
+          const validation = validateLoginPayload({
+            email: String(credentials?.email ?? ""),
+            password: String(credentials?.password ?? ""),
+          });
+
+          if (!validation.data) {
+            return null;
+          }
+
+          const { email, password } = validation.data;
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (!user) {
+            return null;
+          }
+
+          const isPasswordValid = await compare(password, user.passwordHash);
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.username,
+            username: user.username,
+          };
+        },
+      }),
+    ],
+    callbacks: {
+      async jwt({ token, user }) {
+        if (user) {
+          token.username = user.username;
+        }
+
+        return token;
+      },
+      async session({ session, token }) {
+        if (session.user && token.sub && token.email) {
+          session.user.id = token.sub;
+          session.user.email = token.email;
+          session.user.username = String(token.username ?? session.user.name ?? "");
+          session.user.name = session.user.username;
+        }
+
+        return session;
+      },
+    },
+  };
+}
 
 export async function getAuthSession() {
   if (!isAuthAvailable()) {
     return null;
   }
 
-  return getServerSession(authOptions);
+  return getServerSession(getAuthOptions());
 }
 
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {

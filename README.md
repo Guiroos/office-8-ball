@@ -54,7 +54,7 @@ Current route flow:
 - `/login` is the auth entry screen
 - `/scoreboard` is the authenticated match and scoreboard flow
 
-If `DATABASE_URL` is missing, the scoreboard still works locally with temporary in-memory data, but login/signup stay unavailable.
+If `DATABASE_URL` is missing, auth stays disabled and login/signup remain unavailable.
 
 When `DATABASE_URL` is configured, apply the Prisma migration before first use:
 
@@ -64,7 +64,7 @@ npm run prisma:seed
 ```
 
 Also set `NEXTAUTH_SECRET` in every environment before enabling real auth.
-The auth flow stays unavailable when `DATABASE_URL` or `NEXTAUTH_SECRET` is missing.
+If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, the app now treats auth as invalid configuration instead of falling back to an implicit secret.
 Production should run only behind HTTPS so Auth.js can issue secure session cookies.
 
 ## API

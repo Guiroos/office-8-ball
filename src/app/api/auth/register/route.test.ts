@@ -201,9 +201,10 @@ describe("/api/auth/register", () => {
       }),
     );
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({
-      error: "Autenticacao indisponivel sem NEXTAUTH_SECRET configurado.",
+      error:
+        "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
     });
   });
 });

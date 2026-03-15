@@ -11,6 +11,7 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - Persistencia primaria em `Prisma + Postgres`
 - Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
 - Autenticacao por credenciais com `Auth.js`
+- `NEXTAUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
 - Testes automatizados com `Vitest` + Testing Library
 
 ## Rotas principais
@@ -81,6 +82,6 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 
 ## Proximos passos relacionados
 
-- Endurecer aspectos operacionais do auth em ambientes reais
+- Implementar protecao contra brute force no auth sem aumentar complexidade prematuramente
 - Manter a documentacao tecnica sincronizada com o estado do codigo
 - So considerar expansao de dominio apos fechar os gaps operacionais do v1
