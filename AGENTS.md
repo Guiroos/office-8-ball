@@ -37,6 +37,7 @@ When sources disagree, use this priority:
 Practical note:
 - `techspec/` is now the main home for technical documentation and next-step analysis.
 - GitHub operational hardening, CI and repository protection now live in `techspec/github-operations.md`.
+- Git conventions, release-by-tag flow, and deploy prerequisites now live in `techspec/git-conventions.md`.
 
 ## Current Architecture
 
@@ -191,6 +192,7 @@ Read:
 
 Constraint:
 - keep Vercel as the deployment platform; use GitHub for validation and repository protection
+- if the task changes release or deploy behavior, also review `techspec/git-conventions.md` and `vercel.json`
 
 ### Scoreboard or match-history changes
 

@@ -8,7 +8,7 @@ updates:
       time: "09:00"
       timezone: "America/Sao_Paulo"
     open-pull-requests-limit: 5
-    target-branch: main
+    target-branch: master
     commit-message:
       prefix: "deps"
 
@@ -20,6 +20,6 @@ updates:
       time: "09:15"
       timezone: "America/Sao_Paulo"
     open-pull-requests-limit: 3
-    target-branch: main
+    target-branch: master
     commit-message:
       prefix: "ci"
