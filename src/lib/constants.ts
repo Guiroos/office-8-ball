@@ -26,8 +26,8 @@ export const WIN_MESSAGES = {
     "Mais uma para o pixel perfect da sinuca.",
   ],
   backend: [
-    "Backend levou. Frontend vai culpar a iluminacao.",
-    "Richard chamou de regra de negocio e encerrou a discussao.",
-    "Adair versionou a humilhacao em producao.",
+    "Backend levou. Frontend vai culpar a iluminação.",
+    "Richard chamou de regra de negócio e encerrou a discussão.",
+    "Adair versionou a humilhação em produção.",
   ],
 } as const;

@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS matches (
   note TEXT
 );
 
+CREATE INDEX IF NOT EXISTS matches_winner_team_id_idx
+  ON matches (winner_team_id);
+
 INSERT INTO teams (id, name, display_name)
 VALUES
   ('frontend', 'frontend', 'Frontend'),
