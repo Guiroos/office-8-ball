@@ -8,7 +8,8 @@ Implementation status relative to this PRD:
 - the single-screen scoreboard flow is implemented
 - current score, leader, streak, and history are implemented
 - the API supports optional match `note`
-- the dashboard UI still does not expose note entry
+- the dashboard UI already renders persisted match `note` in recent history
+- the winner-registration flow still does not expose note entry
 - credentials authentication is now implemented
 - multi-team support remains intentionally out of scope for `v1`
 

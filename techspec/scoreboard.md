@@ -66,7 +66,8 @@ Comportamento:
 - A dashboard faz fetch de `/api/scoreboard` e `/api/matches`
 - Ao registrar uma vitoria, a UI reconsulta ambos os endpoints
 - Nao existe update otimista antes da persistencia concluir
-- A UI atual ainda nao expõe o campo de `note`, embora a API suporte esse dado
+- A UI atual renderiza `note` no historico recente quando esse dado existe
+- A UI atual ainda nao expõe o campo de entrada de `note` no fluxo de registrar vitoria
 
 ## Persistencia
 
@@ -77,12 +78,12 @@ Comportamento:
 
 ## Gaps conhecidos
 
-- A UI ainda nao usa notas de partida
+- A UI ainda nao permite informar `note` ao registrar a partida
 - Nao ha testes com banco real cobrindo o fluxo completo de scoreboard
 - O modelo segue fixo em dois times globais
 
 ## Proximos passos relacionados
 
-- Decidir quando a UI deve expor `note`
+- Decidir quando a UI deve permitir entrada de `note` no ato do registro
 - Preservar compatibilidade entre API e dashboard em qualquer mudanca de contrato
 - Continuar tratando o placar como derivado, nao como estado salvo separadamente

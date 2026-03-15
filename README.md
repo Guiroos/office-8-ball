@@ -23,11 +23,13 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - signup uses `username + email + password`
   - local validation blocks invalid submit before calling auth endpoints
   - field errors appear after blur or submit attempt and clear as values become valid
-- The API already supports optional `note`, but the current UI does not expose note entry yet.
-- Local validation currently passes:
+- The API already supports optional `note`.
+- The current UI already renders persisted notes in recent history.
+- The current winner-registration flow still does not expose note entry yet.
+- Common local validation commands:
   - `npm run test`
   - `npm run lint`
-  - `npx tsc --noEmit`
+  - `npm run typecheck`
   - `npm run build`
 - An automated test suite is now configured with `Vitest` + Testing Library.
 
