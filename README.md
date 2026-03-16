@@ -28,8 +28,8 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - field errors appear after blur or submit attempt and clear as values become valid
   - repeated auth failures now trigger a temporary progressive block
 - The API already supports optional `note`.
+- The current UI lets each team card send an optional `note` during winner registration.
 - The current UI already renders persisted notes in recent history.
-- The current winner-registration flow still does not expose note entry yet.
 - Common local validation commands:
   - `npm run test`
   - `npm run lint`

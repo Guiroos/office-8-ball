@@ -16,6 +16,11 @@ type DashboardState = {
   matches: MatchRecord[];
 };
 
+type RegisterWinInput = {
+  teamId: TeamId;
+  note: string;
+};
+
 async function fetchDashboardData() {
   const [scoreboardResponse, matchesResponse] = await Promise.all([
     fetch("/api/scoreboard", { cache: "no-store" }),
@@ -63,7 +68,7 @@ export function useDashboardData() {
     })();
   }, []);
 
-  async function registerWin(teamId: TeamId) {
+  async function registerWin({ teamId, note }: RegisterWinInput) {
     setSubmittingTeamId(teamId);
     setError(null);
     setFlashMessage(null);
@@ -74,7 +79,7 @@ export function useDashboardData() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ winnerTeamId: teamId }),
+        body: JSON.stringify({ winnerTeamId: teamId, note }),
       });
 
       if (!response.ok) {
@@ -88,12 +93,14 @@ export function useDashboardData() {
       setFlashMessage(payload.message);
       const dashboardData = await fetchDashboardData();
       setState(dashboardData);
+      return true;
     } catch (submitError) {
       setError(
         submitError instanceof Error
           ? submitError.message
           : "Não foi possível salvar a partida.",
       );
+      return false;
     } finally {
       setSubmittingTeamId(null);
     }

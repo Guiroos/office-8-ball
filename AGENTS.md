@@ -128,7 +128,7 @@ Important:
 
 - The API supports `note`
 - The recent matches UI already renders persisted `note`
-- The scoreboard UI still posts only `{ winnerTeamId }`
+- The scoreboard UI can send `{ winnerTeamId, note }`
 - `src/lib/data.ts` trims `note` and normalizes empty values to `null`
 
 ### UI Data Flow
@@ -296,7 +296,6 @@ Notes:
 - No password recovery yet
 - No email verification yet
 - No profile/nickname UI yet
-- UI renders persisted match notes in recent history but still does not allow entering `note` during winner registration
 - No Prisma-backed integration tests yet
 - No browser E2E coverage yet
 
