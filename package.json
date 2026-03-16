@@ -23,7 +23,7 @@
     "prisma:seed": "prisma db seed"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.2",
+    "@prisma/client": "^7.5.0",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.8",
     "@tailwindcss/postcss": "^4.2.1",
