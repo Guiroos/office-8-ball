@@ -47,6 +47,8 @@ Practical note:
 - `middleware.ts`: route-level auth protection for `/scoreboard`
 - `src/app/page.tsx`: redirects by session state
 - `src/app/login/page.tsx`: login/signup page
+- `src/app/not-found.tsx`: branded 404 screen for invalid routes
+- `src/app/error.tsx`: branded route error recovery screen
 - `src/app/scoreboard/page.tsx`: main scoreboard page
 - `src/app/api/scoreboard/route.ts`: scoreboard read API
 - `src/app/api/matches/route.ts`: matches read/create API
@@ -142,6 +144,8 @@ Important:
 - Repeated auth failures trigger temporary progressive blocks keyed by normalized `email + IP`
 - On desktop, the login keeps the image on the left and the form on the right
 - On mobile, the image is hidden and the form remains in a single column
+- Invalid routes render a branded `404` recovery screen
+- Route rendering failures render a branded retry screen with `reset()`
 
 ## Working Rules For Agents
 
