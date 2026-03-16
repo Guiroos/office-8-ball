@@ -109,7 +109,7 @@ function TeamScoreCard({
               Vitórias
             </p>
             <p className="[font-family:var(--font-display)] text-[length:var(--text-score)] leading-none tracking-[0.03em]">
-              {wins}
+              <span data-testid={`team-wins-${team.id}`}>{wins}</span>
             </p>
           </div>
 
@@ -134,6 +134,7 @@ function TeamScoreCard({
           <textarea
             id={noteId}
             value={note}
+            data-testid={`team-note-${team.id}`}
             maxLength={140}
             rows={3}
             disabled={isSubmitting}
@@ -149,6 +150,7 @@ function TeamScoreCard({
           variant={team.id}
           size="lg"
           className="w-full"
+          data-testid={`register-win-${team.id}`}
           onClick={() => {
             startTransition(() => {
               void onRegisterWin(team.id);
@@ -225,6 +227,7 @@ export function Dashboard({ user }: { user?: SessionUser }) {
             <Button
               variant="ghost"
               className="h-11 rounded-[var(--radius-sm)] px-4"
+              data-testid="dashboard-sign-out"
               onClick={() => {
                 void signOut({ callbackUrl: "/login" });
               }}

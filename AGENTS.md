@@ -260,6 +260,7 @@ Common commands:
 ```bash
 npm run lint
 npm run test
+npm run e2e
 npm run typecheck
 npm run build
 ```
@@ -297,7 +298,7 @@ Notes:
 - No email verification yet
 - No profile/nickname UI yet
 - No Prisma-backed integration tests yet
-- No browser E2E coverage yet
+- No E2E coverage yet for auth rate limit or deeper negative-path variants
 
 ## Safe Change Checklist
 
