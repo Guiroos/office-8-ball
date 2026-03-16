@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -152,7 +152,12 @@ describe("Dashboard", () => {
         }
 
         if (url === "/api/matches" && init?.method === "POST") {
-          expect(init.body).toBe(JSON.stringify({ winnerTeamId: "frontend" }));
+          expect(init.body).toBe(
+            JSON.stringify({
+              winnerTeamId: "frontend",
+              note: "virou passeio",
+            }),
+          );
           return jsonResponse(createMatchResponse, true, 201) as ReturnType<typeof fetch>;
         }
 
@@ -163,18 +168,31 @@ describe("Dashboard", () => {
 
     await screen.findByRole("button", { name: "Vitória Frontend" });
 
-    await userEvent.click(screen.getByRole("button", { name: "Vitória Frontend" }));
-
-    await waitFor(() => {
-      expect(screen.getByText(createMatchResponse.message)).toBeInTheDocument();
-    });
-
     const frontendCard = screen
       .getByRole("button", { name: "Vitória Frontend" })
       .closest("[data-team='frontend']");
     const backendCard = screen
       .getByRole("button", { name: "Vitória Backend" })
       .closest("[data-team='backend']");
+
+    expect(frontendCard).not.toBeNull();
+    expect(backendCard).not.toBeNull();
+
+    const frontendNote = within(frontendCard as HTMLElement).getByLabelText(
+      "Provocação opcional",
+    );
+    const backendNote = within(backendCard as HTMLElement).getByLabelText(
+      "Provocação opcional",
+    );
+
+    await userEvent.type(frontendNote, "virou passeio");
+    await userEvent.type(backendNote, "fica para a próxima");
+
+    await userEvent.click(screen.getByRole("button", { name: "Vitória Frontend" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(createMatchResponse.message)).toBeInTheDocument();
+    });
 
     expect(frontendCard).toHaveAttribute("data-leader", "true");
     expect(frontendCard).toHaveClass("bg-[color:var(--frontend-soft)]");
@@ -187,6 +205,100 @@ describe("Dashboard", () => {
     expect(await screen.findByText("Frontend lidera por 1.")).toBeInTheDocument();
     expect(await screen.findByText("1x")).toBeInTheDocument();
     expect(screen.queryByText("Nenhuma partida registrada ainda.")).not.toBeInTheDocument();
+    expect(frontendNote).toHaveValue("");
+    expect(backendNote).toHaveValue("fica para a próxima");
     expect(fetchMock).toHaveBeenCalledTimes(5);
+  });
+
+  it("preserves the note when saving fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+      const url = String(input);
+
+      if (url === "/api/scoreboard") {
+        return jsonResponse(initialScoreboard) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && !init?.method) {
+        return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && init?.method === "POST") {
+        return jsonResponse(
+          { error: "Não foi possível salvar a partida." },
+          false,
+          500,
+        ) as ReturnType<typeof fetch>;
+      }
+
+      throw new Error(`Unexpected fetch to ${url}`);
+    });
+
+    render(<Dashboard />);
+
+    await screen.findByRole("button", { name: "Vitória Backend" });
+
+    const backendCard = screen
+      .getByRole("button", { name: "Vitória Backend" })
+      .closest("[data-team='backend']");
+
+    expect(backendCard).not.toBeNull();
+
+    const backendNote = within(backendCard as HTMLElement).getByLabelText(
+      "Provocação opcional",
+    );
+
+    await userEvent.type(backendNote, "quase uma humilhação");
+    await userEvent.click(screen.getByRole("button", { name: "Vitória Backend" }));
+
+    expect(
+      await screen.findByText("Não foi possível salvar a partida."),
+    ).toBeInTheDocument();
+    expect(backendNote).toHaveValue("quase uma humilhação");
+  });
+
+  it("limits each note field to 140 characters and keeps the counters independent", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+
+      if (url === "/api/scoreboard") {
+        return jsonResponse(initialScoreboard) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches") {
+        return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
+      }
+
+      throw new Error(`Unexpected fetch to ${url}`);
+    });
+
+    render(<Dashboard />);
+
+    await screen.findByRole("button", { name: "Vitória Frontend" });
+
+    const frontendCard = screen
+      .getByRole("button", { name: "Vitória Frontend" })
+      .closest("[data-team='frontend']");
+    const backendCard = screen
+      .getByRole("button", { name: "Vitória Backend" })
+      .closest("[data-team='backend']");
+
+    expect(frontendCard).not.toBeNull();
+    expect(backendCard).not.toBeNull();
+
+    const frontendNote = within(frontendCard as HTMLElement).getByLabelText(
+      "Provocação opcional",
+    );
+    const backendNote = within(backendCard as HTMLElement).getByLabelText(
+      "Provocação opcional",
+    );
+
+    await userEvent.type(frontendNote, "x".repeat(141));
+    await userEvent.type(backendNote, "boa");
+
+    expect(frontendNote).toHaveValue("x".repeat(140));
+    expect(frontendNote).toHaveAttribute("maxLength", "140");
+    expect(backendNote).toHaveValue("boa");
+    expect(within(frontendCard as HTMLElement).getByText("140/140")).toBeInTheDocument();
+    expect(within(backendCard as HTMLElement).getByText("3/140")).toBeInTheDocument();
   });
 });

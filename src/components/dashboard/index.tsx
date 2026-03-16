@@ -2,7 +2,7 @@
 
 import { cva } from "class-variance-authority";
 import { LogOut, Swords } from "lucide-react";
-import { startTransition } from "react";
+import { startTransition, useId, useState } from "react";
 import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -54,15 +54,20 @@ function TeamScoreCard({
   wins,
   isLeader,
   isSubmitting,
+  note,
+  onNoteChange,
   onRegisterWin,
 }: {
   teamId: (typeof TEAMS)[number]["id"];
   wins: number;
   isLeader: boolean;
   isSubmitting: boolean;
+  note: string;
+  onNoteChange: (teamId: (typeof TEAMS)[number]["id"], value: string) => void;
   onRegisterWin: (teamId: (typeof TEAMS)[number]["id"]) => Promise<void>;
 }) {
   const team = TEAMS.find((entry) => entry.id === teamId);
+  const noteId = useId();
 
   if (!team) {
     return null;
@@ -113,6 +118,33 @@ function TeamScoreCard({
           </div>
         </div>
 
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor={noteId}
+              className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]"
+            >
+              Provocação opcional
+            </label>
+            <span className="text-xs font-medium text-[color:var(--muted-foreground)]">
+              {note.length}/140
+            </span>
+          </div>
+
+          <textarea
+            id={noteId}
+            value={note}
+            maxLength={140}
+            rows={3}
+            disabled={isSubmitting}
+            placeholder="Vale zoeira curta, sem tese de retrospectiva."
+            className="min-h-24 w-full resize-none rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none transition placeholder:text-[color:var(--muted-foreground)] focus:border-[color:var(--frontend)] focus:ring-2 focus:ring-[color:var(--frontend-soft)] disabled:cursor-not-allowed disabled:bg-[color:var(--surface-muted)]"
+            onChange={(event) => {
+              onNoteChange(team.id, event.target.value);
+            }}
+          />
+        </div>
+
         <Button
           variant={team.id}
           size="lg"
@@ -141,11 +173,38 @@ export function Dashboard({ user }: { user?: SessionUser }) {
     status,
     registerWin,
   } = useDashboardData();
+  const [notesByTeam, setNotesByTeam] = useState<Record<(typeof TEAMS)[number]["id"], string>>({
+    frontend: "",
+    backend: "",
+  });
 
   const teams = TEAMS.map((team) => ({
     id: team.id,
     wins: scoreboard?.teams.find((entry) => entry.id === team.id)?.wins ?? 0,
   }));
+
+  function handleNoteChange(teamId: (typeof TEAMS)[number]["id"], value: string) {
+    setNotesByTeam((current) => ({
+      ...current,
+      [teamId]: value,
+    }));
+  }
+
+  async function handleRegisterWin(teamId: (typeof TEAMS)[number]["id"]) {
+    const didSave = await registerWin({
+      teamId,
+      note: notesByTeam[teamId],
+    });
+
+    if (!didSave) {
+      return;
+    }
+
+    setNotesByTeam((current) => ({
+      ...current,
+      [teamId]: "",
+    }));
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
@@ -226,7 +285,9 @@ export function Dashboard({ user }: { user?: SessionUser }) {
                 wins={team.wins}
                 isLeader={scoreboard?.leaderTeamId === team.id}
                 isSubmitting={submittingTeamId === team.id}
-                onRegisterWin={registerWin}
+                note={notesByTeam[team.id]}
+                onNoteChange={handleNoteChange}
+                onRegisterWin={handleRegisterWin}
               />
             ))}
           </div>
