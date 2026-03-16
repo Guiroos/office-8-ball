@@ -24,7 +24,7 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - mobile hides the image and keeps only the form column
   - login uses `email + password`
   - signup uses `username + email + password`
-  - local validation blocks invalid submit before calling auth endpoints
+  - submit actions stay enabled while auth is available, but local validation blocks invalid requests before any auth endpoint call
   - field errors appear after blur or submit attempt and clear as values become valid
   - repeated auth failures now trigger a temporary progressive block
 - The API already supports optional `note`.
