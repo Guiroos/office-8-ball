@@ -59,6 +59,8 @@ Current route flow:
 - `/` redirects by session state
 - `/login` is the auth entry screen
 - `/scoreboard` is the authenticated match and scoreboard flow
+- invalid routes render a branded `404` screen
+- route rendering failures use a branded retry/recovery screen
 
 If `DATABASE_URL` is missing, auth stays disabled and login/signup remain unavailable.
 
