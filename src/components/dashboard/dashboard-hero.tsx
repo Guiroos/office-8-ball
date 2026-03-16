@@ -1,8 +1,9 @@
 import { Trophy } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Separator } from "@/components/ui/separator";
+import { StatTile } from "@/components/ui/stat-tile";
 import type { ScoreboardData } from "@/lib/types";
 
 import { getLeadLabel } from "./dashboard-utils";
@@ -21,22 +22,21 @@ export function DashboardHero({
       <CardContent className="grid gap-6 px-6 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(19rem,0.9fr)] lg:items-end">
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-3">
-            <Badge>Mesa oficial do escritório</Badge>
-            <Badge className="border-[color:var(--gold)] bg-[color:var(--gold-soft)] text-[color:var(--foreground)]">
-              {environmentLabel === "Escritório" ? "Modo escritório" : "Modo dev"}
-            </Badge>
+            <SectionHeader
+              eyebrow="Mesa oficial do escritório"
+              title="Office 8 Ball"
+              description="Um placar interno para registrar quem saiu da mesa como campeão e quem saiu procurando desculpa técnica."
+              className="gap-3"
+              titleClassName="[font-family:var(--font-display)] text-[length:var(--text-display-lg)] leading-[0.88] uppercase tracking-[0.06em] text-[color:var(--foreground)]"
+              descriptionClassName="max-w-2xl text-base leading-7 text-[color:var(--muted-foreground)] sm:text-lg"
+            />
           </div>
-
-          <div className="space-y-3">
+          <div>
             <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-[color:var(--muted-foreground)]">
               Rivalidade operacional
             </p>
-            <h1 className="[font-family:var(--font-display)] text-[length:var(--text-display-lg)] leading-[0.88] uppercase tracking-[0.06em] text-[color:var(--foreground)]">
-              Office 8 Ball
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-[color:var(--muted-foreground)] sm:text-lg">
-              Um placar interno para registrar quem saiu da mesa como campeão e quem
-              saiu procurando desculpa técnica.
+            <p className="mt-3 inline-flex w-fit rounded-[var(--radius-pill)] border border-[color:var(--gold)] bg-[color:var(--gold-soft)] px-3 py-1 text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground)] backdrop-blur-sm">
+              {environmentLabel === "Escritório" ? "Modo escritório" : "Modo dev"}
             </p>
           </div>
         </div>
@@ -61,31 +61,29 @@ export function DashboardHero({
           <Separator className="bg-[color:var(--border)]" />
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
-              <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
-                Total
-              </p>
-              <strong className="mt-2 block text-4xl font-black tracking-[-0.05em]">
-                {scoreboard?.totalMatches ?? 0}
-              </strong>
-              <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
-                partidas registradas
-              </p>
-            </div>
+            <StatTile
+              label="Total"
+              value={
+                <strong className="block text-4xl font-black tracking-[-0.05em]">
+                  {scoreboard?.totalMatches ?? 0}
+                </strong>
+              }
+              description="partidas registradas"
+              className="rounded-[var(--radius-md)]"
+            />
 
-            <div className="rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
-              <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
-                Streak
-              </p>
-              <strong className="mt-2 block text-4xl font-black tracking-[-0.05em]">
-                {scoreboard?.currentStreak ? `${scoreboard.currentStreak.count}x` : "0x"}
-              </strong>
-              <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
-                {scoreboard?.currentStreak
-                  ? scoreboard.currentStreak.teamName
-                  : "sem dominante"}
-              </p>
-            </div>
+            <StatTile
+              label="Streak"
+              value={
+                <strong className="block text-4xl font-black tracking-[-0.05em]">
+                  {scoreboard?.currentStreak ? `${scoreboard.currentStreak.count}x` : "0x"}
+                </strong>
+              }
+              description={
+                scoreboard?.currentStreak ? scoreboard.currentStreak.teamName : "sem dominante"
+              }
+              className="rounded-[var(--radius-md)]"
+            />
           </div>
         </div>
       </CardContent>

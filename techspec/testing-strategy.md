@@ -11,7 +11,7 @@ Definir a estrategia de validacao atual do projeto, os gaps conhecidos e a menor
 - `src/app/api/**/*.test.ts`
   - valida contratos e respostas das rotas
 - `src/components/**/*.test.tsx`
-  - valida dashboard, login e primitives relevantes
+  - valida dashboard, login, tema e componentes globais de composicao relevantes
 
 Ferramentas atuais:
 
@@ -28,6 +28,7 @@ Ferramentas atuais:
 - fluxo de login/signup no nivel de componente
 - regras de rate limit de auth com mocks isolados
 - integracao da dashboard com `fetch` mockado
+- contrato estrutural dos componentes globais de composicao em `src/components/ui/*`
 
 ## Gaps reais
 
@@ -67,7 +68,14 @@ Ferramentas atuais:
 - `npm run test -- src/components/theme/theme-core.test.ts`
 - `npm run test -- src/components/theme/theme-provider.test.tsx`
 - `npm run test -- src/components/theme/theme-toggle.test.tsx`
+- `npm run test -- src/components/ui/composition.test.tsx`
 - `npm run test -- src/components/dashboard.test.tsx`
+
+### Primitives ou composicao global de UI
+
+- `npm run test -- src/components/ui/composition.test.tsx`
+- `npm run test -- src/components/dashboard.test.tsx`
+- `npm run test -- src/components/login/login-screen.test.tsx`
 
 ## Regras praticas
 
