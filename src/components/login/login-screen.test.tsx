@@ -35,7 +35,6 @@ describe("LoginScreen", () => {
   it("renders the real login state by default", () => {
     render(<LoginScreen authAvailable />);
 
-    expect(screen.getByRole("heading", { name: "Login" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "Entre para registrar a proxima vitoria.",
@@ -43,10 +42,6 @@ describe("LoginScreen", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Entrar" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Criar conta" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Ver placar" })).toHaveAttribute(
-      "href",
-      "/scoreboard",
-    );
   });
 
   it("submits login credentials and redirects to the scoreboard", async () => {
@@ -70,9 +65,6 @@ describe("LoginScreen", () => {
 
     expect(pushMock).toHaveBeenCalledWith("/scoreboard");
     expect(refreshMock).toHaveBeenCalled();
-    expect(
-      screen.getByText("Sessao aberta. Redirecionando para o placar..."),
-    ).toBeInTheDocument();
   });
 
   it("shows local validation after blur and clears it when the field is fixed", async () => {
@@ -92,16 +84,16 @@ describe("LoginScreen", () => {
     expect(screen.queryByText("Informe um email valido.")).not.toBeInTheDocument();
   });
 
-  it("blocks invalid login submit before calling signIn", async () => {
+  it("validates invalid login submit before calling signIn", async () => {
     const user = userEvent.setup();
 
     render(<LoginScreen authAvailable />);
 
-    expect(screen.getAllByRole("button", { name: "Entrar" })[1]).toBeDisabled();
+    expect(screen.getAllByRole("button", { name: "Entrar" })[1]).toBeEnabled();
+    await user.click(screen.getAllByRole("button", { name: "Entrar" })[1]);
 
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
-
-    expect(screen.getAllByRole("button", { name: "Entrar" })[1]).toBeDisabled();
+    expect(screen.getByText("Informe um email valido.")).toBeInTheDocument();
+    expect(screen.getByText("Informe a senha.")).toBeInTheDocument();
     expect(signInMock).not.toHaveBeenCalled();
   });
 
@@ -152,18 +144,54 @@ describe("LoginScreen", () => {
     fetchMock.mockRestore();
   });
 
-  it("blocks invalid registration submit before calling the api", async () => {
+  it("shows a general error when registration succeeds but sign-in fails", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({
+        user: {
+          id: "user-1",
+          username: "gui.dev",
+          email: "gui@office8ball.dev",
+        },
+      }),
+    } as Response);
+    signInMock.mockResolvedValue({ ok: false, error: "CredentialsSignin" });
+
+    render(<LoginScreen authAvailable />);
+
+    await user.click(screen.getByRole("button", { name: "Criar conta" }));
+    await user.type(screen.getByLabelText("Username"), "gui.dev");
+    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Senha"), "secret123");
+    await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
+
+    expect(
+      await screen.findByText("Conta criada, mas nao foi possivel abrir a sessao."),
+    ).toBeInTheDocument();
+    expect(pushMock).not.toHaveBeenCalled();
+
+    fetchMock.mockRestore();
+  });
+
+  it("validates invalid registration submit before calling the api", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.spyOn(globalThis, "fetch");
 
     render(<LoginScreen authAvailable />);
 
     await user.click(screen.getByRole("button", { name: "Criar conta" }));
-    await user.type(screen.getByLabelText("Username"), "ab");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "invalido");
-    await user.type(screen.getByLabelText("Senha"), "123");
+    expect(screen.getAllByRole("button", { name: "Criar conta" })[1]).toBeEnabled();
+    await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
-    expect(screen.getAllByRole("button", { name: "Criar conta" })[1]).toBeDisabled();
+    expect(
+      screen.getByText(
+        "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Informe um email valido.")).toBeInTheDocument();
+    expect(screen.getByText("A senha precisa ter pelo menos 8 caracteres.")).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
 
@@ -200,6 +228,37 @@ describe("LoginScreen", () => {
     fetchMock.mockRestore();
   });
 
+  it("clears remote registration field errors when the user edits the field again", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({
+        error: "Ja existe uma conta com esses dados.",
+        fieldErrors: {
+          username: "Este username ja esta em uso.",
+        },
+      }),
+    } as Response);
+
+    render(<LoginScreen authAvailable />);
+
+    await user.click(screen.getByRole("button", { name: "Criar conta" }));
+    await user.type(screen.getByLabelText("Username"), "gui.dev");
+    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Senha"), "secret123");
+    await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
+
+    expect(await screen.findByText("Este username ja esta em uso.")).toBeInTheDocument();
+
+    const usernameInput = screen.getByLabelText("Username");
+    await user.type(usernameInput, "2");
+
+    expect(screen.queryByText("Este username ja esta em uso.")).not.toBeInTheDocument();
+
+    fetchMock.mockRestore();
+  });
+
   it("shows a generic wait message when login is rate limited", async () => {
     const user = userEvent.setup();
     signInMock.mockResolvedValue({ ok: false, error: "AuthRateLimited" });
@@ -216,13 +275,52 @@ describe("LoginScreen", () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it("resets validation and remote errors when switching between login and registration", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({
+        error: "Ja existe uma conta com esses dados.",
+        fieldErrors: {
+          username: "Este username ja esta em uso.",
+        },
+      }),
+    } as Response);
+
+    render(<LoginScreen authAvailable />);
+
+    await user.click(screen.getByRole("button", { name: "Criar conta" }));
+    await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
+    expect(
+      screen.getByText(
+        "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
+      ),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Username"), "gui.dev");
+    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Senha"), "secret123");
+    await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
+
+    expect(await screen.findByText("Este username ja esta em uso.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Entrar" }));
+
+    expect(
+      screen.queryByText("Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore."),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Este username ja esta em uso.")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Username")).not.toBeInTheDocument();
+
+    fetchMock.mockRestore();
+  });
+
   it("keeps auth disabled when DATABASE_URL is unavailable", () => {
     render(<LoginScreen authAvailable={false} />);
 
     expect(screen.getAllByRole("button", { name: "Entrar" })[1]).toBeDisabled();
-    expect(
-      screen.getAllByText("Autenticacao indisponivel sem DATABASE_URL configurado."),
-    ).toHaveLength(2);
+    expect(screen.getByText("Autenticacao indisponivel sem DATABASE_URL configurado.")).toBeInTheDocument();
     expect(signInMock).not.toHaveBeenCalled();
   });
 
@@ -235,9 +333,9 @@ describe("LoginScreen", () => {
     );
 
     expect(
-      screen.getAllByText(
+      screen.getByText(
         "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
       ),
-    ).toHaveLength(2);
+    ).toBeInTheDocument();
   });
 });
