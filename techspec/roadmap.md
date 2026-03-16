@@ -32,7 +32,10 @@ Nota:
 
 Prioridade: media
 
-- Considerar cobertura E2E para login e scoreboard
+- Expandir a cobertura E2E alem do fluxo principal ja implementado em login e scoreboard
+- Priorizar cenarios ainda nao cobertos, como rate limit de auth e variantes negativas mais profundas
+- Endurecer as assercoes de placar para garantir que cada registro de vitoria representa exatamente uma nova partida
+- Avaliar execucao de E2E em servidor mais proximo de producao com `next build` + `next start`
 - Avaliar `SonarQube Cloud` para code smells e quality gate de maintainability
 - Manter contratos de API e fluxo da UI sincronizados em qualquer evolucao
 

@@ -95,6 +95,8 @@ Example body:
 - `npm run test`
 - `npm run test:watch`
 - `npm run test:coverage`
+- `npm run e2e`
+- `npm run e2e:ui`
 - `npm run typecheck`
 
 Current coverage focus:
@@ -105,13 +107,14 @@ Current coverage focus:
 - reusable composition components in `src/components/ui/*`
 - theme provider, toggle, and bootstrap behavior
 - shared auth validation schemas and field error mapping
+- browser E2E for the authenticated login and scoreboard flow with `Playwright`
 
 Not covered yet:
 - Prisma-backed integration tests
-- browser E2E tests
 
 ## CI/CD And Repository Protection
 - GitHub Actions validates pull requests with `CI`, `Dependency Review`, and `CodeQL`.
+- GitHub Actions also runs an `E2E` workflow with a temporary Postgres service for browser coverage.
 - Production deploy now happens only from Git tags `v*` through the `Deploy Production Tag` workflow.
 - Before the production build, `Deploy Production Tag` runs `npm run prisma:deploy` against `DATABASE_URL`.
 - Dependabot is configured for weekly updates to `npm` dependencies and GitHub Actions.
@@ -122,6 +125,9 @@ Not covered yet:
 
 Operational details and follow-up recommendations live in `techspec/github-operations.md`.
 Git workflow, branch naming, commits, and release conventions live in `techspec/git-conventions.md`.
+
+For `Playwright` E2E, the repository does not require a dedicated Neon database.
+The GitHub Actions workflow provisions a temporary Postgres instance just for the E2E job.
 
 ## Database
 The Prisma schema lives in `prisma/schema.prisma`.

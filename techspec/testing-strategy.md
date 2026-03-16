@@ -17,6 +17,7 @@ Ferramentas atuais:
 
 - `Vitest`
 - `Testing Library`
+- `Playwright`
 - `npm run lint`
 - `npm run typecheck`
 - `npm run build`
@@ -30,11 +31,14 @@ Ferramentas atuais:
 - regras de rate limit de auth com mocks isolados
 - integracao da dashboard com `fetch` mockado
 - contrato estrutural dos componentes globais de composicao em `src/components/ui/*`
+- fluxo real autenticado com navegador para signup, login, logout e registro de vitoria
 
 ## Gaps reais
 
 - nao ha testes integrados com Prisma real
-- nao ha E2E de navegador para `/login` e `/scoreboard`
+- a cobertura E2E ainda nao cobre rate limit de auth nem variantes negativas mais profundas
+- as assercoes E2E de registro de vitoria ainda podem ficar mais estritas para detectar duplicidade de partidas
+- a execucao E2E atual roda sobre `next dev`; ainda vale validar migracao futura para `next build` + `next start`
 
 ## Validacao minima por tipo de mudanca
 
@@ -60,6 +64,7 @@ Ferramentas atuais:
 ### Persistencia, schema ou mudanca ampla
 
 - `npm run test`
+- `npm run e2e`
 - `npm run lint`
 - `npm run typecheck`
 - `npm run build`
@@ -84,3 +89,4 @@ Ferramentas atuais:
 - Se `src/lib/data.ts` mudar, considerar sempre os modos com e sem `DATABASE_URL`
 - Se auth mudar, verificar explicitamente o comportamento sem `DATABASE_URL` e sem `NEXTAUTH_SECRET`
 - Nao tratar sucesso em fallback em memoria como prova de persistencia real compartilhada
+- Os E2E usam Postgres temporario no GitHub Actions; nao exigem banco dedicado no Neon

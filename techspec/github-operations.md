@@ -13,6 +13,10 @@ O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plat
 - `CI`
   - roda em `pull_request` e `push` para `master`
   - executa `npm ci`, `prisma generate`, `lint`, `typecheck`, `test:coverage` e `build`
+- `E2E`
+  - roda em `pull_request` e `workflow_dispatch`
+  - sobe um Postgres temporario via service container no GitHub Actions
+  - executa `prisma migrate deploy`, `prisma db seed` e a suite `Playwright`
 - `Dependency Review`
   - roda em `pull_request`
   - analisa dependencias novas ou alteradas no PR
@@ -94,7 +98,6 @@ Configurar:
 Esta camada cobre validacao basica, SAST inicial e review de dependencias. Ela ainda nao cobre:
 
 - analise formal de code smells e maintainability por plataforma dedicada
-- E2E gates
 - testes integrados com Prisma real no CI
 
 Proxima fase recomendada:
