@@ -26,6 +26,7 @@ Ferramentas atuais:
 - derivacao do placar a partir do historico
 - validacao de payloads e erros das rotas principais
 - fluxo de login/signup no nivel de componente
+- validacao do login no submit, limpeza de erros remotos e reset de estado ao trocar entre modos
 - regras de rate limit de auth com mocks isolados
 - integracao da dashboard com `fetch` mockado
 - contrato estrutural dos componentes globais de composicao em `src/components/ui/*`

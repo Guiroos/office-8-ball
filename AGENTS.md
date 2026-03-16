@@ -16,7 +16,7 @@ Use this file as the default operating guide for AI agents working in this repo.
 - Auth field validation is shared with `zod` schemas used by both frontend and backend.
 - The real functional flow today is the authenticated scoreboard at `/scoreboard`.
 - `/login` is the real login/signup entry screen.
-- `/login` uses a branded full-page layout with header, footer, and a desktop-first two-column composition.
+- `/login` uses a branded full-page layout with a desktop-first two-column composition.
 - Visual theme tokens live in `src/app/globals.css`, including the shared foundation scale for radius, shadow, and type across login and dashboard.
 - `/` redirects by session state.
 
@@ -137,7 +137,7 @@ Important:
 - With `DATABASE_URL`, `middleware.ts` protects `/scoreboard` and the page/API layers also validate session
 - Without `DATABASE_URL`, auth stays disabled and the local scoreboard flow can still run only for development fallback
 - The login screen handles both `entrar` and `criar conta`
-- The login screen validates locally before submit and only calls auth endpoints when the current mode is valid
+- The login screen keeps submit actions enabled while auth is available, validates locally on blur or submit, and only calls auth endpoints when the current mode is valid
 - Field errors appear after blur or submit attempt; API conflicts still return remote field errors
 - Repeated auth failures trigger temporary progressive blocks keyed by normalized `email + IP`
 - On desktop, the login keeps the image on the left and the form on the right

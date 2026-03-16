@@ -78,7 +78,7 @@ Status: concluido parcialmente
 
 - Os campos do login ja foram migrados para primitives locais em `src/components/ui/form.tsx`
 - O controle segmentado `Entrar` / `Criar conta` ainda nao virou primitive reutilizavel
-- O bloco de status do ambiente deixou de ser composicao inline e passou a reutilizar `IconCallout`
+- O toggle de tema do login foi mantido como controle local dentro do card, sem depender de cabecalho ou rodape dedicados
 
 Direcao:
 

@@ -17,7 +17,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 ## Fluxo funcional
 
 - `/login` concentra os modos `entrar` e `criar conta`
-- O frontend valida os campos localmente antes de chamar `signIn` ou `POST /api/auth/register`
+- O frontend mantem as acoes de submit habilitadas enquanto auth estiver disponivel, mas valida os campos localmente antes de chamar `signIn` ou `POST /api/auth/register`
 - Os schemas `zod` sao compartilhados entre frontend e backend
 - Erros locais aparecem por blur ou tentativa de submit
 - Erros remotos continuam aparecendo como field errors ou erro geral de submit
