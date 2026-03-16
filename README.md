@@ -132,6 +132,7 @@ The GitHub Actions workflow provisions a temporary Postgres instance just for th
 ## Database
 The Prisma schema lives in `prisma/schema.prisma`.
 The initial migration lives in `prisma/migrations/0001_init/migration.sql`.
+The Prisma client is generated with `binaryTargets = ["native", "rhel-openssl-3.0.x"]` so local development keeps working while production builds still include the query engine required by the current Vercel runtime.
 
 ## Documentation Notes
 - `AGENTS.md` is the fast-start guide for AI agents.
