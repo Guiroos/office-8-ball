@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+
 import { expect, type Page } from "@playwright/test";
 
 type Credentials = {
@@ -9,7 +11,8 @@ type Credentials = {
 export function createCredentials(seed: string): Credentials {
   const safeSeed = seed.toLowerCase().replace(/[^a-z0-9]+/g, "");
   const shortSeed = safeSeed.slice(0, 6) || "user";
-  const uniqueSuffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  const randomPart = randomBytes(4).toString("hex");
+  const uniqueSuffix = `${Date.now().toString(36)}${parseInt(randomPart, 16).toString(36).slice(0, 6)}`;
   const username = `e2e${shortSeed}${uniqueSuffix}`.slice(0, 24);
 
   return {
