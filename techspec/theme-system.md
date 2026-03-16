@@ -21,6 +21,8 @@ Status: manter e expandir
 - `Button`, `Card` e `Badge` ja consomem tokens semanticos em vez de cores fixas
 - login e dashboard agora compartilham uma escala minima de `radius`, `shadow` e `type` via tokens globais
 - Isso reduz retrabalho e evita duplicacao de paleta entre login e dashboard
+- Alem dos primitives base, a camada `src/components/ui/*` agora inclui pequenos componentes de composicao global para evitar repeticao estrutural entre telas
+- `SectionHeader`, `StatTile`, `IconCallout` e `SurfacePanel` concentram padroes recorrentes de cabecalho, tile informativo, callout com icone e superficie tematizada
 
 ### Modo claro/escuro
 
@@ -76,6 +78,7 @@ Status: concluido parcialmente
 
 - Os campos do login ja foram migrados para primitives locais em `src/components/ui/form.tsx`
 - O controle segmentado `Entrar` / `Criar conta` ainda nao virou primitive reutilizavel
+- O bloco de status do ambiente deixou de ser composicao inline e passou a reutilizar `IconCallout`
 
 Direcao:
 
@@ -87,6 +90,7 @@ Status: resolvido
 
 - O `TeamScoreCard` agora usa variantes por time e estado de lideranca
 - O componente expõe `data-team` e `data-leader` para leitura e teste sem depender de `style` inline
+- Cabecalhos de secao e tiles informativos do dashboard agora reaproveitam os componentes globais de composicao em vez de classes repetidas por tela
 
 Direcao:
 

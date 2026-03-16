@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SectionHeader } from "@/components/ui/section-header";
 import type { MatchRecord } from "@/lib/types";
 
 import { formatMatchDate } from "./dashboard-utils";
@@ -9,10 +9,7 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
   return (
     <Card className="bg-[color:var(--surface)]">
       <CardContent className="space-y-5 p-6 sm:p-7">
-        <CardHeader className="gap-3">
-          <Badge>Últimas partidas</Badge>
-          <CardTitle>Histórico recente</CardTitle>
-        </CardHeader>
+        <SectionHeader eyebrow="Últimas partidas" title="Histórico recente" />
 
         {matches.length === 0 ? (
           <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-5">

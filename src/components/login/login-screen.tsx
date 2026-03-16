@@ -9,6 +9,8 @@ import { type FormEvent, useState } from "react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel, Input } from "@/components/ui/form";
+import { IconCallout } from "@/components/ui/icon-callout";
+import { SurfacePanel } from "@/components/ui/surface-panel";
 import {
   getLoginFieldErrors,
   getRegisterFieldErrors,
@@ -272,7 +274,10 @@ export function LoginScreen({
   return (
     <main className="min-h-screen overflow-x-clip bg-[image:var(--brand-gradient)]">
       <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-        <header className="flex flex-none items-center justify-between gap-4 rounded-[var(--radius-xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-[color:var(--surface-strong-foreground)] shadow-[var(--shadow-brand)] backdrop-blur-xl sm:px-6">
+        <SurfacePanel
+          variant="brand"
+          className="flex flex-none items-center justify-between gap-4 px-5 py-4 sm:px-6"
+        >
           <div className="flex items-center gap-3">
             <div className="flex size-11 items-center justify-center rounded-[var(--radius-pill)] border border-[color:var(--gold-soft)] bg-[color:var(--surface-strong-muted)] text-[color:var(--gold)]">
               <LockKeyhole className="size-5" />
@@ -293,7 +298,7 @@ export function LoginScreen({
             </p>
             <ThemeToggle className="h-11 rounded-[var(--radius-sm)] border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground)] hover:bg-[color:var(--surface-muted)]" />
           </div>
-        </header>
+        </SurfacePanel>
 
         <section className="flex min-h-0 flex-1 py-4 lg:py-5">
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
@@ -480,34 +485,28 @@ export function LoginScreen({
                     </Button>
                   </form>
 
-                  <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex size-9 items-center justify-center rounded-[var(--radius-pill)] bg-[color:var(--surface-success)] text-[color:var(--frontend)]">
-                        <ShieldCheck className="size-4" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-[color:var(--foreground-soft)]">
-                          Status do ambiente
-                        </p>
-                        <p className="text-sm leading-6 text-[color:var(--muted-foreground)]">
-                          {statusMessage}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <IconCallout
+                    icon={<ShieldCheck className="size-4" />}
+                    title="Status do ambiente"
+                    description={statusMessage}
+                    tone="default"
+                  />
                 </div>
               </div>
             </section>
           </div>
         </section>
 
-        <footer className="flex flex-none flex-col items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] px-5 py-4 text-sm text-[color:var(--surface-strong-foreground-muted)] backdrop-blur-xl sm:flex-row sm:px-6">
+        <SurfacePanel
+          className="flex flex-none flex-col items-center justify-between gap-3 px-5 py-4 text-sm text-[color:var(--surface-strong-foreground-muted)] sm:flex-row sm:px-6"
+          variant="brand"
+        >
           <p>Office 8 Ball agora separa preview visual de acesso real com sessao.</p>
           <div className="flex items-center gap-3 text-[color:var(--gold)]">
             <span className="h-2 w-2 rounded-full bg-current" />
             <span>Frontend e Backend entram pela mesma porta autenticada.</span>
           </div>
-        </footer>
+        </SurfacePanel>
       </div>
     </main>
   );

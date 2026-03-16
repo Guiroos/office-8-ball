@@ -6,6 +6,7 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
 - `v1` is implemented as a single-screen Next.js app.
 - The main dashboard now uses `Tailwind CSS` + local `shadcn/ui`-style components.
 - The theme system is shared across login and dashboard, with global foundation tokens for radius, shadow, and type.
+- The local UI layer now combines base primitives plus small reusable composition components for shared section headers, stat tiles, icon callouts, and themed surfaces.
 - Persistence supports two modes:
   - `Prisma + Neon/Postgres` when `DATABASE_URL` is configured
   - in-memory fallback for local development when `DATABASE_URL` is missing
@@ -96,6 +97,7 @@ Current coverage focus:
 - API route contracts
 - dashboard behavior with mocked `fetch`
 - login and signup behavior with mocked auth calls
+- reusable composition components in `src/components/ui/*`
 - theme provider, toggle, and bootstrap behavior
 - shared auth validation schemas and field error mapping
 

@@ -59,7 +59,7 @@ Practical note:
 - `src/components/dashboard/*`: scoreboard subcomponents
 - `src/components/login/login-screen.tsx`: branded login/signup UI connected to real auth
 - `src/components/theme/*`: app-wide theme provider, toggle, shared theme helpers, and theme tests
-- `src/components/ui/*`: local UI primitives
+- `src/components/ui/*`: local UI primitives plus shared composition components
 
 ### Domain And Persistence
 
@@ -216,6 +216,7 @@ Read:
 2. `src/components/dashboard/use-dashboard-data.ts`
 3. relevant subcomponents in `src/components/dashboard/`
 4. `src/components/dashboard.test.tsx`
+5. `src/components/ui/composition.test.tsx` when shared composition primitives are involved
 
 ### Login/auth changes
 
@@ -263,6 +264,7 @@ npm run test -- src/app/api/matches/route.test.ts
 npm run test -- src/app/api/scoreboard/route.test.ts
 npm run test -- src/components/dashboard.test.tsx
 npm run test -- src/components/login/login-screen.test.tsx
+npm run test -- src/components/ui/composition.test.tsx
 npm run test -- src/lib/auth-validation.test.ts
 ```
 

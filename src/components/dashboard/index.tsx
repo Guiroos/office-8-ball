@@ -7,7 +7,10 @@ import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
+import { StatTile } from "@/components/ui/stat-tile";
+import { SurfacePanel } from "@/components/ui/surface-panel";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { TEAMS } from "@/lib/constants";
 import type { SessionUser } from "@/lib/types";
@@ -147,7 +150,7 @@ export function Dashboard({ user }: { user?: SessionUser }) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
       {user ? (
-        <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-5 py-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center sm:justify-between">
+        <SurfacePanel className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[color:var(--surface-emphasis)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
               Sessao ativa
@@ -171,7 +174,7 @@ export function Dashboard({ user }: { user?: SessionUser }) {
               Sair
             </Button>
           </div>
-        </div>
+        </SurfacePanel>
       ) : null}
 
       <DashboardHero
@@ -182,52 +185,38 @@ export function Dashboard({ user }: { user?: SessionUser }) {
 
       <Card className="overflow-hidden border-[color:var(--border-inverse)] bg-[color:var(--surface-strong)] text-[color:var(--surface-strong-foreground)]">
         <CardContent className="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <CardHeader className="gap-3">
-              <Badge className="border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground-muted)]">
-                Placar atual
-              </Badge>
-              <CardTitle>Frontend vs Backend</CardTitle>
-              <CardDescription className="max-w-xl text-[color:var(--surface-strong-foreground-muted)]">
-                Registro rápido, sem rodeio e sem update otimista antes da persistência
-                fechar.
-              </CardDescription>
-            </CardHeader>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
-                  Liderança
-                </p>
-                <p className="mt-2 text-lg font-semibold">{getLeaderName(scoreboard)}</p>
-                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
-                  {scoreboard?.leadBy ? `${scoreboard.leadBy} de vantagem` : "sem folga"}
-                </p>
+          <SectionHeader
+            eyebrow="Placar atual"
+            title="Frontend vs Backend"
+            description="Registro rápido, sem rodeio e sem update otimista antes da persistência fechar."
+            inverse
+            actions={
+              <div className="grid gap-3 sm:grid-cols-3">
+                <StatTile
+                  label="Liderança"
+                  value={getLeaderName(scoreboard)}
+                  description={
+                    scoreboard?.leadBy ? `${scoreboard.leadBy} de vantagem` : "sem folga"
+                  }
+                  tone="inverse"
+                />
+                <StatTile
+                  label="Ritmo"
+                  value={loading ? "Carregando..." : "Mesa pronta"}
+                  description={
+                    submittingTeamId ? "gravando partida" : "aguardando a próxima treta"
+                  }
+                  tone="inverse"
+                />
+                <StatTile
+                  label="Ambiente"
+                  value={getEnvironmentLabel()}
+                  description="mesma interface, clima diferente"
+                  tone="inverse"
+                />
               </div>
-
-              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
-                  Ritmo
-                </p>
-                <p className="mt-2 text-lg font-semibold">
-                  {loading ? "Carregando..." : "Mesa pronta"}
-                </p>
-                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
-                  {submittingTeamId ? "gravando partida" : "aguardando a próxima treta"}
-                </p>
-              </div>
-
-              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] p-4">
-                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--surface-strong-foreground-muted)]">
-                  Ambiente
-                </p>
-                <p className="mt-2 text-lg font-semibold">{getEnvironmentLabel()}</p>
-                <p className="mt-1 text-sm text-[color:var(--surface-strong-foreground-muted)]">
-                  mesma interface, clima diferente
-                </p>
-              </div>
-            </div>
-          </div>
+            }
+          />
 
           <div className="grid gap-4 lg:grid-cols-2">
             {teams.map((team) => (
