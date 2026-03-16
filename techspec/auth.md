@@ -10,6 +10,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Login com `email + password`
 - Cadastro com `username + email + password`
 - Usuarios persistidos via Prisma em `users`
+- Rate limit persistido via Prisma para `login` e `signup`
 - O fluxo autenticado real e `/scoreboard`
 - As APIs de scoreboard exigem sessao autenticada quando auth esta disponivel
 
@@ -20,6 +21,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Os schemas `zod` sao compartilhados entre frontend e backend
 - Erros locais aparecem por blur ou tentativa de submit
 - Erros remotos continuam aparecendo como field errors ou erro geral de submit
+- Login e cadastro usam protecao por `email + ip` com janela progressiva de bloqueio
 - `/` redireciona para `/scoreboard` quando ha sessao e para `/login` quando nao ha
 - `middleware.ts` na raiz protege `/scoreboard` com `withAuth` quando `DATABASE_URL` esta configurado
 - `/scoreboard` tambem redireciona para `/login` quando nao existe usuario autenticado
@@ -49,6 +51,7 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 - Nao ha verificacao de email
 - Nao ha perfil de usuario alem do cadastro basico
 - Nao ha RBAC implementado
+- O rate limit usa `email + ip`, bloqueia apos `5` falhas em `10` minutos e dobra `15 -> 30 -> 60` minutos ate sucesso resetar o estado
 
 ## Pontos tecnicos relevantes
 
@@ -63,11 +66,11 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 
 ## Gaps conhecidos
 
-- Nao ha rate limit para tentativas de login
 - Nao ha papeis ou permissoes de backend alem da exigencia de sessao
 
 ## Proximos passos relacionados
 
 - Monitorar o auth endurecido em preview/producao com `NEXTAUTH_SECRET` obrigatorio
+- Adicionar testes integrados com Prisma real para validar o rate limit fora de mocks
 - Definir se o produto precisara de RBAC antes de expandir o dominio
 - Evitar qualquer extensao de auth que complique o v1 sem necessidade real

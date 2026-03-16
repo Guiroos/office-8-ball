@@ -11,6 +11,7 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - `Prisma + Neon/Postgres` when `DATABASE_URL` is configured
   - in-memory fallback for local development when `DATABASE_URL` is missing
 - Authentication uses `Auth.js` credentials plus Prisma-backed users when `DATABASE_URL` is configured
+- Login and signup now apply Prisma-backed rate limiting by `email + ip`
 - Auth validation is shared between client and server through `zod` schemas
 - Implemented APIs:
   - `GET /api/scoreboard`
@@ -25,6 +26,7 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
   - signup uses `username + email + password`
   - local validation blocks invalid submit before calling auth endpoints
   - field errors appear after blur or submit attempt and clear as values become valid
+  - repeated auth failures now trigger a temporary progressive block
 - The API already supports optional `note`.
 - The current UI already renders persisted notes in recent history.
 - The current winner-registration flow still does not expose note entry yet.
@@ -70,6 +72,7 @@ npm run prisma:seed
 Also set `NEXTAUTH_SECRET` in every environment before enabling real auth.
 If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, the app now treats auth as invalid configuration instead of falling back to an implicit secret.
 Production should run only behind HTTPS so Auth.js can issue secure session cookies.
+When auth is enabled, repeated failures on login/signup are tracked by normalized `email + ip`, blocking after `5` failures in `10` minutes with progressive cooldowns `15 -> 30 -> 60` minutes.
 
 ## API
 - `GET /api/scoreboard`

@@ -2,6 +2,13 @@ import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 
 import {
+  AUTH_RATE_LIMIT_MESSAGE,
+  buildAuthRateLimitKey,
+  clearAuthRateLimit,
+  getAuthRateLimitStatus,
+  registerAuthFailure,
+} from "@/lib/auth-rate-limit";
+import {
   getAuthUnavailableResponse,
   isAuthAvailable,
 } from "@/lib/auth";
@@ -28,6 +35,22 @@ export async function POST(request: Request) {
   }
 
   const { email, username } = validation.data;
+  const rateLimitKey = buildAuthRateLimitKey({
+    action: "register",
+    email,
+    headers: request.headers,
+  });
+  const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);
+
+  if (rateLimitStatus.blocked) {
+    return NextResponse.json<ApiErrorResponse>(
+      {
+        error: AUTH_RATE_LIMIT_MESSAGE,
+        retryAfterSeconds: rateLimitStatus.retryAfterSeconds,
+      },
+      { status: 429 },
+    );
+  }
 
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -40,6 +63,18 @@ export async function POST(request: Request) {
   });
 
   if (existingUser) {
+    const failure = await registerAuthFailure(rateLimitKey);
+
+    if (failure.blocked) {
+      return NextResponse.json<ApiErrorResponse>(
+        {
+          error: AUTH_RATE_LIMIT_MESSAGE,
+          retryAfterSeconds: failure.retryAfterSeconds,
+        },
+        { status: 429 },
+      );
+    }
+
     const fieldErrors: NonNullable<ApiErrorResponse["fieldErrors"]> = {};
 
     if (existingUser.email === email) {
@@ -72,6 +107,8 @@ export async function POST(request: Request) {
       email: true,
     },
   });
+
+  await clearAuthRateLimit(rateLimitKey);
 
   return NextResponse.json<RegisterUserResponse>(
     {

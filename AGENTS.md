@@ -12,6 +12,7 @@ Use this file as the default operating guide for AI agents working in this repo.
 - `frontend` and `backend` are the only valid teams in v1.
 - The scoreboard is always derived from match history.
 - Authentication now exists through `Auth.js` credentials backed by Prisma users.
+- Login and signup now use Prisma-backed rate limiting by normalized `email + IP`.
 - Auth field validation is shared with `zod` schemas used by both frontend and backend.
 - The real functional flow today is the authenticated scoreboard at `/scoreboard`.
 - `/login` is the real login/signup entry screen.
@@ -66,6 +67,7 @@ Practical note:
 - `src/lib/constants.ts`: fixed team metadata and win messages
 - `src/lib/types.ts`: shared domain and API types
 - `src/lib/auth.ts`: Auth.js config and session helpers
+- `src/lib/auth-rate-limit.ts`: auth rate limit helpers and IP/email keying
 - `src/lib/auth-validation.ts`: shared auth schemas, normalization, and field error mapping
 - `src/lib/data.ts`: business rules, persistence switching, scoreboard derivation, seed self-healing
 - `src/lib/prisma.ts`: shared Prisma client
@@ -105,6 +107,7 @@ Important:
 - In-memory data disappears on server restart
 - Local success without `DATABASE_URL` does not prove shared persistence works
 - Login/signup require `DATABASE_URL` because users persist only in Postgres
+- Login/signup rate limiting also persists only when `DATABASE_URL` is available
 - If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, treat auth as invalid configuration rather than a disabled feature
 
 ### Match Creation
@@ -136,6 +139,7 @@ Important:
 - The login screen handles both `entrar` and `criar conta`
 - The login screen validates locally before submit and only calls auth endpoints when the current mode is valid
 - Field errors appear after blur or submit attempt; API conflicts still return remote field errors
+- Repeated auth failures trigger temporary progressive blocks keyed by normalized `email + IP`
 - On desktop, the login keeps the image on the left and the form on the right
 - On mobile, the image is hidden and the form remains in a single column
 

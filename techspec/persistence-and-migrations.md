@@ -7,6 +7,7 @@ Documentar como persistencia, schema, seed e fallback em memoria se relacionam n
 ## Modelo atual
 
 - Com `DATABASE_URL`, partidas e usuarios usam Prisma + Postgres
+- Com `DATABASE_URL`, o rate limit de auth tambem usa Prisma + Postgres
 - Sem `DATABASE_URL`, apenas as partidas usam fallback em memoria
 - Auth nao possui fallback em memoria
 
@@ -20,8 +21,9 @@ Documentar como persistencia, schema, seed e fallback em memoria se relacionam n
 
 ### `prisma/schema.prisma`
 
-- define as tabelas `teams`, `matches` e `users`
+- define as tabelas `teams`, `matches`, `users` e `auth_rate_limits`
 - preserva relacao entre `Match.winnerTeamId` e `Team.id`
+- persiste o estado agregado do rate limit de auth por chave `action + email + ip`
 
 ### `prisma/seed.mjs`
 
@@ -47,6 +49,7 @@ Documentar como persistencia, schema, seed e fallback em memoria se relacionam n
 - Mudancas em `prisma/schema.prisma` devem manter compatibilidade com o fluxo atual de `/login` e `/scoreboard`, salvo mudanca explicita de produto
 - Se o schema mudar, revisar tambem `prisma/seed.mjs` e as regras em `src/lib/data.ts`
 - Migrations devem preservar o modelo de dois times fixos, a relacao de `matches` com `teams` e a persistencia de `users`
+- Migrations de auth devem preservar tambem a tabela `auth_rate_limits` e sua compatibilidade com login/signup
 
 ## Validacao recomendada
 
