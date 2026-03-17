@@ -55,4 +55,18 @@ describe("ThemeToggle", () => {
 
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
+
+  it("supports contextual button variants for inverted surfaces", () => {
+    const toggleTheme = vi.fn();
+    useThemeMock.mockReturnValue({
+      resolvedTheme: "light",
+      toggleTheme,
+    });
+
+    render(<ThemeToggle variant="sidebar" />);
+
+    expect(screen.getByRole("button", { name: "Mudar para tema escuro" })).toHaveClass(
+      "text-[color:var(--app-shell-sidebar-foreground)]",
+    );
+  });
 });

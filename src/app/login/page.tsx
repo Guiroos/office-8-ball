@@ -18,7 +18,7 @@ export default async function LoginPage() {
   const authAvailable = isAuthAvailable();
 
   if (user) {
-    redirect("/scoreboard");
+    redirect("/dashboard");
   }
 
   return (

@@ -18,7 +18,7 @@ export function DashboardHero({
   environmentLabel: string;
 }) {
   return (
-    <Card className="overflow-hidden bg-[image:var(--hero-gradient)]">
+    <Card className="overflow-hidden border-[color:var(--border-strong)] bg-[image:var(--hero-gradient)]">
       <CardContent className="grid gap-6 px-6 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(19rem,0.9fr)] lg:items-end">
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-3">
@@ -28,11 +28,11 @@ export function DashboardHero({
               description="Um placar interno para registrar quem saiu da mesa como campeão e quem saiu procurando desculpa técnica."
               className="gap-3"
               titleClassName="[font-family:var(--font-display)] text-[length:var(--text-display-lg)] leading-[0.88] uppercase tracking-[0.06em] text-[color:var(--foreground)]"
-              descriptionClassName="max-w-2xl text-base leading-7 text-[color:var(--muted-foreground)] sm:text-lg"
+              descriptionClassName="max-w-2xl text-base leading-7 text-[color:var(--foreground-soft)] sm:text-lg"
             />
           </div>
           <div>
-            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-[color:var(--foreground-soft)]">
               Rivalidade operacional
             </p>
             <p className="mt-3 inline-flex w-fit rounded-[var(--radius-pill)] border border-[color:var(--gold)] bg-[color:var(--gold-soft)] px-3 py-1 text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground)] backdrop-blur-sm">
@@ -41,10 +41,10 @@ export function DashboardHero({
           </div>
         </div>
 
-        <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-muted)] p-5 backdrop-blur-sm">
+        <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-5 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
+              <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground-soft)]">
                 Leitura oficial
               </p>
               <p className="mt-2 text-xl font-semibold tracking-[-0.03em]">
@@ -53,7 +53,7 @@ export function DashboardHero({
                   : getLeadLabel(scoreboard)}
               </p>
             </div>
-            <div className="rounded-[var(--radius-pill)] bg-[color:var(--surface-emphasis)] p-3 text-[color:var(--foreground)]">
+            <div className="rounded-[var(--radius-pill)] border border-[color:var(--border)] bg-[color:var(--surface)] p-3 text-[color:var(--foreground)]">
               <Trophy className="size-5" />
             </div>
           </div>

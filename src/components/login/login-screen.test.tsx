@@ -44,7 +44,7 @@ describe("LoginScreen", () => {
     expect(screen.getByRole("button", { name: "Criar conta" })).toBeInTheDocument();
   });
 
-  it("submits login credentials and redirects to the scoreboard", async () => {
+  it("submits login credentials and redirects to the dashboard", async () => {
     const user = userEvent.setup();
     signInMock.mockResolvedValue({ ok: true, error: undefined });
 
@@ -59,11 +59,11 @@ describe("LoginScreen", () => {
         email: "gui@office8ball.dev",
         password: "secret123",
         redirect: false,
-        callbackUrl: "/scoreboard",
+        callbackUrl: "/dashboard",
       });
     });
 
-    expect(pushMock).toHaveBeenCalledWith("/scoreboard");
+    expect(pushMock).toHaveBeenCalledWith("/dashboard");
     expect(refreshMock).toHaveBeenCalled();
   });
 
@@ -138,9 +138,9 @@ describe("LoginScreen", () => {
       email: "gui@office8ball.dev",
       password: "secret123",
       redirect: false,
-      callbackUrl: "/scoreboard",
+      callbackUrl: "/dashboard",
     });
-    expect(pushMock).toHaveBeenCalledWith("/scoreboard");
+    expect(pushMock).toHaveBeenCalledWith("/dashboard");
     fetchMock.mockRestore();
   });
 

@@ -43,7 +43,7 @@ export function CardDescription({
   return (
     <p
       className={cn(
-        "text-sm leading-6 text-[color:var(--muted-foreground)]",
+        "text-sm leading-6 text-[color:var(--foreground-soft)]",
         className,
       )}
       {...props}

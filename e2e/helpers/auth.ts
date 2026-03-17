@@ -29,7 +29,7 @@ export async function signUp(page: Page, credentials: Credentials) {
   await page.getByLabel("E-mail corporativo").fill(credentials.email);
   await page.getByLabel("Senha").fill(credentials.password);
   await page.getByRole("button", { name: "Criar conta" }).last().click();
-  await expect(page).toHaveURL(/\/scoreboard$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
 }
 
 export async function login(page: Page, credentials: Credentials) {
@@ -37,10 +37,11 @@ export async function login(page: Page, credentials: Credentials) {
   await page.getByLabel("E-mail corporativo").fill(credentials.email);
   await page.getByLabel("Senha").fill(credentials.password);
   await page.getByRole("button", { name: "Entrar" }).last().click();
-  await expect(page).toHaveURL(/\/scoreboard$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
 }
 
-export async function logout(page: Page) {
+export async function logout(page: Page, username: string) {
+  await page.getByRole("button", { name: new RegExp(username, "i") }).click();
   await page.getByTestId("dashboard-sign-out").click();
   await expect(page).toHaveURL(/\/login$/);
 }

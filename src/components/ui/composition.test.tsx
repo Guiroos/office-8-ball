@@ -39,7 +39,7 @@ describe("composition ui", () => {
     expect(screen.getByRole("heading", { name: "Frontend vs Backend" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Atualizar" })).toBeInTheDocument();
     expect(eyebrow).toHaveClass("border-[color:var(--border-inverse)]");
-    expect(description).toHaveClass("text-[color:var(--surface-strong-foreground-muted)]");
+    expect(description).toHaveClass("theme-text-strong-muted");
   });
 
   it("keeps the title accessible when visually hidden", () => {
@@ -71,12 +71,8 @@ describe("composition ui", () => {
     expect(screen.getByText("Ambiente")).toBeInTheDocument();
     expect(screen.getByText("Escritório")).toBeInTheDocument();
     expect(screen.getByText("mesa oficial")).toBeInTheDocument();
-    expect(screen.getByText("Ambiente")).toHaveClass(
-      "text-[color:var(--surface-strong-foreground-muted)]",
-    );
-    expect(screen.getByText("mesa oficial")).toHaveClass(
-      "text-[color:var(--surface-strong-foreground-muted)]",
-    );
+    expect(screen.getByText("Ambiente")).toHaveClass("theme-text-strong-muted");
+    expect(screen.getByText("mesa oficial")).toHaveClass("theme-text-strong-muted");
   });
 
   it("renders icon callout content", () => {
@@ -104,7 +100,7 @@ describe("composition ui", () => {
 
     let callout = screen.getByText("Status").closest("div.border");
     expect(callout).toHaveClass("bg-[color:var(--surface-success)]");
-    expect(screen.getByText("Base padrao")).toHaveClass("text-[color:inherit]");
+    expect(screen.getByText("Base padrao")).toHaveClass("text-[color:var(--foreground-soft)]");
 
     rerender(
       <IconCallout
@@ -117,9 +113,7 @@ describe("composition ui", () => {
 
     callout = screen.getByText("Status").closest("div.border");
     expect(callout).toHaveClass("border-[color:var(--border-inverse)]");
-    expect(screen.getByText("Base forte")).toHaveClass(
-      "text-[color:var(--surface-strong-foreground-muted)]",
-    );
+    expect(screen.getByText("Base forte")).toHaveClass("theme-text-strong-muted");
   });
 
   it("renders custom stat node values", () => {
@@ -197,7 +191,7 @@ describe("composition ui", () => {
 
     panel = screen.getByTestId("panel");
     expect(panel).toHaveClass("bg-[color:var(--surface-strong)]");
-    expect(panel).toHaveClass("text-[color:var(--surface-strong-foreground)]");
+    expect(panel).toHaveClass("theme-text-strong");
   });
 
   it("renders default and muted surface variants", () => {

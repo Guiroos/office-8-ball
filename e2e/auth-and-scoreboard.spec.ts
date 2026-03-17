@@ -40,10 +40,10 @@ test.describe("authenticated scoreboard flow", () => {
     const credentials = createCredentials("logout");
 
     await signUp(page, credentials);
-    await logout(page);
+    await logout(page, credentials.username);
 
     await login(page, credentials);
-    await logout(page);
+    await logout(page, credentials.username);
 
     await page.goto("/scoreboard");
     await expect(page).toHaveURL(/\/login$/);
@@ -53,7 +53,7 @@ test.describe("authenticated scoreboard flow", () => {
     const credentials = createCredentials("invalid-login");
 
     await signUp(page, credentials);
-    await logout(page);
+    await logout(page, credentials.username);
 
     await page.getByLabel("E-mail corporativo").fill(credentials.email);
     await page.getByLabel("Senha").fill("wrong-password");
@@ -80,7 +80,7 @@ test.describe("authenticated scoreboard flow", () => {
     const credentials = createCredentials("signup-conflict");
 
     await signUp(page, credentials);
-    await logout(page);
+    await logout(page, credentials.username);
 
     await page.getByRole("button", { name: "Criar conta" }).first().click();
     await page.getByLabel("Username").fill(credentials.username);

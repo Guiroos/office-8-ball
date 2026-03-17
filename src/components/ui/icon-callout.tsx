@@ -22,13 +22,13 @@ export function IconCallout({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-[var(--radius-md)] border p-4",
+        "flex items-start gap-3 rounded-[var(--radius-md)] border p-4 backdrop-blur-sm",
         tone === "success" &&
           "border-[color:var(--border)] bg-[color:var(--surface-success)] text-[color:var(--foreground-soft)]",
         tone === "default" &&
           "border-[color:var(--border)] bg-[color:var(--surface-emphasis)] text-[color:var(--foreground)]",
         isStrong &&
-          "border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground)]",
+          "theme-text-strong border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)]",
         className,
       )}
       {...props}
@@ -38,8 +38,7 @@ export function IconCallout({
           "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-pill)]",
           tone === "success" && "bg-[color:var(--surface)] text-[color:var(--frontend)]",
           tone === "default" && "bg-[color:var(--gold-soft)] text-[color:var(--foreground)]",
-          isStrong &&
-            "bg-[color:var(--surface-strong)] text-[color:var(--surface-strong-foreground-muted)]",
+          isStrong && "theme-text-strong-muted bg-[color:var(--surface-strong)]",
         )}
       >
         {icon}
@@ -49,9 +48,7 @@ export function IconCallout({
         <p
           className={cn(
             "text-sm leading-6",
-            isStrong
-              ? "text-[color:var(--surface-strong-foreground-muted)]"
-              : "text-[color:inherit]",
+            isStrong ? "theme-text-strong-muted" : "text-[color:var(--foreground-soft)]",
           )}
         >
           {description}

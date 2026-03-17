@@ -40,9 +40,9 @@ describe("app/not-found", () => {
       screen.getByText("Use um dos atalhos abaixo para voltar ao fluxo certo."),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Voltar ao inicio" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Abrir o placar" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Abrir dashboard" })).toHaveAttribute(
       "href",
-      "/scoreboard",
+      "/dashboard",
     );
   });
 });
