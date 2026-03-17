@@ -16,6 +16,8 @@ import {
 } from "@/lib/auth-validation";
 import type { ApiErrorResponse } from "@/lib/types";
 
+import LoginPageImage from '../../../public/login/login-onboarding.png'
+
 type LoginScreenProps = {
   authAvailable: boolean;
   authUnavailableReason?: string;
@@ -254,7 +256,7 @@ export function LoginScreen({
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
             <aside className="relative hidden min-h-0 overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[var(--shadow-brand)] lg:flex">
               <Image
-                src="/login/login-onboarding.png"
+                src={LoginPageImage}
                 alt="Mesa de sinuca estilizada representando a rivalidade entre frontend e backend."
                 fill
                 sizes="(min-width: 1024px) 55vw, 0vw"
