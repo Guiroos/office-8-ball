@@ -5,5 +5,5 @@ import { getAuthenticatedUser } from "@/lib/auth";
 export default async function Home() {
   const user = await getAuthenticatedUser();
 
-  redirect(user ? "/scoreboard" : "/login");
+  redirect(user ? "/dashboard" : "/login");
 }

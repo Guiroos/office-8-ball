@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Definir a camada operacional minima do repositorio para manter qualidade, reduzir risco de supply chain e integrar os checks do GitHub com o fluxo de preview e build da Vercel.
+Definir a camada operacional minima do repositorio para manter qualidade, reduzir risco de supply chain e integrar os checks do GitHub com o fluxo de deploy controlado na Vercel.
 
-O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plataforma de deploy e preview.
+O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plataforma de deploy, mas sem previews automaticos por Git enquanto `vercel.json` mantiver `git.deploymentEnabled: false`.
 
 ## Estado atual
 

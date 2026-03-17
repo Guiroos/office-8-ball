@@ -30,6 +30,22 @@ Status: manter
 
 - A estrategia `system` por padrao com persistencia local esta coerente
 - O toggle reutilizavel permite reaproveitamento sem acoplar a alternancia a uma tela unica
+- A shell autenticada agora usa tokens semanticos proprios para sidebar, menu de conta e estados ativos, sem depender de verdes hardcoded espalhados pelos componentes
+- O ultimo passe local tambem reforcou contraste entre `surface`, `surface-emphasis`, `surface-strong` e textos secundarios para claro/escuro
+- O ajuste mais recente endureceu o contraste do tema claro na sidebar autenticada e nas superficies invertidas das paginas placeholder, evitando texto lavado sobre verde e bege
+
+### Contraste entre shell e paginas autenticadas
+
+Status: resolvido no pacote atual
+
+- `globals.css` agora concentra tokens de shell como `--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active` e correlatos
+- A sidebar, o menu do usuario e o fundo da area de conteudo passaram a falar a mesma linguagem visual
+- `Badge`, `CardDescription`, `StatTile` e `IconCallout` foram ajustados para melhorar legibilidade em superficies translucidas, especialmente no dark theme
+
+Direcao:
+
+- Continuar preferindo tokens semanticos antes de introduzir novas classes de cor por componente
+- Se houver novo ajuste fino visual, revisar primeiro os tokens base em `globals.css`
 
 ## Aceitavel, mas provisorio
 
@@ -91,6 +107,7 @@ Status: resolvido
 - O `TeamScoreCard` agora usa variantes por time e estado de lideranca
 - O componente expõe `data-team` e `data-leader` para leitura e teste sem depender de `style` inline
 - Cabecalhos de secao e tiles informativos do dashboard agora reaproveitam os componentes globais de composicao em vez de classes repetidas por tela
+- O contraste das variantes por time foi recalibrado para claro e escuro ajustando `--frontend-soft` e `--backend-soft` em vez de espalhar overrides locais
 
 Direcao:
 

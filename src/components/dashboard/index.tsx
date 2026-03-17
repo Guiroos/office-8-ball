@@ -1,19 +1,15 @@
 "use client";
 
 import { cva } from "class-variance-authority";
-import { LogOut, Swords } from "lucide-react";
+import { Swords } from "lucide-react";
 import { startTransition, useId, useState } from "react";
-import { signOut } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { StatTile } from "@/components/ui/stat-tile";
-import { SurfacePanel } from "@/components/ui/surface-panel";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { TEAMS } from "@/lib/constants";
-import type { SessionUser } from "@/lib/types";
 
 import { DashboardHero } from "./dashboard-hero";
 import { DashboardSidebar } from "./dashboard-sidebar";
@@ -22,7 +18,7 @@ import { RecentMatchesCard } from "./recent-matches-card";
 import { useDashboardData } from "./use-dashboard-data";
 
 const teamScoreCardVariants = cva(
-  "overflow-hidden border shadow-none text-[color:var(--foreground)]",
+  "overflow-hidden border shadow-[var(--shadow-sm)] backdrop-blur-sm text-[color:var(--foreground)]",
   {
     variants: {
       team: {
@@ -31,7 +27,7 @@ const teamScoreCardVariants = cva(
       },
       leader: {
         true: "border-[color:var(--gold)] ring-2 ring-[color:var(--gold)]",
-        false: "border-[color:var(--border)]",
+        false: "border-[color:var(--border-strong)]",
       },
     },
   },
@@ -85,19 +81,19 @@ function TeamScoreCard({
       <CardContent className="space-y-6 p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground-soft)]">
               {team.displayName}
             </p>
             <div>
               <h3 className="text-2xl font-black tracking-[-0.04em]">{team.roster}</h3>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-[color:var(--muted-foreground)]">
+              <p className="mt-2 max-w-sm text-sm leading-6 text-[color:var(--foreground-soft)]">
                 {team.slogan}
               </p>
             </div>
           </div>
 
           {isLeader ? (
-            <Badge className="border-[color:var(--gold)] bg-[color:var(--gold-soft)] text-[color:var(--foreground-soft)]">
+            <Badge className="border-[color:var(--gold)] bg-[color:var(--gold-soft)] text-[color:var(--foreground)]">
               líder
             </Badge>
           ) : null}
@@ -105,7 +101,7 @@ function TeamScoreCard({
 
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
+            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground-soft)]">
               Vitórias
             </p>
             <p className="[font-family:var(--font-display)] text-[length:var(--text-score)] leading-none tracking-[0.03em]">
@@ -122,11 +118,11 @@ function TeamScoreCard({
           <div className="flex items-center justify-between gap-3">
             <label
               htmlFor={noteId}
-              className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]"
+              className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground-soft)]"
             >
               Provocação opcional
             </label>
-            <span className="text-xs font-medium text-[color:var(--muted-foreground)]">
+            <span className="text-xs font-medium text-[color:var(--foreground-soft)]">
               {note.length}/140
             </span>
           </div>
@@ -139,7 +135,7 @@ function TeamScoreCard({
             rows={3}
             disabled={isSubmitting}
             placeholder="Vale zoeira curta, sem tese de retrospectiva."
-            className="min-h-24 w-full resize-none rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none transition placeholder:text-[color:var(--muted-foreground)] focus:border-[color:var(--frontend)] focus:ring-2 focus:ring-[color:var(--frontend-soft)] disabled:cursor-not-allowed disabled:bg-[color:var(--surface-muted)]"
+            className="min-h-24 w-full resize-none rounded-[var(--radius-md)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] px-4 py-3 text-sm text-[color:var(--foreground)] outline-none transition placeholder:text-[color:var(--foreground-soft)] focus:border-[color:var(--frontend)] focus:ring-2 focus:ring-[color:var(--frontend-soft)] disabled:cursor-not-allowed disabled:bg-[color:var(--surface-muted)]"
             onChange={(event) => {
               onNoteChange(team.id, event.target.value);
             }}
@@ -165,7 +161,7 @@ function TeamScoreCard({
   );
 }
 
-export function Dashboard({ user }: { user?: SessionUser }) {
+export function Dashboard() {
   const {
     scoreboard,
     matches,
@@ -210,42 +206,13 @@ export function Dashboard({ user }: { user?: SessionUser }) {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-      {user ? (
-        <SurfacePanel className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[color:var(--surface-emphasis)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
-              Sessao ativa
-            </p>
-            <p className="mt-1 text-lg font-semibold text-[color:var(--foreground)]">
-              {user.username}
-            </p>
-            <p className="text-sm text-[color:var(--muted-foreground)]">{user.email}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <ThemeToggle className="h-11 rounded-[var(--radius-sm)] px-4" />
-            <Button
-              variant="ghost"
-              className="h-11 rounded-[var(--radius-sm)] px-4"
-              data-testid="dashboard-sign-out"
-              onClick={() => {
-                void signOut({ callbackUrl: "/login" });
-              }}
-            >
-              <LogOut className="size-4" />
-              Sair
-            </Button>
-          </div>
-        </SurfacePanel>
-      ) : null}
-
       <DashboardHero
         loading={loading}
         scoreboard={scoreboard}
         environmentLabel={getEnvironmentLabel()}
       />
 
-      <Card className="overflow-hidden border-[color:var(--border-inverse)] bg-[color:var(--surface-strong)] text-[color:var(--surface-strong-foreground)]">
+      <Card className="theme-text-strong overflow-hidden border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[var(--shadow-brand)]">
         <CardContent className="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
           <SectionHeader
             eyebrow="Placar atual"

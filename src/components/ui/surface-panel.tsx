@@ -9,9 +9,9 @@ const surfacePanelVariants = cva("rounded-[var(--radius-xl)] border", {
       default: "border-[color:var(--border)] bg-[color:var(--surface)] shadow-[var(--shadow-lg)]",
       muted: "border-[color:var(--border)] bg-[color:var(--surface-emphasis)]",
       strong:
-        "border-[color:var(--border-inverse)] bg-[color:var(--surface-strong)] text-[color:var(--surface-strong-foreground)]",
+        "theme-text-strong border-[color:var(--border-inverse)] bg-[color:var(--surface-strong)]",
       brand:
-        "border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] text-[color:var(--surface-strong-foreground)] shadow-[var(--shadow-brand)] backdrop-blur-xl",
+        "theme-text-strong border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[var(--shadow-brand)] backdrop-blur-xl",
     },
     padded: {
       true: "p-6",

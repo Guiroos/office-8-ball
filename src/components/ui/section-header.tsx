@@ -40,7 +40,7 @@ export function SectionHeader({
         <Badge
           className={
             inverse
-              ? "border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)] text-[color:var(--surface-strong-foreground-muted)]"
+              ? "theme-text-strong-muted border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)]"
               : undefined
           }
         >
@@ -50,7 +50,7 @@ export function SectionHeader({
         {description ? (
           <CardDescription
             className={cn(
-              inverse && "text-[color:var(--surface-strong-foreground-muted)]",
+              inverse && "theme-text-strong-muted",
               descriptionClassName,
             )}
           >

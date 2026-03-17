@@ -7,16 +7,16 @@ import { formatMatchDate } from "./dashboard-utils";
 
 export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
   return (
-    <Card className="bg-[color:var(--surface)]">
+    <Card className="border-[color:var(--border-strong)] bg-[color:var(--surface)]/94 backdrop-blur">
       <CardContent className="space-y-5 p-6 sm:p-7">
         <SectionHeader eyebrow="Últimas partidas" title="Histórico recente" />
 
         {matches.length === 0 ? (
-          <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-5">
+          <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-5">
             <strong className="block text-lg font-semibold">
               Nenhuma partida registrada ainda.
             </strong>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
+            <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-soft)]">
               A primeira vitória já pode vir carregada de provocação.
             </p>
           </div>
@@ -26,11 +26,11 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
               {matches.map((match) => (
                 <li
                   key={match.id}
-                  className="grid gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="grid gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <div className="space-y-1">
                     <strong className="block text-lg font-semibold">{match.winnerName}</strong>
-                    <p className="text-sm text-[color:var(--muted-foreground)]">
+                    <p className="text-sm text-[color:var(--foreground-soft)]">
                       {match.winnerRoster}
                     </p>
                   </div>
@@ -40,7 +40,7 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
                       {formatMatchDate(match.playedAt)}
                     </span>
                     {match.note ? (
-                      <small className="text-sm text-[color:var(--muted-foreground)]">
+                      <small className="text-sm text-[color:var(--foreground-soft)]">
                         {match.note}
                       </small>
                     ) : null}

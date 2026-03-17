@@ -46,7 +46,7 @@ function RouteStateActionButton({ action }: { action: RouteStateAction }) {
     actionClassName,
     action.tone === "secondary"
       ? "border border-[color:var(--border)] bg-[color:var(--surface-muted)] !text-[color:var(--foreground)] hover:bg-[color:var(--surface-emphasis)]"
-      : "bg-[color:var(--foreground)] !text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 hover:bg-[color:var(--foreground-soft)]",
+      : "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 hover:bg-[color:var(--foreground-soft)]",
   );
 
   const content = (
@@ -102,7 +102,7 @@ export function RouteStateScreen({
                   <p className="[font-family:var(--font-display)] text-[length:var(--text-display-lg)] leading-none tracking-[0.08em] text-[color:var(--gold)]">
                     {code}
                   </p>
-                  <h1 className="max-w-md text-4xl font-black tracking-[-0.05em] sm:text-5xl">
+                  <h1 className="max-w-md text-4xl font-black tracking-[-0.05em] text-[color:var(--surface-strong-foreground)] sm:text-5xl">
                     {title}
                   </h1>
                 </div>

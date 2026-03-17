@@ -3,9 +3,10 @@
 Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richard)`.
 
 ## Current Status
-- `v1` is implemented as a single-screen Next.js app.
+- `v1` is implemented as a single Next.js App Router app with a shared authenticated shell.
 - The main dashboard now uses `Tailwind CSS` + local `shadcn/ui`-style components.
-- The theme system is shared across login and dashboard, with global foundation tokens for radius, shadow, and type.
+- The theme system is shared across login, dashboard, and the authenticated shell, with global foundation tokens for radius, shadow, and type.
+- `src/app/globals.css` now also carries semantic shell tokens for sidebar, account menu, and content contrast in light and dark themes.
 - The local UI layer now combines base primitives plus small reusable composition components for shared section headers, stat tiles, icon callouts, and themed surfaces.
 - Persistence supports two modes:
   - `Prisma + Neon/Postgres` when `DATABASE_URL` is configured
@@ -58,11 +59,13 @@ Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richar
 Current route flow:
 - `/` redirects by session state
 - `/login` is the auth entry screen
-- `/scoreboard` is the authenticated match and scoreboard flow
+- `/dashboard` is the authenticated home for the shared app shell
+- `/times`, `/ranking`, `/profile`, and `/settings` currently live inside the authenticated shell as safe placeholders
+- `/scoreboard` remains as a legacy redirect to `/dashboard`
 - invalid routes render a branded `404` screen
 - route rendering failures use a branded retry/recovery screen
 
-If `DATABASE_URL` is missing, auth stays disabled and login/signup remain unavailable.
+If `DATABASE_URL` is missing, auth stays disabled and login/signup remain unavailable. In the current codebase, the authenticated dashboard and protected scoreboard APIs also remain unavailable without a real session, even though the domain layer still keeps an in-memory fallback for local development.
 
 When `DATABASE_URL` is configured, apply the Prisma migration before first use:
 
@@ -106,6 +109,7 @@ Current coverage focus:
 - login and signup behavior with mocked auth calls
 - reusable composition components in `src/components/ui/*`
 - theme provider, toggle, and bootstrap behavior
+- authenticated shell navigation and account menu behavior
 - shared auth validation schemas and field error mapping
 - browser E2E for the authenticated login and scoreboard flow with `Playwright`
 
@@ -137,4 +141,4 @@ The Prisma client is generated with `binaryTargets = ["native", "rhel-openssl-3.
 ## Documentation Notes
 - `AGENTS.md` is the fast-start guide for AI agents.
 - `techspec/techspec.md` is the central index for technical documentation.
-- `techspec/architecture.md`, `techspec/scoreboard.md`, `techspec/auth.md`, `techspec/runtime-environments.md`, `techspec/api-contracts.md`, `techspec/testing-strategy.md`, `techspec/persistence-and-migrations.md`, `techspec/theme-system.md`, and `techspec/roadmap.md` split the living technical docs by domain.
+- `techspec/architecture.md`, `techspec/scoreboard.md`, `techspec/auth.md`, `techspec/runtime-environments.md`, `techspec/api-contracts.md`, `techspec/testing-strategy.md`, `techspec/persistence-and-migrations.md`, `techspec/theme-system.md`, `techspec/sidebar-layout.md`, and `techspec/roadmap.md` split the living technical docs by domain.

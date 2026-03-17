@@ -46,7 +46,7 @@ Documentar como persistencia, schema, seed e fallback em memoria se relacionam n
 
 ## Mudancas de schema e migration
 
-- Mudancas em `prisma/schema.prisma` devem manter compatibilidade com o fluxo atual de `/login` e `/scoreboard`, salvo mudanca explicita de produto
+- Mudancas em `prisma/schema.prisma` devem manter compatibilidade com o fluxo atual de `/login`, `/dashboard` e com o redirecionamento legado de `/scoreboard`, salvo mudanca explicita de produto
 - Se o schema mudar, revisar tambem `prisma/seed.mjs` e as regras em `src/lib/data.ts`
 - Migrations devem preservar o modelo de dois times fixos, a relacao de `matches` com `teams` e a persistencia de `users`
 - Migrations de auth devem preservar tambem a tabela `auth_rate_limits` e sua compatibilidade com login/signup

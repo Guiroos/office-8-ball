@@ -169,7 +169,7 @@ export function LoginScreen({
       email: form.email,
       password: form.password,
       redirect: false,
-      callbackUrl: "/scoreboard",
+      callbackUrl: "/dashboard",
     });
 
     if (!signInResult || signInResult.error) {
@@ -183,7 +183,7 @@ export function LoginScreen({
       email: form.email,
       password: form.password,
       redirect: false,
-      callbackUrl: "/scoreboard",
+      callbackUrl: "/dashboard",
     });
 
     if (!signInResult || signInResult.error) {
@@ -223,7 +223,7 @@ export function LoginScreen({
         await handleLogin();
       }
 
-      router.push("/scoreboard");
+      router.push("/dashboard");
       router.refresh();
     } catch {
       // Error feedback is already set by the auth handlers above.
@@ -295,7 +295,7 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         !isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)]"
+                          ? "bg-[color:var(--frontend)] theme-text-inverse shadow-[var(--shadow-sm)]"
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("login")}
@@ -307,7 +307,7 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)]"
+                          ? "bg-[color:var(--frontend)] theme-text-inverse shadow-[var(--shadow-sm)]"
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("register")}

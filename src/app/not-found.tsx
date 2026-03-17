@@ -15,8 +15,8 @@ export default function NotFound() {
         icon: "home",
       }}
       secondaryAction={{
-        label: "Abrir o placar",
-        href: "/scoreboard",
+        label: "Abrir dashboard",
+        href: "/dashboard",
         icon: "back",
         tone: "secondary",
       }}

@@ -1,0 +1,388 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import {
+  ChevronDown,
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Settings,
+  Shield,
+  Trophy,
+  Users,
+  X,
+} from "lucide-react";
+import { type ComponentType, type ReactNode, useMemo, useState } from "react";
+
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { SessionUser } from "@/lib/types";
+
+type AppShellProps = {
+  user: SessionUser;
+  children: ReactNode;
+};
+
+type NavigationItem = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  match: (pathname: string) => boolean;
+};
+
+const navigationItems: NavigationItem[] = [
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    match: (pathname) => pathname === "/dashboard",
+  },
+  {
+    href: "/times",
+    label: "Times",
+    icon: Users,
+    match: (pathname) => pathname.startsWith("/times"),
+  },
+  {
+    href: "/ranking",
+    label: "Ranking",
+    icon: Trophy,
+    match: (pathname) => pathname.startsWith("/ranking"),
+  },
+];
+
+function UserAvatar({ user }: { user: SessionUser }) {
+  const initials = useMemo(() => {
+    const base = user.username.trim() || user.email.trim();
+
+    return base
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((chunk) => chunk.charAt(0).toUpperCase())
+      .join("")
+      .slice(0, 2);
+  }, [user.email, user.username]);
+
+  return (
+    <div className="relative">
+      <div className="theme-text-sidebar flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-pill)] border border-[color:var(--app-shell-sidebar-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-[0.12em]">
+        {initials || "OB"}
+      </div>
+      <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-[color:var(--app-shell-avatar-ring)] bg-[color:var(--app-shell-status)]" />
+    </div>
+  );
+}
+
+function SidebarBrand() {
+  return (
+    <div className="flex items-center gap-3 px-1">
+      <div className="theme-text-sidebar flex size-10 items-center justify-center rounded-[12px] border border-[color:var(--app-shell-sidebar-border)] bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
+        <Globe className="size-5" />
+      </div>
+
+      <div>
+        <p className="theme-text-sidebar text-lg font-bold tracking-[-0.03em]">
+          Office 8 Ball
+        </p>
+        <p className="theme-text-sidebar-subtle text-xs font-medium tracking-[0.12em] uppercase">
+          Area autenticada
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function UserFooter({
+  user,
+  pathname,
+  isOpen,
+  onToggle,
+  onClose,
+}: {
+  user: SessionUser;
+  pathname: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}) {
+  const membershipLabel = pathname.startsWith("/dashboard")
+    ? "mesa ativa"
+    : pathname.startsWith("/ranking")
+      ? "visao aberta"
+      : "area autenticada";
+
+  return (
+    <div className="relative border-t border-[color:var(--app-shell-sidebar-border)] px-1 pt-5">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center gap-3 rounded-[18px] px-3 py-3 text-left transition hover:bg-[color:var(--app-shell-sidebar-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+      >
+        <UserAvatar user={user} />
+        <div className="min-w-0 flex-1">
+          <p className="theme-text-sidebar truncate text-sm font-semibold">
+            {user.username}
+          </p>
+          <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--app-shell-sidebar-accent)]">
+            {membershipLabel}
+          </p>
+        </div>
+        <ChevronDown
+          className={cn("theme-text-sidebar-subtle size-4 shrink-0 transition", {
+            "rotate-180": isOpen,
+          })}
+        />
+      </button>
+
+      {isOpen ? (
+        <>
+          <button
+            type="button"
+            aria-label="Fechar menu de conta"
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={onClose}
+          />
+          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-[22px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-menu)] p-3 shadow-[0_22px_50px_rgba(0,0,0,0.38)]">
+            <UserMenu pathname={pathname} user={user} onClose={onClose} />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function UserMenu({
+  pathname,
+  user,
+  onClose,
+}: {
+  pathname: string;
+  user: SessionUser;
+  onClose: () => void;
+}) {
+  const accountLinks = [
+    {
+      href: "/profile",
+      label: "Ver perfil",
+      icon: Shield,
+      active: pathname.startsWith("/profile"),
+    },
+    {
+      href: "/settings",
+      label: "Configuracoes",
+      icon: Settings,
+      active: pathname.startsWith("/settings"),
+    },
+  ];
+
+  return (
+    <div
+      className="theme-text-sidebar grid gap-1.5"
+      role="menu"
+      aria-label="Menu da conta"
+    >
+      <div className="rounded-[18px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-3">
+        <div className="flex items-center gap-3">
+          <UserAvatar user={user} />
+          <div className="min-w-0">
+            <p className="theme-text-sidebar truncate text-sm font-semibold">
+              {user.username}
+            </p>
+            <p className="theme-text-sidebar-muted truncate text-xs">
+              {user.email}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {accountLinks.map((link) => {
+        const Icon = link.icon;
+
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={onClose}
+            role="menuitem"
+            className={cn(
+              "flex items-center gap-3 rounded-[16px] border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]",
+              link.active
+                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] theme-text-sidebar shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
+                : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
+            )}
+          >
+            <Icon className="size-4" />
+            {link.label}
+          </Link>
+        );
+      })}
+
+      <div className="mt-1 flex items-center justify-between rounded-[16px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-2.5">
+        <div>
+          <p className="theme-text-sidebar text-sm font-semibold">Tema</p>
+          <p className="theme-text-sidebar-muted text-xs">
+            Alterna claro e escuro
+          </p>
+        </div>
+        <ThemeToggle
+          variant="sidebar"
+          className="h-10 rounded-[12px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]"
+        />
+      </div>
+
+      <Button
+        variant="sidebar"
+        className="mt-1 h-11 justify-start rounded-[16px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]"
+        onClick={() => {
+          onClose();
+          void signOut({ callbackUrl: "/login" });
+        }}
+        data-testid="dashboard-sign-out"
+      >
+        <LogOut className="size-4" />
+        Sair
+      </Button>
+    </div>
+  );
+}
+
+function SidebarContent({
+  pathname,
+  user,
+  onNavigate,
+}: {
+  pathname: string;
+  user: SessionUser;
+  onNavigate?: () => void;
+}) {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  return (
+    <div className="flex h-full flex-col gap-8">
+      <SidebarBrand />
+
+      <div className="flex-1">
+        <SidebarNavigation pathname={pathname} onNavigate={onNavigate} />
+      </div>
+
+      <UserFooter
+        pathname={pathname}
+        user={user}
+        isOpen={isUserMenuOpen}
+        onToggle={() => setIsUserMenuOpen((current) => !current)}
+        onClose={() => setIsUserMenuOpen(false)}
+      />
+    </div>
+  );
+}
+
+function SidebarNavigation({
+  pathname,
+  onNavigate,
+}: {
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <nav
+      className="theme-text-sidebar grid gap-2"
+      aria-label="Navegacao principal"
+    >
+      {navigationItems.map((item) => {
+        const isActive = item.match(pathname);
+        const Icon = item.icon;
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-4 rounded-[12px] border px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]",
+              isActive
+                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] theme-text-sidebar shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
+                : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
+            )}
+            aria-current={isActive ? "page" : undefined}
+          >
+            <Icon className="size-4.5" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function AppShell({ user, children }: AppShellProps) {
+  const pathname = usePathname();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  return (
+    <div className="min-h-dvh">
+      <div className="flex min-h-dvh w-full">
+        <aside className="theme-text-sidebar hidden w-[260px] shrink-0 bg-[color:var(--app-shell-sidebar)] lg:flex lg:flex-col lg:border-r lg:border-[color:var(--app-shell-sidebar-border)]">
+          <div className="sticky top-0 flex h-dvh flex-col px-4 py-6">
+            <SidebarContent pathname={pathname} user={user} />
+          </div>
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col bg-[image:var(--app-shell-content-gradient)]">
+          <header className="flex items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/92 px-4 py-3 backdrop-blur lg:hidden">
+            <SidebarBrand />
+
+            <Button
+              variant="ghost"
+              className="h-11 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-4"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Abrir navegacao"
+            >
+              <Menu className="size-4" />
+              Menu
+            </Button>
+          </header>
+
+          <div className="min-w-0 flex-1">{children}</div>
+        </div>
+      </div>
+
+      {isMobileSidebarOpen ? (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45"
+            aria-label="Fechar navegacao"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          <div className="theme-text-sidebar absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar)] px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+            <div className="mb-6 flex items-center justify-between">
+              <SidebarBrand />
+              <Button
+                variant="sidebar"
+                className="h-10 rounded-[12px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                aria-label="Fechar navegacao"
+              >
+                <X className="size-4" />
+              </Button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <SidebarContent
+                pathname={pathname}
+                user={user}
+                onNavigate={() => setIsMobileSidebarOpen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

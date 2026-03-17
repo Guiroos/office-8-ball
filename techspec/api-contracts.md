@@ -9,7 +9,9 @@ Documentar os contratos publicos atuais das APIs internas usadas pela UI, preser
 - Todos os contratos seguem os tipos compartilhados em `src/lib/types.ts`
 - Os ids validos de time continuam limitados a `frontend` e `backend`
 - O placar continua derivado de `matches`
-- Com auth disponivel, as APIs do placar exigem sessao autenticada
+- As APIs do placar exigem sessao autenticada no estado atual do codigo
+- Sem sessao valida, `GET /api/scoreboard`, `GET /api/matches` e `POST /api/matches` retornam `401`
+- O fallback em memoria de `src/lib/data.ts` continua existindo para o dominio, mas nao muda esse contrato HTTP protegido
 
 ## `GET /api/scoreboard`
 
