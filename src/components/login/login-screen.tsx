@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,7 @@ export function LoginScreen({
   authUnavailableReason = "Autenticacao indisponivel sem DATABASE_URL configurado.",
 }: LoginScreenProps) {
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [localFieldErrors, setLocalFieldErrors] = useState(INITIAL_FIELD_ERRORS);
@@ -65,6 +66,10 @@ export function LoginScreen({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   function resetFeedback() {
     setRemoteFieldErrors(INITIAL_FIELD_ERRORS);
@@ -238,7 +243,8 @@ export function LoginScreen({
     email: getVisibleFieldError("email"),
     password: getVisibleFieldError("password"),
   };
-  const isSubmitDisabled = isSubmitting || !authAvailable;
+  const areControlsDisabled = !isHydrated || isSubmitting;
+  const isSubmitDisabled = areControlsDisabled || !authAvailable;
   const submitLabel = isSubmitting
     ? isRegisterMode
       ? "Criando conta..."
@@ -299,7 +305,8 @@ export function LoginScreen({
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("login")}
-                      disabled={isSubmitting}
+                      disabled={areControlsDisabled}
+                      data-testid="login-mode-login"
                     >
                       Entrar
                     </button>
@@ -311,7 +318,8 @@ export function LoginScreen({
                           : "text-[color:var(--foreground-soft)]"
                       }`}
                       onClick={() => handleModeChange("register")}
-                      disabled={isSubmitting}
+                      disabled={areControlsDisabled}
+                      data-testid="login-mode-register"
                     >
                       Criar conta
                     </button>
@@ -330,7 +338,7 @@ export function LoginScreen({
                           value={form.username}
                           onChange={(event) => updateField("username", event.target.value)}
                           onBlur={() => touchField("username")}
-                          disabled={isSubmitting || !authAvailable}
+                          disabled={areControlsDisabled || !authAvailable}
                           invalid={Boolean(visibleFieldErrors.username)}
                           aria-describedby={
                             visibleFieldErrors.username ? "username-error" : undefined
@@ -353,7 +361,7 @@ export function LoginScreen({
                         value={form.email}
                         onChange={(event) => updateField("email", event.target.value)}
                         onBlur={() => touchField("email")}
-                        disabled={isSubmitting || !authAvailable}
+                        disabled={areControlsDisabled || !authAvailable}
                         invalid={Boolean(visibleFieldErrors.email)}
                         aria-describedby={visibleFieldErrors.email ? "email-error" : undefined}
                       />
@@ -371,7 +379,7 @@ export function LoginScreen({
                         value={form.password}
                         onChange={(event) => updateField("password", event.target.value)}
                         onBlur={() => touchField("password")}
-                        disabled={isSubmitting || !authAvailable}
+                        disabled={areControlsDisabled || !authAvailable}
                         invalid={Boolean(visibleFieldErrors.password)}
                         aria-describedby={
                           visibleFieldErrors.password ? "password-error" : undefined
@@ -393,6 +401,7 @@ export function LoginScreen({
                       size="lg"
                       className="h-14 w-full rounded-[var(--radius-md)] text-base shadow-[var(--shadow-brand)]"
                       disabled={isSubmitDisabled}
+                      data-testid="login-submit"
                     >
                       {submitLabel}
                     </Button>

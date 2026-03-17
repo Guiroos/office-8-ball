@@ -24,11 +24,11 @@ export function createCredentials(seed: string): Credentials {
 
 export async function signUp(page: Page, credentials: Credentials) {
   await page.goto("/login");
-  await page.getByRole("button", { name: "Criar conta" }).first().click();
+  await page.getByTestId("login-mode-register").click();
   await page.getByLabel("Username").fill(credentials.username);
   await page.getByLabel("E-mail corporativo").fill(credentials.email);
   await page.getByLabel("Senha").fill(credentials.password);
-  await page.getByRole("button", { name: "Criar conta" }).last().click();
+  await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 
@@ -36,7 +36,7 @@ export async function login(page: Page, credentials: Credentials) {
   await page.goto("/login");
   await page.getByLabel("E-mail corporativo").fill(credentials.email);
   await page.getByLabel("Senha").fill(credentials.password);
-  await page.getByRole("button", { name: "Entrar" }).last().click();
+  await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 

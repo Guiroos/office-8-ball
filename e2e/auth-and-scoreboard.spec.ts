@@ -57,7 +57,7 @@ test.describe("authenticated scoreboard flow", () => {
 
     await page.getByLabel("E-mail corporativo").fill(credentials.email);
     await page.getByLabel("Senha").fill("wrong-password");
-    await page.getByRole("button", { name: "Entrar" }).last().click();
+    await page.getByTestId("login-submit").click();
 
     await expect(page).toHaveURL(/\/login$/);
     await expect(
@@ -82,11 +82,11 @@ test.describe("authenticated scoreboard flow", () => {
     await signUp(page, credentials);
     await logout(page, credentials.username);
 
-    await page.getByRole("button", { name: "Criar conta" }).first().click();
+    await page.getByTestId("login-mode-register").click();
     await page.getByLabel("Username").fill(credentials.username);
     await page.getByLabel("E-mail corporativo").fill(credentials.email);
     await page.getByLabel("Senha").fill(credentials.password);
-    await page.getByRole("button", { name: "Criar conta" }).last().click();
+    await page.getByTestId("login-submit").click();
 
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByText("Ja existe uma conta com esses dados.")).toBeVisible();
