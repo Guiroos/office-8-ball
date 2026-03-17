@@ -5,34 +5,38 @@
 
 ## Goal
 
-Replace Codex-oriented `AGENTS.md` as the primary agent instruction source with a Claude Code–native setup: a lean `CLAUDE.md` backed by auto-loaded `.claude/rules/` files.
+Replace Codex-oriented `AGENTS.md` as the primary agent instruction source with a Claude Code–native setup: a lean `CLAUDE.md` at the repo root backed by auto-loaded `.claude/rules/` files.
 
 ## Motivation
 
 - `AGENTS.md` was the authoritative guide for Codex. The project now uses Claude Code exclusively.
-- The current `CLAUDE.md` delegates to `AGENTS.md`, making Claude a second-class consumer.
+- The current `CLAUDE.md` (root) delegates to `AGENTS.md`, making Claude a second-class consumer.
 - A rules-based split keeps the root file under 80 lines while preserving domain context that agents need.
 
 ## File Structure
 
 ```
-CLAUDE.md                        # Core context (~70 lines), loaded every session
+CLAUDE.md                        # New root file — core context (~70 lines), loaded every session
 AGENTS.md                        # Deleted
 .claude/
+  CLAUDE.md                      # Deleted — was a duplicate of the old root CLAUDE.md
   settings.json                  # No change
   settings.local.json            # No change
   rules/
     domain.md                    # Domain invariants + working rules + runtime behavior
-    safe-change.md               # Safe-change checklist + task routing + known gaps
+    safe-change.md               # Safe-change checklist + task routing + validation commands + known gaps
 ```
+
+**CLAUDE.md location:** The authoritative file is `CLAUDE.md` at the repo root. The existing `.claude/CLAUDE.md` (which only delegated to `AGENTS.md`) is deleted. Going forward, only the root `CLAUDE.md` is maintained.
 
 ## Content Map
 
-### CLAUDE.md
+### CLAUDE.md (root, ~70 lines)
 
 Only what is useful in every session:
 
 - **What this is** — one-paragraph product description
+- **Source of truth priority** — code in `src/` and `prisma/` > `README.md` and `techspec/` > `PRD.md`; note that `techspec/` is the home for technical docs, `techspec/github-operations.md` for CI/repo ops, `techspec/git-conventions.md` for release/deploy
 - **Commands** — dev, test, quality, database scripts
 - **Architecture** — stack, route structure summary, persistence abstraction, auth, middleware
 - **Environment Variables** — required and optional
@@ -40,19 +44,21 @@ Only what is useful in every session:
 
 ### .claude/rules/domain.md
 
-Domain context that should always be available when Claude touches business logic:
+Domain context always available when Claude touches business logic:
 
-- **Domain Invariants** — two valid team ids, scoreboard always derived from matches, leaderTeamId/leadBy/currentStreak semantics
-- **Working Rules** — prefer small changes, match UX intent, precision on persistence, keep docs honest
-- **Runtime Behavior** — persistence mode switching, match creation rules, UI data flow
+- **Domain Invariants** — only `frontend` and `backend` are valid team ids; scoreboard always derived from match history; `leaderTeamId` is null on ties; `leadBy` is absolute win difference; `currentStreak` is newest consecutive wins by latest winner
+- **Team behavior file list** — when touching team behavior, review all of: `src/lib/constants.ts`, `src/lib/types.ts`, `src/lib/data.ts`, `src/app/api/matches/route.ts`, `prisma/seed.mjs`, `prisma/schema.prisma`
+- **Working Rules** — prefer small changes; match UX intent (scoreboard fast, copy playful, auth credentials-only, green billiards theme); precision on persistence (verify both modes when changing `data.ts`); keep docs honest (update `AGENTS.md` → update `.claude/rules/` files and `techspec/` for architecture changes, `README.md` for setup/runtime changes)
+- **Runtime Behavior** — persistence mode switching (`DATABASE_URL` present = Prisma, absent = in-memory); match creation validation rules; UI data flow (fetch scoreboard + matches, re-fetch after win, no optimistic updates)
 
 ### .claude/rules/safe-change.md
 
 Validation and routing reference, always loaded:
 
-- **Safe Change Checklist** — 7 questions to verify before finishing
-- **Task Routing Guide** — which files to read per area (scoreboard, dashboard, login, persistence, GitHub)
-- **Known Gaps** — missing features agents should not accidentally implement
+- **Safe Change Checklist** — 7 questions to verify before finishing (both persistence modes, scoreboard derived, team ids, routing, API shape, auth model, docs)
+- **Task Routing Guide** — which files to read per area: GitHub/CI ops, scoreboard/match-history, dashboard UI, login/auth, persistence/schema
+- **Validation Expectations** — common commands (`npm run lint`, `npm run test`, `npm run typecheck`, `npm run build`, `npm run e2e`) plus targeted per-file test commands (e.g. `npm run test -- src/lib/data.test.ts`)
+- **Known Gaps** — no password recovery, no email verification, no profile/nickname UI, no Prisma-backed integration tests, no E2E for auth rate limit
 
 ## Approach Rationale
 
