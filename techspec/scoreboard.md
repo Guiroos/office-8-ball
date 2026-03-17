@@ -38,10 +38,12 @@ Retorna o agregado do placar, incluindo:
 - lider atual
 - streak atual
 - diferenca de vitorias
+- exige sessao autenticada no estado atual da API
 
 ### `GET /api/matches`
 
 Retorna partidas recentes em ordem decrescente por data.
+- exige sessao autenticada no estado atual da API
 
 ### `POST /api/matches`
 
@@ -60,6 +62,7 @@ Comportamento:
 - aceita `note` opcional
 - persiste a partida
 - retorna erro claro em caso de falha
+- exige sessao autenticada no estado atual da API
 
 ## Fluxo atual da UI
 
@@ -74,7 +77,8 @@ Comportamento:
 - Com `DATABASE_URL`:
   - leitura e escrita via Prisma/Postgres
 - Sem `DATABASE_URL`:
-  - fallback em memoria, apenas para desenvolvimento local
+  - fallback em memoria, apenas para desenvolvimento local no dominio
+  - esse fallback nao fica exposto pela dashboard autenticada nem pelas rotas protegidas no estado atual
 
 ## Gaps conhecidos
 

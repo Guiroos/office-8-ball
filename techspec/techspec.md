@@ -13,8 +13,8 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
 - Placar sempre derivado do historico de partidas
 - Persistencia em `Prisma + Postgres` com fallback em memoria para desenvolvimento local
 - Autenticacao por credenciais com `Auth.js` e usuarios salvos via Prisma
-- Fluxo principal atual em `/login` -> `/scoreboard`
-- Sistema de tema compartilhado entre login e dashboard, com foundation tokens e bootstrap inicial consistente
+- Fluxo principal atual em `/login` -> `/dashboard`
+- Sistema de tema compartilhado entre login, dashboard e shell autenticada, com foundation tokens, tokens de shell e bootstrap inicial consistente
 
 ## Invariantes
 
@@ -44,6 +44,8 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
   - relacao entre schema, seed, fallback em memoria e invariantes de persistencia
 - `theme-system.md`
   - estado atual do sistema de tema, gaps e ordem recomendada de evolucao
+- `sidebar-layout.md`
+  - estado atual da shell autenticada com sidebar, menu do usuario e consolidacao da home logada em `/dashboard`
 - `github-operations.md`
   - workflows, checks obrigatorios, integracao com Vercel e endurecimento operacional do repositorio
 - `git-conventions.md`
@@ -67,6 +69,8 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
   - leia `persistence-and-migrations.md`
 - Se a mudanca mexe em tokens, provider, toggle, primitives ou visual system:
   - leia `theme-system.md`
+- Se a mudanca mexe em shell autenticada, navegacao lateral, layout compartilhado ou migracao de `/scoreboard` para `/dashboard`:
+  - leia `sidebar-layout.md`
 - Se a mudanca mexe em CI, GitHub Actions, checks de PR, Dependabot ou integracao operacional com Vercel:
   - leia `github-operations.md`
 - Se a mudanca mexe em fluxo de branch, convencao de commit, versionamento ou release:

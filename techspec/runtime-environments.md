@@ -13,13 +13,15 @@ Centralizar como o app se comporta em cada combinacao relevante de ambiente, com
 - `getAuthenticatedUser()` retorna `null`
 - `middleware.ts` atua como no-op
 - `/` redireciona para `/login`
+- `/dashboard` redireciona para `/login`
 - `/scoreboard` redireciona para `/login`
 - `/api/scoreboard` e `/api/matches` retornam `401`
 - `POST /api/auth/register` retorna indisponibilidade de auth
+- O fallback em memoria continua existindo no dominio, mas nao fica exposto pela UI autenticada nem pelas APIs protegidas no estado atual
 
 Uso esperado:
 
-- desenvolvimento local de UI e dominio do placar
+- desenvolvimento local de componentes isolados e dominio do placar
 - nao valida persistencia compartilhada
 - nao valida auth real
 
@@ -29,6 +31,7 @@ Uso esperado:
 - Auth e tratado como configuracao invalida
 - `middleware.ts` falha na inicializacao para impedir secret implicito
 - `/` continua resolvendo sessao como ausente e redireciona para `/login`
+- `/dashboard` redireciona para `/login`
 - `/scoreboard` redireciona para `/login`
 - `/api/scoreboard` e `/api/matches` retornam `401`
 - `POST /api/auth/register` retorna erro de configuracao de auth
@@ -43,8 +46,9 @@ Uso esperado:
 
 - Persistencia de partidas usa Prisma + Postgres
 - Login e signup ficam disponiveis
-- `middleware.ts` protege `/scoreboard` com `withAuth`
-- `src/app/scoreboard/page.tsx` reforca a validacao de sessao no server component
+- `middleware.ts` protege a area autenticada com `withAuth`
+- `src/app/(authenticated)/layout.tsx` reforca a validacao de sessao no server component
+- `src/app/scoreboard/page.tsx` so preserva o redirecionamento legado para `/dashboard`
 - As APIs do placar validam sessao e retornam `401` sem autenticacao
 - `/` redireciona por estado de sessao
 - cookies seguros sao usados em producao ou quando `NEXTAUTH_URL` comeca com `https://`
@@ -58,8 +62,10 @@ Uso esperado:
 
 - O fallback em memoria existe apenas para desenvolvimento local
 - A ausencia de `DATABASE_URL` nao desabilita apenas o banco; ela inviabiliza auth real
+- No estado atual do codigo, a ausencia de `DATABASE_URL` tambem impede usar o fluxo autenticado de dashboard, mesmo com o dominio de placar ainda disponivel em memoria
 - A presenca de `DATABASE_URL` sem `NEXTAUTH_SECRET` e erro de configuracao, nao modo degradado aceitavel
-- `/scoreboard` permanece o fluxo funcional principal do produto
+- `/dashboard` permanece o fluxo funcional principal do produto
+- `/scoreboard` permanece acessivel apenas como rota legada de compatibilidade
 
 ## Fontes de verdade
 
@@ -67,6 +73,8 @@ Uso esperado:
 - `src/lib/auth.ts`
 - `src/lib/data.ts`
 - `src/app/page.tsx`
+- `src/app/(authenticated)/layout.tsx`
+- `src/app/(authenticated)/dashboard/page.tsx`
 - `src/app/scoreboard/page.tsx`
 - `src/app/api/scoreboard/route.ts`
 - `src/app/api/matches/route.ts`

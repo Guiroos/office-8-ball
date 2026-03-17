@@ -8,7 +8,7 @@ Organizar os proximos passos tecnicos do projeto sem misturar backlog futuro com
 
 - Prisma ja foi adotado
 - A UI principal ja usa `Tailwind CSS` com primitives locais no estilo `shadcn/ui`
-- Auth.js por credenciais ja protege `/scoreboard` e as APIs do placar
+- Auth.js por credenciais ja protege a shell autenticada em `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings` e as APIs do placar
 - O cadastro inicial de usuarios ja existe via Postgres
 - O dominio continua fixo em dois times globais
 
@@ -32,7 +32,7 @@ Nota:
 
 Prioridade: media
 
-- Expandir a cobertura E2E alem do fluxo principal ja implementado em login e scoreboard
+- Expandir a cobertura E2E alem do fluxo principal ja implementado em login, shell autenticada e dashboard
 - Priorizar cenarios ainda nao cobertos, como rate limit de auth e variantes negativas mais profundas
 - Endurecer as assercoes de placar para garantir que cada registro de vitoria representa exatamente uma nova partida
 - Avaliar execucao de E2E em servidor mais proximo de producao com `next build` + `next start`

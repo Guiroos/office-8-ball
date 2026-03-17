@@ -14,10 +14,11 @@ Use this file as the default operating guide for AI agents working in this repo.
 - Authentication now exists through `Auth.js` credentials backed by Prisma users.
 - Login and signup now use Prisma-backed rate limiting by normalized `email + IP`.
 - Auth field validation is shared with `zod` schemas used by both frontend and backend.
-- The real functional flow today is the authenticated scoreboard at `/scoreboard`.
+- The real functional flow today is the authenticated dashboard at `/dashboard`.
 - `/login` is the real login/signup entry screen.
 - `/login` uses a branded full-page layout with a desktop-first two-column composition.
-- Visual theme tokens live in `src/app/globals.css`, including the shared foundation scale for radius, shadow, and type across login and dashboard.
+- Visual theme tokens live in `src/app/globals.css`, including the shared foundation scale for radius, shadow, and type across login, dashboard, and the authenticated shell.
+- The authenticated shell now also owns dedicated sidebar/menu tokens for light and dark mode contrast.
 - `/` redirects by session state.
 
 ## Product Context
@@ -25,7 +26,7 @@ Use this file as the default operating guide for AI agents working in this repo.
 - Frontend team: `Gui + Jean`
 - Backend team: `Adair + Richard`
 - Tone: playful internal rivalry, but behavior should stay simple and reliable
-- Main working user flow today: enter through `/login`, open `/scoreboard`, register the winner, see scoreboard and recent history refresh
+- Main working user flow today: enter through `/login`, open `/dashboard`, register the winner, see scoreboard and recent history refresh
 
 ## Source Of Truth
 
@@ -44,12 +45,18 @@ Practical note:
 
 ### Routes
 
-- `middleware.ts`: route-level auth protection for `/scoreboard`
+- `middleware.ts`: route-level auth protection for the authenticated area, including `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings`, and `/scoreboard`
 - `src/app/page.tsx`: redirects by session state
 - `src/app/login/page.tsx`: login/signup page
 - `src/app/not-found.tsx`: branded 404 screen for invalid routes
 - `src/app/error.tsx`: branded route error recovery screen
-- `src/app/scoreboard/page.tsx`: main scoreboard page
+- `src/app/(authenticated)/layout.tsx`: shared authenticated shell with sidebar
+- `src/app/(authenticated)/dashboard/page.tsx`: main dashboard page
+- `src/app/(authenticated)/times/page.tsx`: authenticated placeholder for teams
+- `src/app/(authenticated)/ranking/page.tsx`: authenticated placeholder for ranking
+- `src/app/(authenticated)/profile/page.tsx`: authenticated placeholder for profile
+- `src/app/(authenticated)/settings/page.tsx`: authenticated placeholder for settings
+- `src/app/scoreboard/page.tsx`: legacy redirect from `/scoreboard` to `/dashboard`
 - `src/app/api/scoreboard/route.ts`: scoreboard read API
 - `src/app/api/matches/route.ts`: matches read/create API
 - `src/app/api/auth/register/route.ts`: user signup API
@@ -60,6 +67,7 @@ Practical note:
 - `src/components/dashboard/index.tsx`: main scoreboard screen
 - `src/components/dashboard/use-dashboard-data.ts`: fetch/load/register-win flow
 - `src/components/dashboard/*`: scoreboard subcomponents
+- `src/components/authenticated/*`: shared authenticated shell, account menu, and placeholder pages
 - `src/components/login/login-screen.tsx`: branded login/signup UI connected to real auth
 - `src/components/theme/*`: app-wide theme provider, toggle, shared theme helpers, and theme tests
 - `src/components/ui/*`: local UI primitives plus shared composition components
@@ -136,12 +144,13 @@ Important:
 - The scoreboard UI fetches `/api/scoreboard` and `/api/matches`
 - After registering a win, the UI re-fetches both endpoints
 - The UI intentionally does not apply optimistic scoreboard updates before persistence succeeds
-- With `DATABASE_URL`, `middleware.ts` protects `/scoreboard` and the page/API layers also validate session
-- Without `DATABASE_URL`, auth stays disabled and the local scoreboard flow can still run only for development fallback
+- With `DATABASE_URL`, `middleware.ts` protects the authenticated area and the page/API layers also validate session
+- Without `DATABASE_URL`, auth stays disabled; the in-memory fallback remains useful for domain and isolated UI work, but the authenticated dashboard/API flow still stays unavailable
 - The login screen handles both `entrar` and `criar conta`
 - The login screen keeps submit actions enabled while auth is available, validates locally on blur or submit, and only calls auth endpoints when the current mode is valid
 - Field errors appear after blur or submit attempt; API conflicts still return remote field errors
 - Repeated auth failures trigger temporary progressive blocks keyed by normalized `email + IP`
+- The authenticated shell keeps sidebar, account menu, and rendered pages on the same semantic color system in both light and dark themes
 - On desktop, the login keeps the image on the left and the form on the right
 - On mobile, the image is hidden and the form remains in a single column
 - Invalid routes render a branded `404` recovery screen
@@ -168,7 +177,7 @@ This is a narrow v1 app. Keep it narrow.
 - Copy should stay short, readable, and playful
 - Auth UX should stay simple: credentials only, no fake providers
 - Keep the current green billiards-table direction unless the task explicitly asks for a different visual language
-- If you change routing, confirm that `/scoreboard` remains accessible unless the user asks for a product change
+- If you change routing, confirm that `/dashboard` remains the main authenticated entry and `/scoreboard` remains accessible as a legacy redirect unless the user asks for a product change
 
 ### Be Precise About Persistence
 
@@ -307,7 +316,7 @@ Before finishing, check:
 1. Does the app still support both persistence modes?
 2. Is the scoreboard still derived from match history?
 3. Are `frontend` and `backend` still the only accepted team ids unless the task explicitly changed that?
-4. Did `/scoreboard` remain the real functional flow?
+4. Did `/dashboard` remain the real functional flow while `/scoreboard` stayed available as a legacy redirect?
 5. Did API response shapes stay compatible with the current UI?
 6. Did login, signup, and protected routes stay consistent with the current auth model?
 7. Did you update docs only where behavior actually changed?

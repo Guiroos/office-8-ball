@@ -12,9 +12,9 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
 - Autenticacao por credenciais com `Auth.js`
 - Protecao contra brute force em auth persistida via Prisma
-- `middleware.ts` na raiz protege `/scoreboard` no nivel de roteamento
+- `middleware.ts` na raiz protege a area autenticada no nivel de roteamento
 - `NEXTAUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
-- Testes automatizados com `Vitest` + Testing Library
+- Testes automatizados com `Vitest`, Testing Library e `Playwright`
 
 ## Rotas principais
 
@@ -22,8 +22,18 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - redireciona conforme estado de sessao
 - `/login`
   - entrada real de login e cadastro
+- `/dashboard`
+  - fluxo principal autenticado do produto dentro da shell compartilhada
+- `/times`
+  - placeholder autenticado para futura evolucao de times
+- `/ranking`
+  - placeholder autenticado para futura leitura de ranking
+- `/profile`
+  - placeholder autenticado de conta acessivel pelo menu do usuario
+- `/settings`
+  - placeholder autenticado para configuracoes da shell
 - `/scoreboard`
-  - fluxo principal autenticado do produto
+  - rota legada que redireciona para `/dashboard`
 - `/api/scoreboard`
   - leitura do placar agregado
 - `/api/matches`
@@ -41,10 +51,12 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - fluxo visual e interacoes de login/signup
 - `src/components/dashboard/*`
   - tela principal de placar, historico e registro de vitoria
+- `src/components/authenticated/*`
+  - shell compartilhada, sidebar, menu de conta e placeholders autenticados
 - `src/components/theme/*`
   - provider, toggle, helper compartilhado de bootstrap/resolve e comportamento de tema
 - `src/components/ui/*`
-  - primitives locais reutilizaveis
+  - primitives locais reutilizaveis e composicao visual compartilhada
 
 ### Dominio e regras
 
@@ -61,7 +73,7 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - `src/lib/auth-rate-limit.ts`
   - estado e regras de rate limit por `email + ip`
 - `middleware.ts`
-  - protecao de rota para `/scoreboard` com `withAuth`
+  - protecao de rota para a area autenticada com `withAuth`
 
 ### Persistencia
 
@@ -79,11 +91,12 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - Nao persistir counters agregados do placar
 - Nao tratar times do banco como fonte unica de verdade; o v1 ainda os espelha em codigo
 - Nao quebrar o fallback em memoria sem aprovacao explicita
+- Nao documentar o fallback em memoria como se ele reabrisse o fluxo autenticado sem sessao; hoje ele permanece restrito ao dominio e ao desenvolvimento isolado
 
 ## Gaps conhecidos
 
 - Ainda nao ha testes integrados com Prisma real
-- Ainda nao ha cobertura E2E de navegador
+- A cobertura E2E ainda nao cobre rate limit de auth nem variantes negativas mais profundas
 - O dominio continua deliberadamente estreito e nao cobre RBAC ou ligas
 
 ## Proximos passos relacionados
