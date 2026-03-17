@@ -7,7 +7,7 @@
 - Scoreboard values are always derived from `matches` — never stored as counters
 - `leaderTeamId` is `null` on ties
 - `leadBy` is the absolute win difference
-- `currentStreak` is based on newest consecutive wins by the latest winner
+- `currentStreak` counts consecutive wins backward from the newest match until a different winner appears
 
 ## Team Behavior Files
 
