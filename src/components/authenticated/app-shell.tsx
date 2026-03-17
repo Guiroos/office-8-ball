@@ -226,9 +226,6 @@ function UserMenu({
       <div className="mt-1 flex items-center justify-between rounded-[16px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-2.5">
         <div>
           <p className="theme-text-sidebar text-sm font-semibold">Tema</p>
-          <p className="theme-text-sidebar-muted text-xs">
-            Alterna claro e escuro
-          </p>
         </div>
         <ThemeToggle
           variant="sidebar"
