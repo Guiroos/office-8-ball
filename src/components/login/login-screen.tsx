@@ -332,7 +332,7 @@ export function LoginScreen({
                   <form className="space-y-4" onSubmit={handleSubmit}>
                     {isRegisterMode ? (
                       <Field>
-                        <Label htmlFor="username" className="text-sm font-semibold text-[color:var(--foreground-soft)]">Username</Label>
+                        <Label htmlFor="username" className="text-sm font-semibold text-muted-foreground">Username</Label>
                         <Input
                           id="username"
                           name="username"
@@ -355,7 +355,7 @@ export function LoginScreen({
                     ) : null}
 
                     <Field>
-                      <Label htmlFor="email" className="text-sm font-semibold text-[color:var(--foreground-soft)]">E-mail corporativo</Label>
+                      <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">E-mail corporativo</Label>
                       <Input
                         id="email"
                         name="email"
@@ -373,7 +373,7 @@ export function LoginScreen({
                     </Field>
 
                     <Field>
-                      <Label htmlFor="password" className="text-sm font-semibold text-[color:var(--foreground-soft)]">Senha</Label>
+                      <Label htmlFor="password" className="text-sm font-semibold text-muted-foreground">Senha</Label>
                       <Input
                         id="password"
                         name="password"
