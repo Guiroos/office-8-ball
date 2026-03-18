@@ -15,12 +15,12 @@ export function DashboardSidebar({
 }) {
   return (
     <div className="grid gap-6">
-      <Card className="border-[color:var(--border-strong)] bg-[color:var(--surface)]/94 backdrop-blur">
+      <Card className="border-border-strong bg-surface/94 backdrop-blur">
         <CardContent className="space-y-5 p-6">
           <SectionHeader eyebrow="Clima da mesa" title="Leitura oficial" />
 
           <div className="grid gap-4">
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-1">
+            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
               <IconCallout
                 icon={<Trophy className="size-4" />}
                 title="Mensagem"
@@ -29,7 +29,7 @@ export function DashboardSidebar({
               />
             </div>
 
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-1">
+            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
               <IconCallout
                 icon={<status.icon className="size-4" />}
                 title={status.title}

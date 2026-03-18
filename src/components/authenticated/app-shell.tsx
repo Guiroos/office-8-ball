@@ -69,7 +69,7 @@ function UserAvatar({ user }: { user: SessionUser }) {
 
   return (
     <div className="relative">
-      <div className="theme-text-sidebar flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-pill)] border border-[color:var(--app-shell-sidebar-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-[0.12em]">
+      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-[color:var(--app-shell-sidebar-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-[0.12em]">
         {initials || "OB"}
       </div>
       <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-[color:var(--app-shell-avatar-ring)] bg-[color:var(--app-shell-status)]" />
@@ -80,15 +80,15 @@ function UserAvatar({ user }: { user: SessionUser }) {
 function SidebarBrand() {
   return (
     <div className="flex items-center gap-3 px-1">
-      <div className="theme-text-sidebar flex size-10 items-center justify-center rounded-[12px] border border-[color:var(--app-shell-sidebar-border)] bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
+      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-[12px] border border-[color:var(--app-shell-sidebar-border)] bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
         <Globe className="size-5" />
       </div>
 
       <div>
-        <p className="theme-text-sidebar text-lg font-bold tracking-[-0.03em]">
+        <p className="text-sidebar-foreground text-lg font-bold tracking-[-0.03em]">
           Office 8 Ball
         </p>
-        <p className="theme-text-sidebar-subtle text-xs font-medium tracking-[0.12em] uppercase">
+        <p className="text-sidebar-foreground-subtle text-xs font-medium tracking-[0.12em] uppercase">
           Area autenticada
         </p>
       </div>
@@ -126,7 +126,7 @@ function UserFooter({
       >
         <UserAvatar user={user} />
         <div className="min-w-0 flex-1">
-          <p className="theme-text-sidebar truncate text-sm font-semibold">
+          <p className="text-sidebar-foreground truncate text-sm font-semibold">
             {user.username}
           </p>
           <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--app-shell-sidebar-accent)]">
@@ -134,7 +134,7 @@ function UserFooter({
           </p>
         </div>
         <ChevronDown
-          className={cn("theme-text-sidebar-subtle size-4 shrink-0 transition", {
+          className={cn("text-sidebar-foreground-subtle size-4 shrink-0 transition", {
             "rotate-180": isOpen,
           })}
         />
@@ -183,7 +183,7 @@ function UserMenu({
 
   return (
     <div
-      className="theme-text-sidebar grid gap-1.5"
+      className="text-sidebar-foreground grid gap-1.5"
       role="menu"
       aria-label="Menu da conta"
     >
@@ -191,10 +191,10 @@ function UserMenu({
         <div className="flex items-center gap-3">
           <UserAvatar user={user} />
           <div className="min-w-0">
-            <p className="theme-text-sidebar truncate text-sm font-semibold">
+            <p className="text-sidebar-foreground truncate text-sm font-semibold">
               {user.username}
             </p>
-            <p className="theme-text-sidebar-muted truncate text-xs">
+            <p className="text-sidebar-foreground-muted truncate text-xs">
               {user.email}
             </p>
           </div>
@@ -213,7 +213,7 @@ function UserMenu({
             className={cn(
               "flex items-center gap-3 rounded-[16px] border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]",
               link.active
-                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] theme-text-sidebar shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
+                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] text-sidebar-foreground shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
                 : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
             )}
           >
@@ -225,7 +225,7 @@ function UserMenu({
 
       <div className="mt-1 flex items-center justify-between rounded-[16px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-2.5">
         <div>
-          <p className="theme-text-sidebar text-sm font-semibold">Tema</p>
+          <p className="text-sidebar-foreground text-sm font-semibold">Tema</p>
         </div>
         <ThemeToggle
           variant="sidebar"
@@ -288,7 +288,7 @@ function SidebarNavigation({
 }) {
   return (
     <nav
-      className="theme-text-sidebar grid gap-2"
+      className="text-sidebar-foreground grid gap-2"
       aria-label="Navegacao principal"
     >
       {navigationItems.map((item) => {
@@ -303,7 +303,7 @@ function SidebarNavigation({
             className={cn(
               "flex items-center gap-4 rounded-[12px] border px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]",
               isActive
-                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] theme-text-sidebar shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
+                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] text-sidebar-foreground shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
                 : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
             )}
             aria-current={isActive ? "page" : undefined}
@@ -324,7 +324,7 @@ export function AppShell({ user, children }: AppShellProps) {
   return (
     <div className="min-h-dvh">
       <div className="flex min-h-dvh w-full">
-        <aside className="theme-text-sidebar hidden w-[260px] shrink-0 bg-[color:var(--app-shell-sidebar)] lg:flex lg:flex-col lg:border-r lg:border-[color:var(--app-shell-sidebar-border)]">
+        <aside className="text-sidebar-foreground hidden w-[260px] shrink-0 bg-[color:var(--app-shell-sidebar)] lg:flex lg:flex-col lg:border-r lg:border-[color:var(--app-shell-sidebar-border)]">
           <div className="sticky top-0 flex h-dvh flex-col px-4 py-6">
             <SidebarContent pathname={pathname} user={user} />
           </div>
@@ -357,7 +357,7 @@ export function AppShell({ user, children }: AppShellProps) {
             aria-label="Fechar navegacao"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
-          <div className="theme-text-sidebar absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar)] px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+          <div className="text-sidebar-foreground absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar)] px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
             <div className="mb-6 flex items-center justify-between">
               <SidebarBrand />
               <Button

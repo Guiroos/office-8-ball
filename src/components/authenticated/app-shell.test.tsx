@@ -78,7 +78,7 @@ describe("AppShell", () => {
         .some((link) => link.getAttribute("aria-current") === "page"),
     ).toBe(true);
     expect(screen.getByRole("navigation", { name: "Navegacao principal" })).toHaveClass(
-      "theme-text-sidebar",
+      "text-sidebar-foreground",
     );
     expect(screen.getAllByRole("link", { name: "Times" })[0]).toHaveAttribute("href", "/times");
     expect(screen.getByText("Gui Dev")).toBeInTheDocument();
@@ -112,10 +112,10 @@ describe("AppShell", () => {
     expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tema" })).toHaveAttribute("data-variant", "sidebar");
     expect(screen.getByRole("menu", { name: "Menu da conta" })).toHaveClass(
-      "theme-text-sidebar",
+      "text-sidebar-foreground",
     );
     expect(screen.getByRole("button", { name: "Sair" })).toHaveClass(
-      "text-[color:var(--app-shell-sidebar-foreground)]",
+      "text-sidebar-foreground",
     );
 
     await user.click(screen.getByRole("button", { name: "Sair" }));

@@ -54,7 +54,7 @@ const INITIAL_TOUCHED_FIELDS = {
 };
 
 const SEGMENT_BUTTON_BASE_CLASS =
-  "rounded-[var(--radius-sm)] px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed";
+  "rounded-sm px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed";
 
 export function LoginScreen({
   authAvailable,
@@ -262,7 +262,7 @@ export function LoginScreen({
       <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 lg:h-full lg:min-h-0 lg:px-8 lg:py-5">
         <section className="flex min-h-0 flex-1 lg:overflow-hidden">
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
-            <aside className="relative hidden min-h-0 overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] shadow-[var(--shadow-brand)] lg:flex">
+            <aside className="relative hidden min-h-0 overflow-hidden rounded-2xl border border-border-inverse bg-surface-brand shadow-brand lg:flex">
               <Image
                 src={LoginPageImage}
                 alt="Mesa de sinuca estilizada representando a rivalidade entre frontend e backend."
@@ -274,39 +274,39 @@ export function LoginScreen({
             </aside>
 
             <section className="flex min-h-0 items-stretch justify-center lg:overflow-hidden">
-              <div className="flex w-full max-w-[540px] flex-col rounded-[var(--radius-2xl)] border border-[color:var(--border)] bg-[color:var(--surface)] p-6 shadow-[var(--shadow-lg)] sm:p-8 lg:h-full lg:max-h-full lg:p-8">
+              <div className="flex w-full max-w-[540px] flex-col rounded-2xl border border-border bg-surface p-6 shadow-lg sm:p-8 lg:h-full lg:max-h-full lg:p-8">
                 <div className="space-y-6 lg:flex lg:h-full lg:flex-col lg:justify-center lg:space-y-5">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="[font-family:var(--font-display)] text-3xl font-black leading-none tracking-[0.04em] text-[color:var(--foreground)] sm:text-4xl">
+                        <p className="font-display text-3xl font-black leading-none tracking-[0.04em] text-foreground sm:text-4xl">
                           Office 8 Ball
                         </p>
                       </div>
-                      <ThemeToggle className="h-11 shrink-0 rounded-[var(--radius-sm)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] text-[color:var(--foreground-soft)] hover:bg-[color:var(--surface-muted)]" />
+                      <ThemeToggle className="h-11 shrink-0 rounded-sm border border-border bg-surface-emphasis text-muted-foreground hover:bg-surface-muted" />
                     </div>
 
                     <div className="space-y-3">
-                      <h1 className="text-xl font-semibold leading-tight tracking-[-0.03em] text-[color:var(--foreground-soft)] sm:text-2xl">
+                      <h1 className="text-xl font-semibold leading-tight tracking-[-0.03em] text-muted-foreground sm:text-2xl">
                         {isRegisterMode
                           ? "Crie a conta basica para liberar a mesa."
                           : "Entre para registrar a proxima vitoria."}
                       </h1>
                       {!authAvailable ? (
-                        <p className="text-sm leading-6 text-[color:var(--danger)]">
+                        <p className="text-sm leading-6 text-danger">
                           {authUnavailableReason}
                         </p>
                       ) : null}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-2">
+                  <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-surface-emphasis p-2">
                     <button
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         !isRegisterMode
-                          ? "bg-[color:var(--frontend)] theme-text-inverse shadow-[var(--shadow-sm)]"
-                          : "text-[color:var(--foreground-soft)]"
+                          ? "bg-[color:var(--frontend)] text-foreground-inverse shadow-sm"
+                          : "text-muted-foreground"
                       }`}
                       onClick={() => handleModeChange("login")}
                       disabled={areControlsDisabled}
@@ -318,8 +318,8 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         isRegisterMode
-                          ? "bg-[color:var(--frontend)] theme-text-inverse shadow-[var(--shadow-sm)]"
-                          : "text-[color:var(--foreground-soft)]"
+                          ? "bg-[color:var(--frontend)] text-foreground-inverse shadow-sm"
+                          : "text-muted-foreground"
                       }`}
                       onClick={() => handleModeChange("register")}
                       disabled={areControlsDisabled}
@@ -395,7 +395,7 @@ export function LoginScreen({
                     </Field>
 
                     {generalError ? (
-                      <div className="rounded-[var(--radius-md)] border border-[color:var(--backend-soft)] bg-[color:var(--surface-danger)] px-4 py-3 text-sm text-[color:var(--danger)]">
+                      <div className="rounded-md border border-[color:var(--backend-soft)] bg-surface-danger px-4 py-3 text-sm text-danger">
                         {generalError}
                       </div>
                     ) : null}
@@ -403,7 +403,7 @@ export function LoginScreen({
                     <Button
                       type="submit"
                       size="lg"
-                      className="h-14 w-full rounded-[var(--radius-md)] text-base shadow-[var(--shadow-brand)]"
+                      className="h-14 w-full rounded-md text-base shadow-brand"
                       disabled={isSubmitDisabled}
                       data-testid="login-submit"
                     >

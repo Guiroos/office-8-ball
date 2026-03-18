@@ -22,23 +22,23 @@ export function IconCallout({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-[var(--radius-md)] border p-4 backdrop-blur-sm",
+        "flex items-start gap-3 rounded-md border p-4 backdrop-blur-sm",
         tone === "success" &&
-          "border-[color:var(--border)] bg-[color:var(--surface-success)] text-[color:var(--foreground-soft)]",
+          "border-border bg-surface-success text-muted-foreground",
         tone === "default" &&
-          "border-[color:var(--border)] bg-[color:var(--surface-emphasis)] text-[color:var(--foreground)]",
+          "border-border bg-surface-emphasis text-foreground",
         isStrong &&
-          "theme-text-strong border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)]",
+          "text-surface-strong-foreground border-border-inverse bg-surface-strong-muted",
         className,
       )}
       {...props}
     >
       <div
         className={cn(
-          "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-pill)]",
-          tone === "success" && "bg-[color:var(--surface)] text-[color:var(--frontend)]",
-          tone === "default" && "bg-[color:var(--gold-soft)] text-[color:var(--foreground)]",
-          isStrong && "theme-text-strong-muted bg-[color:var(--surface-strong)]",
+          "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-pill",
+          tone === "success" && "bg-surface text-frontend",
+          tone === "default" && "bg-[color:var(--gold-soft)] text-foreground",
+          isStrong && "text-surface-strong-foreground-muted bg-surface-strong",
         )}
       >
         {icon}
@@ -48,7 +48,7 @@ export function IconCallout({
         <p
           className={cn(
             "text-sm leading-6",
-            isStrong ? "theme-text-strong-muted" : "text-[color:var(--foreground-soft)]",
+            isStrong ? "text-surface-strong-foreground-muted" : "text-muted-foreground",
           )}
         >
           {description}
