@@ -29,6 +29,9 @@
 # superpowers brainstorm sessions
 .superpowers/
 
+# git worktrees
+.worktrees/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
