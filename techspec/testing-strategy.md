@@ -44,7 +44,7 @@ Ferramentas atuais:
 
 ### Documentacao apenas
 
-- revisar consistencia entre `README.md`, `AGENTS.md` e `techspec/`
+- revisar consistencia entre `README.md`, `CLAUDE.md` e `techspec/`
 
 ### Auth, login ou protecao de rota
 
