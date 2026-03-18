@@ -35,7 +35,7 @@ export function DashboardHero({
             <p className="label-wide text-muted-foreground">
               Rivalidade operacional
             </p>
-            <p className="mt-3 inline-flex w-fit rounded-pill border border-gold bg-[color:var(--gold-soft)] px-3 py-1 label-xs text-foreground backdrop-blur-sm">
+            <p className="mt-3 inline-flex w-fit rounded-pill border border-gold bg-gold-soft px-3 py-1 label-xs text-foreground backdrop-blur-sm">
               {environmentLabel === "Escritório" ? "Modo escritório" : "Modo dev"}
             </p>
           </div>

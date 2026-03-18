@@ -37,7 +37,7 @@ export function IconCallout({
         className={cn(
           "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-pill",
           tone === "success" && "bg-surface text-frontend",
-          tone === "default" && "bg-[color:var(--gold-soft)] text-foreground",
+          tone === "default" && "bg-gold-soft text-foreground",
           isStrong && "text-surface-strong-foreground-muted bg-surface-strong",
         )}
       >

@@ -305,7 +305,7 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         !isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-foreground-inverse shadow-sm"
+                          ? "bg-frontend text-foreground-inverse shadow-sm"
                           : "text-muted-foreground"
                       }`}
                       onClick={() => handleModeChange("login")}
@@ -318,7 +318,7 @@ export function LoginScreen({
                       type="button"
                       className={`${SEGMENT_BUTTON_BASE_CLASS} ${
                         isRegisterMode
-                          ? "bg-[color:var(--frontend)] text-foreground-inverse shadow-sm"
+                          ? "bg-frontend text-foreground-inverse shadow-sm"
                           : "text-muted-foreground"
                       }`}
                       onClick={() => handleModeChange("register")}
@@ -395,7 +395,7 @@ export function LoginScreen({
                     </Field>
 
                     {generalError ? (
-                      <div className="rounded-md border border-[color:var(--backend-soft)] bg-surface-danger px-4 py-3 text-sm text-danger">
+                      <div className="rounded-md border border-backend-soft bg-surface-danger px-4 py-3 text-sm text-danger">
                         {generalError}
                       </div>
                     ) : null}
