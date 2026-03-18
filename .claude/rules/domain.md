@@ -8,6 +8,7 @@
 - `leaderTeamId` is `null` on ties
 - `leadBy` is the absolute win difference
 - `currentStreak` counts consecutive wins backward from the newest match until a different winner appears
+- `getScoreboard()` fetches **all** match records with no limit; `listMatches()` defaults to 12 for UI display. Adding a limit to `getScoreboard()` silently produces wrong `wins`, `leadBy`, and `currentStreak` values.
 
 ## Team Behavior Files
 
@@ -42,30 +43,8 @@ Prefer short corrections over broad doc rewrites.
 
 ## Runtime Behavior
 
-### Persistence Modes
+- `DATABASE_URL` absent → in-memory fallback for matches only; auth is unavailable; dashboard stays protected
+- `DATABASE_URL` present, `NEXTAUTH_SECRET` absent → invalid configuration; do not treat as degraded mode
+- Do not change API status codes (401, 409, 429, 500, 503) without also updating client-side error handling
 
-- With `DATABASE_URL`: Prisma + Postgres
-- Without `DATABASE_URL`: in-memory fallback (local dev only)
-
-Important:
-- In-memory data disappears on server restart
-- Login/signup require `DATABASE_URL` (users persist only in Postgres)
-- Rate limiting also persists only when `DATABASE_URL` is available
-- If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, treat as invalid configuration
-
-### Match Creation
-
-`POST /api/matches` accepts `winnerTeamId` (required) and `note` (optional, max 140 chars).
-
-Validation:
-- `winnerTeamId` must be `frontend` or `backend`
-- `note` is trimmed; empty values normalized to `null`
-
-### UI Data Flow
-
-- Scoreboard UI fetches `/api/scoreboard` and `/api/matches`
-- After registering a win, UI re-fetches both endpoints
-- No optimistic scoreboard updates before persistence succeeds
-- With `DATABASE_URL`, middleware protects the authenticated area; page/API layers also validate session
-- Login screen handles both `entrar` and `criar conta`; validates on blur or submit; remote field errors returned on conflict
-- Repeated auth failures trigger progressive blocks keyed by `email + IP`
+See `techspec/runtime-environments.md` for the full environment matrix and `techspec/api-contracts.md` for payload details.

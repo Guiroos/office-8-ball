@@ -44,6 +44,27 @@ Read:
 4. `src/components/dashboard.test.tsx`
 5. `src/components/ui/composition.test.tsx` when shared composition primitives are involved
 
+### Theme system changes
+
+Read:
+1. `src/app/globals.css`
+2. `src/components/theme/theme-provider.tsx`
+3. `src/components/theme/theme-core.ts`
+4. `src/components/ui/`
+5. `techspec/theme-system.md`
+
+Constraint: prefer semantic tokens over per-component color overrides; keep `useTheme()` strict.
+
+### Shell or authenticated layout changes
+
+Read:
+1. `src/app/(authenticated)/layout.tsx`
+2. `src/components/authenticated/app-shell.tsx`
+3. `middleware.ts`
+4. `techspec/sidebar-layout.md`
+
+Constraint: do not break `/scoreboard` legacy redirect or duplicate route protection inconsistently between middleware and pages.
+
 ### Login/auth changes
 
 Read:
