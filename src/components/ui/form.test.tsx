@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { FieldError, FieldLabel, Input } from "@/components/ui/form";
+import { FieldError } from "@/components/primitives/form-field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 describe("form primitives", () => {
   it("renders an input with default accessible state", () => {
@@ -32,7 +34,7 @@ describe("form primitives", () => {
   it("associates labels through native htmlFor behavior", () => {
     render(
       <>
-        <FieldLabel htmlFor="username">Username</FieldLabel>
+        <Label htmlFor="username">Username</Label>
         <Input id="username" />
       </>,
     );

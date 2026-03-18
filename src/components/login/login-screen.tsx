@@ -7,7 +7,9 @@ import { type FormEvent, useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel, Input } from "@/components/ui/form";
+import { Field, FieldError } from "@/components/primitives/form-field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit";
 import {
   getLoginFieldErrors,
@@ -330,7 +332,7 @@ export function LoginScreen({
                   <form className="space-y-4" onSubmit={handleSubmit}>
                     {isRegisterMode ? (
                       <Field>
-                        <FieldLabel htmlFor="username">Username</FieldLabel>
+                        <Label htmlFor="username" className="text-sm font-semibold text-[color:var(--foreground-soft)]">Username</Label>
                         <Input
                           id="username"
                           name="username"
@@ -353,7 +355,7 @@ export function LoginScreen({
                     ) : null}
 
                     <Field>
-                      <FieldLabel htmlFor="email">E-mail corporativo</FieldLabel>
+                      <Label htmlFor="email" className="text-sm font-semibold text-[color:var(--foreground-soft)]">E-mail corporativo</Label>
                       <Input
                         id="email"
                         name="email"
@@ -371,7 +373,7 @@ export function LoginScreen({
                     </Field>
 
                     <Field>
-                      <FieldLabel htmlFor="password">Senha</FieldLabel>
+                      <Label htmlFor="password" className="text-sm font-semibold text-[color:var(--foreground-soft)]">Senha</Label>
                       <Input
                         id="password"
                         name="password"
