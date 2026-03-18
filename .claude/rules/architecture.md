@@ -21,6 +21,7 @@ These rules apply for v1 and must not be broken without an explicit product or a
 | UI — authenticated shell | `src/components/authenticated/*` |
 | UI — theme | `src/components/theme/*` |
 | UI — primitives | `src/components/ui/*` |
+| UI — domain primitives | `src/components/primitives/*` |
 | Domain & rules | `src/lib/constants.ts`, `src/lib/types.ts`, `src/lib/data.ts` |
 | Auth | `src/lib/auth.ts`, `src/lib/auth-validation.ts`, `src/lib/auth-rate-limit.ts` |
 | Middleware | `middleware.ts` |
