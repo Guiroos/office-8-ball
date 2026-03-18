@@ -66,7 +66,7 @@ describe("ThemeToggle", () => {
     render(<ThemeToggle variant="sidebar" />);
 
     expect(screen.getByRole("button", { name: "Mudar para tema escuro" })).toHaveClass(
-      "text-[color:var(--app-shell-sidebar-foreground)]",
+      "text-sidebar-foreground",
     );
   });
 });

@@ -1,8 +1,8 @@
 import { Flame, Swords, TimerReset, Trophy } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { IconCallout } from "@/components/ui/icon-callout";
-import { SectionHeader } from "@/components/ui/section-header";
+import { IconCallout } from "@/components/primitives/icon-callout";
+import { SectionHeader } from "@/components/primitives/section-header";
 
 import type { DashboardStatus } from "./dashboard-utils";
 
@@ -15,12 +15,12 @@ export function DashboardSidebar({
 }) {
   return (
     <div className="grid gap-6">
-      <Card className="border-[color:var(--border-strong)] bg-[color:var(--surface)]/94 backdrop-blur">
+      <Card className="border-border-strong bg-surface/94 backdrop-blur">
         <CardContent className="space-y-5 p-6">
           <SectionHeader eyebrow="Clima da mesa" title="Leitura oficial" />
 
           <div className="grid gap-4">
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-1">
+            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
               <IconCallout
                 icon={<Trophy className="size-4" />}
                 title="Mensagem"
@@ -29,7 +29,7 @@ export function DashboardSidebar({
               />
             </div>
 
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--border-strong)] bg-[color:var(--surface-emphasis)] p-1">
+            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
               <IconCallout
                 icon={<status.icon className="size-4" />}
                 title={status.title}
@@ -41,7 +41,7 @@ export function DashboardSidebar({
         </CardContent>
       </Card>
 
-      <Card className="theme-text-strong border-[color:var(--border-inverse)] bg-[image:var(--brand-gradient)] shadow-[var(--shadow-brand)]">
+      <Card variant="brand">
         <CardContent className="space-y-4 p-6">
           <SectionHeader eyebrow="Painel rápido" title="Painel rápido" inverse hideTitle className="gap-0" />
           <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">

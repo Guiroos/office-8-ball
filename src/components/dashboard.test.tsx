@@ -195,11 +195,11 @@ describe("Dashboard", () => {
     });
 
     expect(frontendCard).toHaveAttribute("data-leader", "true");
-    expect(frontendCard).toHaveClass("bg-[color:var(--frontend-soft)]");
-    expect(frontendCard).toHaveClass("ring-[color:var(--gold)]");
+    expect(frontendCard).toHaveClass("bg-frontend-soft");
+    expect(frontendCard).toHaveClass("ring-gold");
     expect(frontendCard).not.toHaveAttribute("style");
     expect(backendCard).toHaveAttribute("data-leader", "false");
-    expect(backendCard).toHaveClass("bg-[color:var(--backend-soft)]");
+    expect(backendCard).toHaveClass("bg-backend-soft");
     expect(backendCard).not.toHaveAttribute("style");
 
     expect(await screen.findByText("Frontend lidera por 1.")).toBeInTheDocument();

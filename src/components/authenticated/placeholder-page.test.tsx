@@ -31,7 +31,7 @@ describe("PlaceholderPage", () => {
     );
 
     expect(screen.getByRole("link", { name: "Voltar para dashboard" })).toHaveClass(
-      "text-[color:var(--foreground-inverse)]",
+      "text-foreground-inverse",
     );
   });
 });
