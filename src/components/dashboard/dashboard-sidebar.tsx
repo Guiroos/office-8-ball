@@ -41,7 +41,7 @@ export function DashboardSidebar({
         </CardContent>
       </Card>
 
-      <Card className="theme-text-strong border-[color:var(--border-inverse)] bg-[image:var(--brand-gradient)] shadow-[var(--shadow-brand)]">
+      <Card variant="brand">
         <CardContent className="space-y-4 p-6">
           <SectionHeader eyebrow="Painel rápido" title="Painel rápido" inverse hideTitle className="gap-0" />
           <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
