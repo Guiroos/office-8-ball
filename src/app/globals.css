@@ -2,8 +2,6 @@
 
 :root {
   color-scheme: light;
-  --font-body: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
-  --font-display: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
   --text-label-sm: 0.68rem;
   --text-label: 0.72rem;
   --text-title: clamp(1.9rem, 4vw, 2.7rem);
@@ -11,14 +9,6 @@
   --text-display-md: clamp(3rem, 4vw, 4.8rem);
   --text-display-lg: clamp(3.5rem, 10vw, 7.5rem);
   --text-score: clamp(4rem, 12vw, 6rem);
-  --tracking-label: 0.22em;
-  --tracking-label-wide: 0.28em;
-  --radius-sm: 18px;
-  --radius-md: 20px;
-  --radius-lg: 22px;
-  --radius-xl: 28px;
-  --radius-2xl: 32px;
-  --radius-pill: 999px;
   --background: #f1e8d8;
   --background-subtle: #f8f1e6;
   --background-strong: #dcc7a4;
@@ -69,10 +59,23 @@
   --app-shell-content-gradient:
     radial-gradient(circle at top right, rgba(199, 149, 31, 0.16), transparent 22%),
     radial-gradient(circle at left 20%, rgba(22, 102, 87, 0.14), transparent 26%);
-  --shadow-sm: 0 14px 30px rgba(13, 18, 14, 0.18);
-  --shadow-md: 0 20px 45px rgba(19, 74, 50, 0.22);
-  --shadow-lg: 0 24px 60px rgba(49, 37, 27, 0.12);
-  --shadow-brand: 0 20px 45px rgba(19, 74, 50, 0.28);
+  --shadow-sm-value: 0 14px 30px rgba(13, 18, 14, 0.18);
+  --shadow-md-value: 0 20px 45px rgba(19, 74, 50, 0.22);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(19, 74, 50, 0.28);
+  /* shadcn aliases — point to existing tokens, no values duplicated */
+  --primary: var(--foreground);
+  --primary-foreground: var(--foreground-inverse);
+  --secondary: var(--surface-emphasis);
+  --secondary-foreground: var(--foreground);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --accent: var(--surface-emphasis);
+  --accent-foreground: var(--foreground);
+  --destructive: var(--danger);
+  --input: var(--border);
 }
 
 .dark {
@@ -127,10 +130,41 @@
   --app-shell-content-gradient:
     radial-gradient(circle at top right, rgba(229, 188, 84, 0.1), transparent 22%),
     radial-gradient(circle at left 18%, rgba(63, 196, 157, 0.08), transparent 24%);
-  --shadow-sm: 0 14px 30px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 20px 45px rgba(0, 0, 0, 0.24);
-  --shadow-lg: 0 24px 60px rgba(49, 37, 27, 0.12);
-  --shadow-brand: 0 20px 45px rgba(0, 0, 0, 0.28);
+  --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
+  /* shadcn aliases — point to existing tokens, no values duplicated */
+  --primary: var(--foreground);
+  --primary-foreground: var(--foreground-inverse);
+  --secondary: var(--surface-emphasis);
+  --secondary-foreground: var(--foreground);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --accent: var(--surface-emphasis);
+  --accent-foreground: var(--foreground);
+  --destructive: var(--danger);
+  --input: var(--border);
+}
+
+@theme {
+  /* Radius — generates: rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-pill */
+  --radius-sm: 18px;
+  --radius-md: 20px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+
+  /* Letter spacing — generates: tracking-label, tracking-label-wide */
+  --tracking-label: 0.22em;
+  --tracking-label-wide: 0.28em;
+
+  /* Font families — generates: font-body, font-display */
+  --font-body: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
 }
 
 @theme inline {
@@ -156,6 +190,58 @@
   --color-frontend-soft: var(--frontend-soft);
   --color-backend: var(--backend);
   --color-backend-soft: var(--backend-soft);
+  /* shadow → generates: shadow-sm, shadow-md, shadow-lg, shadow-brand */
+  --shadow-sm: var(--shadow-sm-value);
+  --shadow-md: var(--shadow-md-value);
+  --shadow-lg: var(--shadow-lg-value);
+  --shadow-brand: var(--shadow-brand-value);
+  /* missing color mappings needed for .theme-text-* removal */
+  --color-surface-strong-foreground-muted: var(--surface-strong-foreground-muted);
+  --color-sidebar-foreground: var(--app-shell-sidebar-foreground);
+  --color-sidebar-foreground-muted: var(--app-shell-sidebar-foreground-muted);
+  --color-sidebar-foreground-subtle: var(--app-shell-sidebar-foreground-subtle);
+}
+
+@utility label-xs {
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+@utility label {
+  font-size: var(--text-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+@utility label-wide {
+  font-size: var(--text-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label-wide);
+}
+
+@utility display-sm {
+  font-size: var(--text-display-sm);
+  font-weight: 900;
+}
+
+@utility display-md {
+  font-size: var(--text-display-md);
+  font-weight: 900;
+}
+
+@utility display-lg {
+  font-size: var(--text-display-lg);
+  font-weight: 900;
+}
+
+@utility score {
+  font-size: var(--text-score);
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
 * {
