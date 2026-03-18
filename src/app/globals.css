@@ -195,7 +195,6 @@
   --shadow-md: var(--shadow-md-value);
   --shadow-lg: var(--shadow-lg-value);
   --shadow-brand: var(--shadow-brand-value);
-  /* missing color mappings needed for .theme-text-* removal */
   --color-surface-strong-foreground-muted: var(--surface-strong-foreground-muted);
   --color-sidebar-foreground: var(--app-shell-sidebar-foreground);
   --color-sidebar-foreground-muted: var(--app-shell-sidebar-foreground-muted);
@@ -293,30 +292,6 @@ body::before {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-.theme-text-inverse {
-  color: var(--foreground-inverse);
-}
-
-.theme-text-strong {
-  color: var(--surface-strong-foreground);
-}
-
-.theme-text-strong-muted {
-  color: var(--surface-strong-foreground-muted);
-}
-
-.theme-text-sidebar {
-  color: var(--app-shell-sidebar-foreground);
-}
-
-.theme-text-sidebar-muted {
-  color: var(--app-shell-sidebar-foreground-muted);
-}
-
-.theme-text-sidebar-subtle {
-  color: var(--app-shell-sidebar-foreground-subtle);
 }
 
 button,
