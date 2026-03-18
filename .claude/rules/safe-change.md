@@ -126,12 +126,3 @@ Notes:
 - If you change API shape, verify the calling UI
 - If you change routing, verify `/`, `/login`, and `/scoreboard`
 
----
-
-## Known Gaps
-
-- No password recovery
-- No email verification
-- No profile/nickname UI
-- No Prisma-backed integration tests
-- No E2E coverage for auth rate limit or deeper negative-path variants
