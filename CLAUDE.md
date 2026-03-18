@@ -1,16 +1,15 @@
 # CLAUDE.md
 
-Office 8 Ball is an internal scoreboard app for office pool matches between two fixed teams (`frontend` and `backend`). Flow: login → `/dashboard` → register a match winner → scoreboard updates. See `.claude/rules/` for domain invariants, working rules, and safe-change checklist.
+Office 8 Ball is a Next.js 16 scoreboard app for two fixed office teams (`frontend` and `backend`). Flow: login → `/dashboard` → register a match winner → scoreboard updates. See `.claude/rules/` for domain invariants, architecture constraints, testing patterns, and safe-change checklist.
 
-## Source of Truth
+## Tech Stack
 
-When sources disagree: `src/` and `prisma/` > `README.md` and `techspec/` > `PRD.md`.
+- Next.js 16.1.6 (App Router) · React 19.2.3 · TypeScript 5
+- Prisma 6.19.2 + PostgreSQL · Auth.js v4 (next-auth 4.24.13) — credentials-only, JWT sessions
+- Tailwind CSS 4.2.1 · shadcn/ui · class-variance-authority · Zod 4.3.6
+- Vitest 4 · @testing-library/react 16 · Playwright
 
-- `techspec/` — technical docs and architecture decisions
-- `techspec/github-operations.md` — CI and repository protection
-- `techspec/git-conventions.md` — release flow and deploy prerequisites
-
-## Commands
+## Common Commands
 
 ```bash
 # Development
@@ -22,8 +21,9 @@ npm run typecheck     # TypeScript strict check
 npm run test                              # Run all unit/component tests
 npm run test:watch                        # Watch mode
 npm run test -- src/lib/data.test.ts     # Run a single test file
-npm run e2e                               # Playwright E2E tests
-npm run e2e:ui                            # Playwright UI mode
+
+npm run e2e                               # Playwright E2E tests (real Postgres)
+npm run e2e:ui
 
 # Quality
 npm run lint
@@ -32,46 +32,80 @@ npm run lint
 npm run prisma:migrate    # Run migrations in dev
 npm run prisma:deploy     # Deploy migrations to production
 npm run prisma:seed       # Seed teams into DB
+
 npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 ```
 
-## Architecture
+## Directory Structure
 
-**Stack:** Next.js (App Router) · React 19 · Prisma + PostgreSQL · Auth.js v4 · Tailwind CSS · Zod · Vitest · Playwright
+- `src/lib/` — domain (constants, types, data), auth, Prisma client
+- `src/components/ui/` — shadcn primitives (Button, Card, Input, Badge, etc.)
+- `src/components/primitives/` — domain reusables (StatTile, SectionHeader, IconCallout)
+- `src/components/dashboard/` — main scoreboard feature
+- `src/components/authenticated/` — app shell and sidebar layout
+- `src/components/login/` — login/register screen
+- `src/app/(authenticated)/` — protected route group
+- `techspec/` — architecture and operational docs
+- `prisma/` — schema, migrations, seed
 
-**Routes:**
+## Routes
+
 - `/` — redirects by session state
-- `/login` — login/signup (public)
+- `/login` — public; credentials-only login/signup
 - `/(authenticated)/dashboard` — main scoreboard (protected)
-- `/(authenticated)/**` — placeholder pages (protected)
+- `/scoreboard` — legacy redirect to dashboard
 - `/api/scoreboard` — GET aggregated scoreboard (session required)
 - `/api/matches` — GET/POST matches (session required)
 - `/api/auth/register` — POST signup
 
-**Persistence (`src/lib/data.ts`):**
-- `DATABASE_URL` present → Prisma + Postgres
-- `DATABASE_URL` absent → in-memory fallback (local dev only, no auth)
-- Scoreboard is always derived from match history, never stored as counters
+## Architecture Decisions
 
-**Auth (`src/lib/auth.ts`, `auth-validation.ts`, `auth-rate-limit.ts`):**
-- Credentials-only via Auth.js with JWT sessions
-- Zod schemas in `auth-validation.ts` shared by client and server
-- Rate limiting: 5 failures in 10 min → progressive blocks (15/30/60 min), keyed by `email + IP`
-- Requires both `DATABASE_URL` and `NEXTAUTH_SECRET`
+- Scoreboard is always derived from match history — never store aggregate counters.
+- Two teams only: `frontend` and `backend`, defined in `src/lib/constants.ts` and seeded into DB.
+- Dual-mode persistence: Prisma + Postgres when `DATABASE_URL` is set; in-memory fallback otherwise (local dev only, no auth).
+- Auth requires both `DATABASE_URL` and `NEXTAUTH_SECRET` — missing one is invalid configuration, not a degraded mode.
+- Import with `@/` alias — no relative `../` paths.
+- Named exports everywhere except Next.js page/layout/route files.
+- Dashboard state managed with React hooks only — no client-side state library.
+- Use semantic design tokens — no arbitrary Tailwind values.
 
-**Middleware (`middleware.ts`):** protects `/(authenticated)` routes; no-op if auth env vars missing.
+## Behavior Rules
+
+- Never modify `prisma/schema.prisma` without explicit approval.
+- Never install new packages without asking first.
+- Never skip tests or bypass git hooks (`--no-verify`).
+- Only read files directly relevant to the current task.
+- When changing `src/lib/data.ts`, verify behavior both with and without `DATABASE_URL`.
+- Do not change API status codes (401, 409, 429, 500, 503) without also updating client-side error handling.
+- Update `.claude/rules/` or `techspec/` only when behavior actually changed — no preemptive doc edits.
+
+## Testing
+
+- Unit/integration: Vitest + Testing Library (jsdom); E2E: Playwright (real Postgres, CI only).
+- Data layer tests: use `vi.resetModules()` + dynamic imports to isolate `memoryState` between tests.
+- Route tests: mock `@/lib/auth` and stub `getAuthenticatedUser` — never call real Auth.js in unit tests.
+- Never import Prisma in test files — all tests run against in-memory mode.
+
+See `.claude/rules/testing.md` for the full isolation pattern.
 
 ## Environment Variables
 
 ```
-DATABASE_URL=postgresql://...       # Required for auth and shared persistence
+DATABASE_URL=postgresql://...       # Required for auth and persistence
 NEXTAUTH_SECRET=...                 # Required when DATABASE_URL is set
 NEXTAUTH_URL=http://localhost:3000  # Optional in dev
 ```
 
-## Testing
+## Source of Truth
 
-- Unit/integration: Vitest + Testing Library (jsdom)
-- E2E: Playwright with a real temporary Postgres (configured in CI)
-- Run a specific file: `npm run test -- <path>`
-- Coverage: `npm run test:coverage`
+When sources disagree: `src/` and `prisma/` > `README.md` and `techspec/` > `PRD.md`.
+
+- `techspec/github-operations.md` — CI and repository protection rules
+- `techspec/git-conventions.md` — release flow and deploy prerequisites
+
+## Warnings
+
+- `getScoreboard()` must fetch ALL matches with no limit — adding a limit silently produces wrong `wins`, `leadBy`, and `currentStreak`.
+- `DATABASE_URL` set without `NEXTAUTH_SECRET` is invalid — never treat as a degraded fallback.
+- Do not generalize to multi-team, add admin concepts, or introduce stored aggregate counters.
+- Prisma client is auto-generated on `postinstall` — run `npm run prisma:generate` manually after schema changes.
