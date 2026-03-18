@@ -36,39 +36,64 @@ Adopt **shadcn/ui + custom token mapping** as the component foundation:
 
 Three changes to the token system:
 
-**A — Extend `@theme inline` to cover all token categories**
+**A — Extend `@theme` for static tokens, keep `@theme inline` only for dynamic (theme-switching) tokens**
 
-Currently only colors are mapped. Radius, shadows, letter-spacing, and font families must also be mapped so Tailwind generates native utility classes:
+The existing `@theme inline` correctly maps colors: `:root`/`.dark` define `--background`, and `@theme inline` maps `--color-background: var(--background)` — different names, no circular reference.
+
+For tokens that do NOT change between light and dark (radius, letter-spacing, fonts), use `@theme {}` directly — no CSS variable indirection needed:
 
 ```css
-@theme inline {
-  /* existing color mappings stay */
+@theme {
+  /* radius → generates rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-pill */
+  --radius-sm: 18px;
+  --radius-md: 20px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
 
-  /* radius → rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-pill */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
-  --radius-pill: var(--radius-pill);
+  /* letter-spacing → generates tracking-label, tracking-label-wide */
+  --tracking-label: 0.22em;
+  --tracking-label-wide: 0.28em;
 
-  /* shadows → shadow-sm, shadow-md, shadow-lg, shadow-brand */
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-brand: var(--shadow-brand);
-
-  /* letter-spacing → tracking-label, tracking-label-wide */
-  --tracking-label: var(--tracking-label);
-  --tracking-label-wide: var(--tracking-label-wide);
-
-  /* font families → font-body, font-display */
-  --font-body: var(--font-body);
-  --font-display: var(--font-display);
+  /* font families → generates font-body, font-display */
+  --font-body: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
 }
 ```
 
-Result: `rounded-xl` instead of `rounded-[var(--radius-xl)]`, `shadow-lg` instead of `shadow-[var(--shadow-lg)]`.
+For tokens that DO change between light and dark (shadows), rename the `:root` variable to avoid self-reference, then map in `@theme inline`:
+
+```css
+:root {
+  /* renamed with -value suffix to avoid @theme inline circular reference */
+  --shadow-sm-value: 0 14px 30px rgba(13, 18, 14, 0.18);
+  --shadow-md-value: 0 20px 45px rgba(19, 74, 50, 0.22);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(19, 74, 50, 0.28);
+}
+
+.dark {
+  --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
+}
+
+@theme inline {
+  /* existing color mappings stay */
+
+  /* shadow → generates shadow-sm, shadow-md, shadow-lg, shadow-brand */
+  --shadow-sm: var(--shadow-sm-value);
+  --shadow-md: var(--shadow-md-value);
+  --shadow-lg: var(--shadow-lg-value);
+  --shadow-brand: var(--shadow-brand-value);
+}
+```
+
+Result: `rounded-xl shadow-lg tracking-label` instead of `rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] tracking-[var(--tracking-label)]`.
+
+Note: `--radius-pill` generates a `rounded-pill` class which is non-standard in Tailwind but valid as a custom token. Verify it generates correctly after setup.
 
 **B — Add shadcn variable aliases in `:root` and `.dark`**
 
@@ -93,6 +118,8 @@ shadcn components expect specific variable names. These are aliases pointing to 
   --input: var(--border);
 }
 ```
+
+Mirror the same aliases in `.dark` pointing to the dark-mode versions of the same tokens.
 
 **C — Typography utility classes via `@utility`**
 
@@ -123,13 +150,18 @@ Recurring multi-property typography patterns become single composable classes:
 @utility display-sm { font-size: var(--text-display-sm); font-weight: 900; }
 @utility display-md { font-size: var(--text-display-md); font-weight: 900; }
 @utility display-lg { font-size: var(--text-display-lg); font-weight: 900; }
-@utility score { font-size: var(--text-score); font-weight: 900; tracking: -0.05em; }
+
+@utility score {
+  font-size: var(--text-score);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
 ```
 
 Before: `"text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--foreground-soft)]"`
 After: `"label-xs text-muted-foreground"`
 
-The existing `.theme-text-*` global CSS classes are removed in favor of these `@utility` patterns and Tailwind color classes.
+**Important:** The existing `.theme-text-*` global CSS classes (`.theme-text-strong`, `.theme-text-strong-muted`, `.theme-text-sidebar`, etc.) are load-bearing — they are used in `SurfacePanel` CVA variants and asserted on in `composition.test.tsx`. They must not be removed until all consumers are migrated to Tailwind color equivalents. Removal happens at the end of the migration (step 10), not before.
 
 ---
 
@@ -141,6 +173,8 @@ Install shadcn configured to use the existing token structure:
 // components.json
 {
   "style": "default",
+  "rsc": true,
+  "tsx": true,
   "tailwind": {
     "cssVariables": true,
     "config": ""
@@ -175,9 +209,11 @@ The `cn()` utility at `src/lib/utils.ts` already exists and is compatible.
 |---|---|---|
 | `StatTile` | `primitives/` | Domain component, no shadcn equivalent |
 | `IconCallout` | `primitives/` | Project-specific composition |
-| `SectionHeader` | `primitives/` | Layout primitive with eyebrow/title/description |
+| `SectionHeader` | `primitives/` | Layout primitive — see note below |
 | `ThemeProvider` | `theme/` | Custom theme system, works well |
 | `ThemeToggle` | `theme/` | Tied to custom theme system |
+
+**SectionHeader coupling note:** `SectionHeader` currently imports and renders `CardHeader`, `CardTitle`, and `CardDescription` from `@/components/ui/card`. When `Card` is replaced with the shadcn version, these subcomponents will have different class defaults. Before moving `SectionHeader` to `primitives/`, its internals must be decoupled from `Card` — it should compose its own layout using semantic HTML and Tailwind classes directly, not via card subcomponents.
 
 **Available on demand (install when needed):**
 `Dialog`, `Select`, `DropdownMenu`, `Tabs`, `Tooltip`, `Sonner`, `Avatar`, `Table`
@@ -231,7 +267,7 @@ import { useTheme } from "@/components/theme/theme-provider";
 1. **Semantic tokens always** — never hardcode color values in `className`. Use `text-frontend`, `bg-surface`, `border-border`, etc.
 2. **Typography utilities** — use `label-xs`, `label`, `display-lg`, `score` instead of composing 3–4 classes manually.
 3. **`ui/` = shadcn, `primitives/` = custom** — never mix the two categories in the same folder.
-4. **No arbitrary `[var(--...)]`** — if a token doesn't have a Tailwind class, add it to `@theme inline` first, then use the class.
+4. **No arbitrary `[var(--...)]`** — if a token doesn't have a Tailwind class, add it to `@theme` or `@theme inline` first, then use the class.
 5. **Variants via CVA** — multi-state components use `cva()` for variants, not conditional class concatenation.
 
 ---
@@ -247,12 +283,33 @@ import { useTheme } from "@/components/theme/theme-provider";
 
 ## Implementation Order
 
-1. Configure `globals.css`: extend `@theme inline`, add shadcn aliases, add `@utility` typography classes
-2. Configure shadcn: `npx shadcn init`, set `components.json`
-3. Install and adapt `Button` — first component, establishes the pattern
-4. Install and adapt `Card` (absorbing `SurfacePanel`) — eliminates the overlap
-5. Install and adapt `Badge`
-6. Install `Separator`, `ScrollArea`, `Form` — drop-in replacements
-7. Move `StatTile`, `IconCallout`, `SectionHeader` to `primitives/`
-8. Update all consumer components (`dashboard-hero`, `dashboard-sidebar`, etc.) to use new imports and class names
-9. Remove `SurfacePanel`, dead `.theme-text-*` global classes, and old `Card` if fully replaced
+1. **Token system — `globals.css`**
+   - Add static tokens to `@theme {}` (radius, tracking, fonts)
+   - Remove the same `--radius-*`, `--tracking-*`, `--font-body`, `--font-display` declarations from `:root` (lines 5–6, 14–15, 16–21 in the current file) — keeping them in both places causes redundant or conflicting custom property definitions
+   - Rename shadow `:root` vars to `-value` suffix, map in `@theme inline`
+   - Add shadcn variable aliases in `:root` and `.dark`
+   - Add `@utility` typography classes
+
+2. **shadcn init** — `npx shadcn init`, confirm `components.json`
+
+3. **Button** — first shadcn component; establishes the pattern for custom CVA variants on top of shadcn base
+
+4. **Badge** — add `gold`, `frontend`, `backend`, `outline` variants
+
+5. **Card (absorbing SurfacePanel)** — single component with CVA variants; all `SurfacePanel` consumers are migrated to the new `Card` variants (the file itself is deleted in step 12)
+
+6. **Separator, ScrollArea** — drop-in replacements, update imports
+
+7. **Form** — shadcn Form + Input + Label; update login form and any other consumers
+
+8. **Decouple SectionHeader from Card** — remove `CardHeader`/`CardTitle`/`CardDescription` imports; rewrite internals with semantic HTML and Tailwind classes
+
+9. **Move custom components to `primitives/`** — `StatTile`, `IconCallout`, `SectionHeader`; update all import paths
+
+10. **Update consumer components** — `dashboard-hero`, `dashboard-sidebar`, `app-shell`, `login-screen`, etc.; replace old class strings with new Tailwind classes and typography utilities
+
+11. **Update tests** — `composition.test.tsx` and `login-screen.test.tsx`; update import paths (`@/components/ui/` → `@/components/primitives/` where needed) and update class assertions to match new Tailwind equivalents
+
+12. **Remove dead code** — delete `SurfacePanel`, remove `.theme-text-*` global CSS classes (only after step 11 confirms no consumers remain), delete old `Card` if fully replaced
+
+13. **Verify** — `npm run typecheck`, `npm run lint`, `npm run test`, `npm run build`
