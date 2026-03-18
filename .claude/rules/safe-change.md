@@ -50,10 +50,11 @@ Read:
 1. `src/app/globals.css`
 2. `src/components/theme/theme-provider.tsx`
 3. `src/components/theme/theme-core.ts`
-4. `src/components/ui/`
-5. `techspec/theme-system.md`
+4. `src/components/ui/` — componentes base shadcn/ui
+5. `src/components/primitives/` — primitivos de composição do domínio
+6. `techspec/theme-system.md`
 
-Constraint: prefer semantic tokens over per-component color overrides; keep `useTheme()` strict.
+Constraint: prefer semantic tokens over per-component color overrides; keep `useTheme()` strict. Use native token classes (`rounded-xl`, `shadow-brand`) instead of arbitrary `[var(--...)]` values.
 
 ### Shell or authenticated layout changes
 
