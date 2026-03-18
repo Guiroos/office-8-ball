@@ -1,7 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
-
 import { Badge } from "@/components/ui/badge";
-import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type SectionHeaderProps = HTMLAttributes<HTMLDivElement> & {
@@ -36,28 +34,38 @@ export function SectionHeader({
       )}
       {...props}
     >
-      <CardHeader className="gap-3">
+      <div className="flex flex-col gap-3">
         <Badge
+          variant={inverse ? "outline" : "default"}
           className={
             inverse
-              ? "theme-text-strong-muted border-[color:var(--border-inverse)] bg-[color:var(--surface-strong-muted)]"
+              ? "text-surface-strong-foreground-muted border-border-inverse bg-surface-strong-muted"
               : undefined
           }
         >
           {eyebrow}
         </Badge>
-        <CardTitle className={cn(hideTitle && "sr-only", titleClassName)}>{title}</CardTitle>
+        <h2
+          className={cn(
+            "text-[length:var(--text-title)] leading-none font-black tracking-[-0.04em]",
+            hideTitle && "sr-only",
+            titleClassName,
+          )}
+        >
+          {title}
+        </h2>
         {description ? (
-          <CardDescription
+          <p
             className={cn(
-              inverse && "theme-text-strong-muted",
+              "text-sm leading-6 text-muted-foreground",
+              inverse && "text-surface-strong-foreground-muted",
               descriptionClassName,
             )}
           >
             {description}
-          </CardDescription>
+          </p>
         ) : null}
-      </CardHeader>
+      </div>
 
       {actions ? <div className="shrink-0">{actions}</div> : null}
     </div>
