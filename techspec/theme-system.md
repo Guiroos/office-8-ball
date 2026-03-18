@@ -1,142 +1,38 @@
 # Tech Spec - Theme System
 
-## Objetivo
+## Arquitetura atual
 
-Centralizar a revisao tecnica do sistema de tema atual e organizar os proximos passos do design system da aplicacao.
+- Tokens globais em `src/app/globals.css` com Tailwind v4 via `@theme inline`
+- Provider em `src/components/theme/theme-provider.tsx`: estado, persistência e sincronização com sistema
+- Script inline em `src/app/layout.tsx` evita flash de tema errado antes da hidratação
+- `useTheme()` é estrito: falha explicitamente fora de `ThemeProvider`
+- Lógica de resolve centralizada em helper compartilhado entre provider, testes e script de bootstrap
+- Estratégia `system` por padrão com persistência local
 
-## Solido
+## Tokens
 
-### Arquitetura geral do tema
+### Categorias em `globals.css`
 
-Status: manter
+- **Foundation:** radius, shadow, font, display/label sizes
+- **Semantic surfaces:** `surface`, `surface-emphasis`, `surface-strong`
+- **Brand/team:** `--frontend-soft`, `--backend-soft` e variantes por estado de liderança
+- **Shell autenticada:** `--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active`
+- **Composition:** `--hero-gradient`, `--brand-gradient`, `--page-gradient` — convivem com foundations no mesmo arquivo (aceitável no volume atual)
 
-- O uso de tokens globais em `src/app/globals.css` com Tailwind v4 via `@theme inline` esta correto
-- O provider em `src/components/theme/theme-provider.tsx` cuida de estado, persistencia e sincronizacao com o sistema
-- O script inicial em `src/app/layout.tsx` evita flash de tema errado antes da hidratacao
+## Primitives
 
-### Adocao pelos primitives
+- `Button`, `Card`, `Badge` consomem tokens semânticos
+- `src/components/ui/*` inclui `SectionHeader`, `StatTile`, `IconCallout`, `SurfacePanel` — padrões recorrentes de composição global
+- `TeamScoreCard` usa variantes por time e estado de liderança; expõe `data-team` e `data-leader` para testes
 
-Status: manter e expandir
+## Regras
 
-- `Button`, `Card` e `Badge` ja consomem tokens semanticos em vez de cores fixas
-- login e dashboard agora compartilham uma escala minima de `radius`, `shadow` e `type` via tokens globais
-- Isso reduz retrabalho e evita duplicacao de paleta entre login e dashboard
-- Alem dos primitives base, a camada `src/components/ui/*` agora inclui pequenos componentes de composicao global para evitar repeticao estrutural entre telas
-- `SectionHeader`, `StatTile`, `IconCallout` e `SurfacePanel` concentram padroes recorrentes de cabecalho, tile informativo, callout com icone e superficie tematizada
+- Preferir tokens semânticos antes de introduzir classes de cor por componente
+- Manter `useTheme()` estrito em qualquer novo componente de tema
+- Reutilizar a escala de `radius`, `shadow` e `type` antes de introduzir novos valores soltos
+- Ajustes finos de cor e contraste devem preferir tokens da shell antes de overrides locais
 
-### Modo claro/escuro
+## Próximos passos
 
-Status: manter
-
-- A estrategia `system` por padrao com persistencia local esta coerente
-- O toggle reutilizavel permite reaproveitamento sem acoplar a alternancia a uma tela unica
-- A shell autenticada agora usa tokens semanticos proprios para sidebar, menu de conta e estados ativos, sem depender de verdes hardcoded espalhados pelos componentes
-- O ultimo passe local tambem reforcou contraste entre `surface`, `surface-emphasis`, `surface-strong` e textos secundarios para claro/escuro
-- O ajuste mais recente endureceu o contraste do tema claro na sidebar autenticada e nas superficies invertidas das paginas placeholder, evitando texto lavado sobre verde e bege
-
-### Contraste entre shell e paginas autenticadas
-
-Status: resolvido no pacote atual
-
-- `globals.css` agora concentra tokens de shell como `--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active` e correlatos
-- A sidebar, o menu do usuario e o fundo da area de conteudo passaram a falar a mesma linguagem visual
-- `Badge`, `CardDescription`, `StatTile` e `IconCallout` foram ajustados para melhorar legibilidade em superficies translucidas, especialmente no dark theme
-
-Direcao:
-
-- Continuar preferindo tokens semanticos antes de introduzir novas classes de cor por componente
-- Se houver novo ajuste fino visual, revisar primeiro os tokens base em `globals.css`
-
-## Aceitavel, mas provisorio
-
-### Tokens ainda misturam sistema e composicao
-
-Status: aceitavel agora, mas precisa organizacao antes de escalar
-
-- Existem tokens realmente globais junto com tokens especificos de composicao, como `--hero-gradient`, `--brand-gradient` e `--page-gradient`
-
-Direcao:
-
-- Separar em grupos:
-  - foundation
-  - semantic surfaces
-  - brand/team
-  - composition
-
-### Tokens de composicao ainda convivem com foundation no mesmo arquivo
-
-Status: aceitavel agora, mas ainda pede disciplina
-
-- Os aliases redundantes de card ja foram removidos em favor da semantica de `surface`
-- Ainda existem tokens de composicao, como `--hero-gradient`, `--brand-gradient` e `--page-gradient`, no mesmo arquivo dos foundations
-
-Direcao:
-
-- Manter `surface` como semantica principal
-- Reavaliar separacao fisica por grupos apenas se o volume de tokens crescer
-
-### Provider robusto para runtime, mas relaxado para consumo
-
-Status: resolvido
-
-- `useTheme()` voltou a ser estrito e agora falha explicitamente fora de `ThemeProvider`
-- A regra de leitura/resolve do tema foi centralizada em helper compartilhado entre provider, testes e script de bootstrap
-
-Direcao:
-
-- Manter o hook estrito
-
-## Vale refatorar antes de expandir
-
-### Inputs e controles do login
-
-Status: concluido parcialmente
-
-- Os campos do login ja foram migrados para primitives locais em `src/components/ui/form.tsx`
-- O controle segmentado `Entrar` / `Criar conta` ainda nao virou primitive reutilizavel
-- O toggle de tema do login foi mantido como controle local dentro do card, sem depender de cabecalho ou rodape dedicados
-
-Direcao:
-
-- Opcionalmente extrair esse controle quando surgir mais de um fluxo que precise dele
-
-### Dashboard usa variantes previsiveis por time
-
-Status: resolvido
-
-- O `TeamScoreCard` agora usa variantes por time e estado de lideranca
-- O componente expõe `data-team` e `data-leader` para leitura e teste sem depender de `style` inline
-- Cabecalhos de secao e tiles informativos do dashboard agora reaproveitam os componentes globais de composicao em vez de classes repetidas por tela
-- O contraste das variantes por time foi recalibrado para claro e escuro ajustando `--frontend-soft` e `--backend-soft` em vez de espalhar overrides locais
-
-Direcao:
-
-- Reutilizar o mesmo padrao se surgirem novos cards tematicos
-
-### Tipografia, radius e sombras ganharam escala minima
-
-Status: resolvido no pacote atual
-
-- `globals.css` agora define foundation tokens para `radius`, `shadow`, `font` e tamanhos de display/label
-- Primitives e telas principais migraram dos valores soltos mais repetidos para essa escala
-
-Direcao:
-
-- Expandir a escala apenas quando houver novo caso real de uso
-
-### Cobertura de teste de tema
-
-Status: concluido para provider, toggle e bootstrap
-
-- Ja existe cobertura dedicada para provider e toggle
-- Agora tambem existe cobertura para o script inline de bootstrap do tema
-
-Direcao:
-
-- Manter a cobertura sincronizada com qualquer mudanca no bootstrap inicial
-
-## Ordem recomendada
-
-1. Preservar `useTheme()` estrito em qualquer novo componente de tema
-2. Reaproveitar a escala minima de `radius`, `shadow` e `type` antes de introduzir novos valores soltos
-3. So depois disso iniciar redesign maior do dashboard
+- Separar tokens de composição (`--hero-gradient` etc.) em grupo próprio se o volume crescer
+- Extrair o controle segmentado `Entrar / Criar conta` como primitive reutilizável quando surgir mais de um fluxo que precise dele
