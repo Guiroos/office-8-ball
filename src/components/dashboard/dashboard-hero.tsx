@@ -58,7 +58,7 @@ export function DashboardHero({
             </div>
           </div>
 
-          <Separator className="bg-[color:var(--border)]" />
+          <Separator />
 
           <div className="grid grid-cols-2 gap-3">
             <StatTile
