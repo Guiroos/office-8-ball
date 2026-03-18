@@ -7,8 +7,8 @@ import { startTransition, useId, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SectionHeader } from "@/components/ui/section-header";
-import { StatTile } from "@/components/ui/stat-tile";
+import { SectionHeader } from "@/components/primitives/section-header";
+import { StatTile } from "@/components/primitives/stat-tile";
 import { TEAMS } from "@/lib/constants";
 
 import { DashboardHero } from "./dashboard-hero";

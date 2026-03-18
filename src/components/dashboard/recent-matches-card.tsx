@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionHeader } from "@/components/primitives/section-header";
 import type { MatchRecord } from "@/lib/types";
 
 import { formatMatchDate } from "./dashboard-utils";

@@ -1,8 +1,8 @@
 import { Flame, Swords, TimerReset, Trophy } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { IconCallout } from "@/components/ui/icon-callout";
-import { SectionHeader } from "@/components/ui/section-header";
+import { IconCallout } from "@/components/primitives/icon-callout";
+import { SectionHeader } from "@/components/primitives/section-header";
 
 import type { DashboardStatus } from "./dashboard-utils";
 

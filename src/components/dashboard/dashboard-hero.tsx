@@ -1,9 +1,9 @@
 import { Trophy } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { SectionHeader } from "@/components/ui/section-header";
+import { SectionHeader } from "@/components/primitives/section-header";
 import { Separator } from "@/components/ui/separator";
-import { StatTile } from "@/components/ui/stat-tile";
+import { StatTile } from "@/components/primitives/stat-tile";
 import type { ScoreboardData } from "@/lib/types";
 
 import { getLeadLabel } from "./dashboard-utils";
