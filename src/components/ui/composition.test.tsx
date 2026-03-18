@@ -2,10 +2,10 @@ import { ChartColumn, ShieldCheck } from "lucide-react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { IconCallout } from "@/components/ui/icon-callout";
-import { SectionHeader } from "@/components/ui/section-header";
-import { StatTile } from "@/components/ui/stat-tile";
-import { SurfacePanel } from "@/components/ui/surface-panel";
+import { IconCallout } from "@/components/primitives/icon-callout";
+import { SectionHeader } from "@/components/primitives/section-header";
+import { StatTile } from "@/components/primitives/stat-tile";
+import { Card } from "@/components/ui/card";
 
 describe("composition ui", () => {
   it("renders section header with optional description", () => {
@@ -38,8 +38,8 @@ describe("composition ui", () => {
 
     expect(screen.getByRole("heading", { name: "Frontend vs Backend" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Atualizar" })).toBeInTheDocument();
-    expect(eyebrow).toHaveClass("border-[color:var(--border-inverse)]");
-    expect(description).toHaveClass("theme-text-strong-muted");
+    expect(eyebrow).toHaveClass("border-border-inverse");
+    expect(description).toHaveClass("text-surface-strong-foreground-muted");
   });
 
   it("keeps the title accessible when visually hidden", () => {
@@ -71,8 +71,8 @@ describe("composition ui", () => {
     expect(screen.getByText("Ambiente")).toBeInTheDocument();
     expect(screen.getByText("Escritório")).toBeInTheDocument();
     expect(screen.getByText("mesa oficial")).toBeInTheDocument();
-    expect(screen.getByText("Ambiente")).toHaveClass("theme-text-strong-muted");
-    expect(screen.getByText("mesa oficial")).toHaveClass("theme-text-strong-muted");
+    expect(screen.getByText("Ambiente")).toHaveClass("text-surface-strong-foreground-muted");
+    expect(screen.getByText("mesa oficial")).toHaveClass("text-surface-strong-foreground-muted");
   });
 
   it("renders icon callout content", () => {
@@ -99,8 +99,8 @@ describe("composition ui", () => {
     );
 
     let callout = screen.getByText("Status").closest("div.border");
-    expect(callout).toHaveClass("bg-[color:var(--surface-success)]");
-    expect(screen.getByText("Base padrao")).toHaveClass("text-[color:var(--foreground-soft)]");
+    expect(callout).toHaveClass("bg-surface-success");
+    expect(screen.getByText("Base padrao")).toHaveClass("text-muted-foreground");
 
     rerender(
       <IconCallout
@@ -112,8 +112,8 @@ describe("composition ui", () => {
     );
 
     callout = screen.getByText("Status").closest("div.border");
-    expect(callout).toHaveClass("border-[color:var(--border-inverse)]");
-    expect(screen.getByText("Base forte")).toHaveClass("theme-text-strong-muted");
+    expect(callout).toHaveClass("border-border-inverse");
+    expect(screen.getByText("Base forte")).toHaveClass("text-surface-strong-foreground-muted");
   });
 
   it("renders custom stat node values", () => {
@@ -164,55 +164,55 @@ describe("composition ui", () => {
     expect(screen.getByText("Status").closest(".custom-callout")).toBeInTheDocument();
 
     rerender(
-      <SurfacePanel className="custom-panel" data-testid="panel">
+      <Card className="custom-panel" data-testid="panel">
         Conteúdo
-      </SurfacePanel>,
+      </Card>,
     );
     expect(screen.getByTestId("panel")).toHaveClass("custom-panel");
   });
 
-  it("renders surface panel variants and padded mode", () => {
+  it("renders card variants and padded mode", () => {
     const { rerender } = render(
-      <SurfacePanel variant="brand" padded data-testid="panel">
+      <Card variant="brand" padded data-testid="panel">
         Conteúdo
-      </SurfacePanel>,
+      </Card>,
     );
 
     let panel = screen.getByTestId("panel");
-    expect(panel).toHaveClass("bg-[color:var(--surface-brand)]");
-    expect(panel).toHaveClass("shadow-[var(--shadow-brand)]");
+    expect(panel).toHaveClass("bg-surface-brand");
+    expect(panel).toHaveClass("shadow-brand");
     expect(panel).toHaveClass("p-6");
 
     rerender(
-      <SurfacePanel variant="strong" data-testid="panel">
+      <Card variant="strong" data-testid="panel">
         Conteúdo
-      </SurfacePanel>,
+      </Card>,
     );
 
     panel = screen.getByTestId("panel");
-    expect(panel).toHaveClass("bg-[color:var(--surface-strong)]");
-    expect(panel).toHaveClass("theme-text-strong");
+    expect(panel).toHaveClass("bg-surface-strong");
+    expect(panel).toHaveClass("text-surface-strong-foreground");
   });
 
-  it("renders default and muted surface variants", () => {
+  it("renders default and muted card variants", () => {
     const { rerender } = render(
-      <SurfacePanel variant="default" data-testid="panel">
+      <Card variant="default" data-testid="panel">
         Conteúdo
-      </SurfacePanel>,
+      </Card>,
     );
 
     let panel = screen.getByTestId("panel");
-    expect(panel).toHaveClass("bg-[color:var(--surface)]");
-    expect(panel).toHaveClass("shadow-[var(--shadow-lg)]");
+    expect(panel).toHaveClass("bg-surface");
+    expect(panel).toHaveClass("shadow-lg");
 
     rerender(
-      <SurfacePanel variant="muted" data-testid="panel">
+      <Card variant="muted" data-testid="panel">
         Conteúdo
-      </SurfacePanel>,
+      </Card>,
     );
 
     panel = screen.getByTestId("panel");
-    expect(panel).toHaveClass("bg-[color:var(--surface-emphasis)]");
-    expect(panel).toHaveClass("border-[color:var(--border)]");
+    expect(panel).toHaveClass("bg-surface-emphasis");
+    expect(panel).toHaveClass("border-border");
   });
 });
