@@ -14,8 +14,29 @@ permissions:
   security-events: write
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            src:
+              - 'src/**'
+              - 'prisma/**'
+              - 'middleware.ts'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/codeql.yml'
+
   analyze:
     name: CodeQL
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
