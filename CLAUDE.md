@@ -109,3 +109,22 @@ When sources disagree: `src/` and `prisma/` > `README.md` and `techspec/` > `PRD
 - `DATABASE_URL` set without `NEXTAUTH_SECRET` is invalid — never treat as a degraded fallback.
 - Do not generalize to multi-team, add admin concepts, or introduce stored aggregate counters.
 - Prisma client is auto-generated on `postinstall` — run `npm run prisma:generate` manually after schema changes.
+
+## Context Engineering (Main Agent Discipline)
+
+The main agent is an **orchestrator**, not a worker.
+
+**Main agent role:** Coordinate files, spawn sub-agents, process
+summaries, communicate with the user.
+
+**Main agent NEVER:** Explores the codebase broadly, implements code
+changes, runs builds/tests, processes large command output.
+All of these get delegated to sub-agents.
+
+### Sub-agent Communication Protocol
+
+- Every prompt ends with: "Return a structured summary: [exact fields]"
+- Never ask a sub-agent to "return everything"
+- Target 10-20 lines of actionable info per result
+- Chain sub-agents: pass only relevant fields between them
+

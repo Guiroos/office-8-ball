@@ -27,8 +27,3 @@ These rules apply for v1 and must not be broken without an explicit product or a
 | Middleware | `middleware.ts` |
 | Persistence | `prisma/schema.prisma`, `prisma/seed.mjs`, `src/lib/prisma.ts` |
 
-## Known Gaps
-
-- No integration tests with real Prisma
-- E2E coverage does not yet cover auth rate limit or deeper negative paths
-- Domain is intentionally narrow — no RBAC or leagues in v1
