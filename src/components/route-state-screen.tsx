@@ -99,10 +99,10 @@ export function RouteStateScreen({
                   {eyebrow}
                 </p>
                 <div className="space-y-3">
-                  <p className="font-display text-display-lg leading-none tracking-[0.08em] text-gold">
+                  <p className="font-display headline leading-none tracking-[0.08em] text-gold">
                     {code}
                   </p>
-                  <h1 className="max-w-md text-4xl font-black tracking-[-0.05em] text-surface-strong-foreground sm:text-5xl">
+                  <h1 className="max-w-md title text-surface-strong-foreground">
                     {title}
                   </h1>
                 </div>
@@ -126,7 +126,7 @@ export function RouteStateScreen({
 
             <CardContent className="space-y-6 px-6 pb-6 sm:px-8 sm:pb-8">
               <div className="rounded-lg border border-border bg-surface-emphasis p-5">
-                <p className="label-xs text-muted-foreground">
+                <p className="caption text-muted-foreground">
                   Proxima jogada
                 </p>
                 <p className="mt-2 text-sm leading-6 text-foreground-soft">

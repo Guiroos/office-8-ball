@@ -26,7 +26,7 @@ export function PlaceholderPage({
         <p className="label-wide text-surface-strong-foreground-muted">
           {eyebrow}
         </p>
-        <h1 className="relative mt-3 max-w-3xl text-4xl font-black tracking-[-0.05em] text-surface-strong-foreground sm:text-5xl">
+        <h1 className="relative mt-3 max-w-3xl title text-surface-strong-foreground">
           {title}
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-surface-strong-foreground-muted sm:text-lg">
