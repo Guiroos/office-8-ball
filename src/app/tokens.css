@@ -98,7 +98,7 @@
   /* Border literals */
   --border-raw: rgba(43, 33, 26, 0.16);
   --border-strong-raw: rgba(43, 33, 26, 0.24);
-  --border-inverse-raw: rgba(255, 255, 255, 0.14);
+  --border-inverse-raw: rgba(255, 255, 255, 0.14); /* same in dark */
 
   /* Ring */
   --ring-raw: rgba(199, 149, 31, 0.9);
@@ -130,7 +130,7 @@
   --app-shell-sidebar-accent-raw: #b6f0d8;
   --app-shell-sidebar-menu-raw: rgba(18, 55, 42, 0.98);
   --app-shell-avatar-ring-raw: rgba(11, 34, 27, 0.96);
-  --app-shell-status-raw: #4ade80;
+  --app-shell-status-raw: #4ade80; /* same in dark */
 
   /* Selection */
   --selection-bg: rgba(199, 149, 31, 0.25);
@@ -141,10 +141,13 @@
 }
 
 .dark {
+  /* Note: --foreground-raw and similar vars are defined here (dark only) because
+     globals.css :root uses neutral scale vars directly for light mode foregrounds. */
+
   /* Shadow overrides */
   --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
   --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
-  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12); /* same as light — intentional */
   --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
 
   /* Surface dark overrides */
