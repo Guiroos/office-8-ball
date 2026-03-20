@@ -69,10 +69,10 @@ function UserAvatar({ user }: { user: SessionUser }) {
 
   return (
     <div className="relative">
-      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-[color:var(--app-shell-sidebar-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-[0.12em]">
+      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-sidebar-border bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-label-sm">
         {initials || "OB"}
       </div>
-      <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-[color:var(--app-shell-avatar-ring)] bg-[color:var(--app-shell-status)]" />
+      <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-avatar-ring bg-status" />
     </div>
   );
 }
@@ -80,7 +80,7 @@ function UserAvatar({ user }: { user: SessionUser }) {
 function SidebarBrand() {
   return (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-[12px] border border-[color:var(--app-shell-sidebar-border)] bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
+      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
         <Globe className="size-5" />
       </div>
 
@@ -88,7 +88,7 @@ function SidebarBrand() {
         <p className="text-sidebar-foreground text-lg font-bold tracking-[-0.03em]">
           Office 8 Ball
         </p>
-        <p className="text-sidebar-foreground-subtle text-xs font-medium tracking-[0.12em] uppercase">
+        <p className="text-sidebar-foreground-subtle text-xs font-medium tracking-label-sm uppercase">
           Area autenticada
         </p>
       </div>
@@ -116,11 +116,11 @@ function UserFooter({
       : "area autenticada";
 
   return (
-    <div className="relative border-t border-[color:var(--app-shell-sidebar-border)] px-1 pt-5">
+    <div className="relative border-t border-sidebar-border px-1 pt-5">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-3 rounded-[18px] px-3 py-3 text-left transition hover:bg-[color:var(--app-shell-sidebar-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]"
+        className="flex w-full items-center gap-3 rounded-sm px-3 py-3 text-left transition hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
@@ -129,7 +129,7 @@ function UserFooter({
           <p className="text-sidebar-foreground truncate text-sm font-semibold">
             {user.username}
           </p>
-          <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--app-shell-sidebar-accent)]">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-label-sm text-sidebar-accent">
             {membershipLabel}
           </p>
         </div>
@@ -148,7 +148,7 @@ function UserFooter({
             className="fixed inset-0 z-10 cursor-default"
             onClick={onClose}
           />
-          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-[22px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-menu)] p-3 shadow-[0_22px_50px_rgba(0,0,0,0.38)]">
+          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-3 shadow-[0_22px_50px_rgba(0,0,0,0.38)]">
             <UserMenu pathname={pathname} user={user} onClose={onClose} />
           </div>
         </>
@@ -187,7 +187,7 @@ function UserMenu({
       role="menu"
       aria-label="Menu da conta"
     >
-      <div className="rounded-[18px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-3">
+      <div className="rounded-sm border border-sidebar-border bg-sidebar-hover px-3 py-3">
         <div className="flex items-center gap-3">
           <UserAvatar user={user} />
           <div className="min-w-0">
@@ -211,10 +211,10 @@ function UserMenu({
             onClick={onClose}
             role="menuitem"
             className={cn(
-              "flex items-center gap-3 rounded-[16px] border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]",
+              "flex items-center gap-3 rounded-sm border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar-menu",
               link.active
-                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] text-sidebar-foreground shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
-                : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
+                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
+                : "border-transparent text-sidebar-foreground-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
             )}
           >
             <Icon className="size-4" />
@@ -223,19 +223,19 @@ function UserMenu({
         );
       })}
 
-      <div className="mt-1 flex items-center justify-between rounded-[16px] border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] px-3 py-2.5">
+      <div className="mt-1 flex items-center justify-between rounded-sm border border-sidebar-border bg-sidebar-hover px-3 py-2.5">
         <div>
           <p className="text-sidebar-foreground text-sm font-semibold">Tema</p>
         </div>
         <ThemeToggle
           variant="sidebar"
-          className="h-10 rounded-[12px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]"
+          className="h-10 rounded-xs px-3 focus-visible:ring-offset-sidebar-menu"
         />
       </div>
 
       <Button
         variant="sidebar"
-        className="mt-1 h-11 justify-start rounded-[16px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar-menu)]"
+        className="mt-1 h-11 justify-start rounded-sm px-3 focus-visible:ring-offset-sidebar-menu"
         onClick={() => {
           onClose();
           void signOut({ callbackUrl: "/login" });
@@ -301,10 +301,10 @@ function SidebarNavigation({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-4 rounded-[12px] border px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]",
+              "flex items-center gap-4 rounded-xs border px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
               isActive
-                ? "border-[color:var(--app-shell-sidebar-active-strong)] bg-[color:var(--app-shell-sidebar-active)] text-sidebar-foreground shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
-                : "border-transparent text-[color:var(--app-shell-sidebar-foreground-muted)] hover:bg-[color:var(--app-shell-sidebar-hover)] hover:text-[color:var(--app-shell-sidebar-foreground)]",
+                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
+                : "border-transparent text-sidebar-foreground-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
             )}
             aria-current={isActive ? "page" : undefined}
           >
@@ -324,19 +324,19 @@ export function AppShell({ user, children }: AppShellProps) {
   return (
     <div className="min-h-dvh">
       <div className="flex min-h-dvh w-full">
-        <aside className="text-sidebar-foreground hidden w-[260px] shrink-0 bg-[color:var(--app-shell-sidebar)] lg:flex lg:flex-col lg:border-r lg:border-[color:var(--app-shell-sidebar-border)]">
+        <aside className="text-sidebar-foreground hidden w-[260px] shrink-0 bg-sidebar lg:flex lg:flex-col lg:border-r lg:border-sidebar-border">
           <div className="sticky top-0 flex h-dvh flex-col px-4 py-6">
             <SidebarContent pathname={pathname} user={user} />
           </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col bg-[image:var(--app-shell-content-gradient)]">
-          <header className="flex items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/92 px-4 py-3 backdrop-blur lg:hidden">
+          <header className="flex items-center justify-between border-b border-border bg-surface/92 px-4 py-3 backdrop-blur lg:hidden">
             <SidebarBrand />
 
             <Button
               variant="ghost"
-              className="h-11 rounded-[12px] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] px-4"
+              className="h-11 rounded-xs border border-border bg-surface-emphasis px-4"
               onClick={() => setIsMobileSidebarOpen(true)}
               aria-label="Abrir navegacao"
             >
@@ -357,12 +357,12 @@ export function AppShell({ user, children }: AppShellProps) {
             aria-label="Fechar navegacao"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
-          <div className="text-sidebar-foreground absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar)] px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+          <div className="text-sidebar-foreground absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
             <div className="mb-6 flex items-center justify-between">
               <SidebarBrand />
               <Button
                 variant="sidebar"
-                className="h-10 rounded-[12px] px-3 focus-visible:ring-offset-[color:var(--app-shell-sidebar)]"
+                className="h-10 rounded-xs px-3 focus-visible:ring-offset-sidebar"
                 onClick={() => setIsMobileSidebarOpen(false)}
                 aria-label="Fechar navegacao"
               >

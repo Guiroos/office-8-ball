@@ -23,7 +23,7 @@ export function PlaceholderPage({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_30%)]"
         />
-        <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-surface-strong-foreground-muted">
+        <p className="label-wide text-surface-strong-foreground-muted">
           {eyebrow}
         </p>
         <h1 className="relative mt-3 max-w-3xl text-4xl font-black tracking-[-0.05em] text-surface-strong-foreground sm:text-5xl">

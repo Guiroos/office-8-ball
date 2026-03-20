@@ -27,7 +27,7 @@ export function DashboardHero({
               title="Office 8 Ball"
               description="Um placar interno para registrar quem saiu da mesa como campeão e quem saiu procurando desculpa técnica."
               className="gap-3"
-              titleClassName="font-display text-[length:var(--text-display-lg)] leading-[0.88] uppercase tracking-[0.06em] text-foreground"
+              titleClassName="font-display text-display-lg leading-[0.88] uppercase tracking-[0.06em] text-foreground"
               descriptionClassName="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg"
             />
           </div>

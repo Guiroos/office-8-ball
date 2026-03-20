@@ -86,7 +86,7 @@ function TeamScoreCard({
       <CardContent className="space-y-6 p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label)] text-foreground-soft">
+            <p className="label text-foreground-soft">
               {team.displayName}
             </p>
             <div>
@@ -106,16 +106,16 @@ function TeamScoreCard({
 
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-foreground-soft">
+            <p className="label-xs text-foreground-soft">
               Vitórias
             </p>
-            <p className="font-display text-[length:var(--text-score)] leading-none tracking-[0.03em]">
+            <p className="font-display text-score leading-none tracking-[0.03em]">
               <span data-testid={`team-wins-${team.id}`}>{wins}</span>
             </p>
           </div>
 
           <div className={teamScoreBadgeVariants({ team: team.id })}>
-            <Swords className="size-5 text-white" />
+            <Swords className="size-5 text-foreground-inverse" />
           </div>
         </div>
 
@@ -123,7 +123,7 @@ function TeamScoreCard({
           <div className="flex items-center justify-between gap-3">
             <label
               htmlFor={noteId}
-              className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-foreground-soft"
+              className="label-xs text-foreground-soft"
             >
               Provocação opcional
             </label>

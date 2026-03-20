@@ -20,7 +20,7 @@ const buttonVariants = cva(
         "team-beta":
           "bg-team-beta text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
         sidebar:
-          "border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] text-sidebar-foreground hover:bg-[color:var(--app-shell-sidebar-active)]",
+          "border border-sidebar-border bg-sidebar-hover text-sidebar-foreground hover:bg-sidebar-active",
       },
       size: {
         default: "h-11 px-5",

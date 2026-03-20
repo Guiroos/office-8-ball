@@ -47,7 +47,7 @@ export function SectionHeader({
         </Badge>
         <h2
           className={cn(
-            "text-[length:var(--text-title)] leading-none font-black tracking-[-0.04em]",
+            "text-title leading-none font-black tracking-[-0.04em]",
             hideTitle && "sr-only",
             titleClassName,
           )}

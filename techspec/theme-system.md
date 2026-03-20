@@ -23,7 +23,7 @@
 ### Categorias em `globals.css`
 
 - **Foundation (estáticos em `@theme`):** radius (`--radius-sm` → `--radius-pill`), tracking (`--tracking-label`, `--tracking-label-wide`), font families (`--font-body`, `--font-display`)
-- **Foundation (em `:root`):** shadow values (`--shadow-sm-value` etc.), font sizes (`--text-label`, `--text-display-lg`, etc.)
+- **Foundation (em `:root`):** shadow values (`--shadow-sm-value` etc.), font sizes (`--fz-label`, `--fz-display-lg`, etc.) — prefixo `--fz-*` evita colisão com o namespace `--text-*` do Tailwind v4
 - **Semantic surfaces:** `surface`, `surface-emphasis`, `surface-strong`
 - **Brand/team:** `--team-alpha`, `--team-alpha-soft`, `--team-beta`, `--team-beta-soft` e variantes por estado de liderança
 - **Shell autenticada:** `--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active`
@@ -45,9 +45,7 @@
 - Manter `useTheme()` estrito em qualquer novo componente de tema
 - Reutilizar a escala de `radius`, `shadow` e `type` antes de introduzir novos valores soltos
 - Ajustes finos de cor e contraste devem preferir tokens da shell antes de overrides locais
-- Tokens de `--app-shell-sidebar-*` são específicos da shell — não promover para `@theme inline` a menos que apareçam em 3+ arquivos fora da shell
 
 ## Próximos passos
 
 - Separar tokens de composição (`--hero-gradient` etc.) em grupo próprio se o volume crescer
-- Mapear `--text-*` (font sizes) em `@theme` para gerar classes nativas (`text-label`, `text-display-lg`) e eliminar os últimos `text-[length:var(--text-*)]` restantes

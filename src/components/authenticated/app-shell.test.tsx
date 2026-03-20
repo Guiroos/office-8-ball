@@ -107,7 +107,7 @@ describe("AppShell", () => {
       "/profile",
     );
     expect(screen.getByRole("menuitem", { name: "Ver perfil" })).toHaveClass(
-      "border-[color:var(--app-shell-sidebar-active-strong)]",
+      "border-sidebar-active-strong",
     );
     expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tema" })).toHaveAttribute("data-variant", "sidebar");

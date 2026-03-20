@@ -27,7 +27,7 @@ type RouteStateScreenProps = {
 };
 
 const actionClassName =
-  "inline-flex h-11 items-center justify-center gap-2 rounded-[var(--radius-pill)] px-5 text-sm font-semibold no-underline transition-all focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--background)] focus-visible:outline-none";
+  "inline-flex h-11 items-center justify-center gap-2 rounded-pill px-5 text-sm font-semibold no-underline transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none";
 
 function ActionIcon({ icon }: { icon: RouteStateAction["icon"] }) {
   if (icon === "back") {
@@ -45,8 +45,8 @@ function RouteStateActionButton({ action }: { action: RouteStateAction }) {
   const className = cn(
     actionClassName,
     action.tone === "secondary"
-      ? "border border-[color:var(--border)] bg-[color:var(--surface-muted)] !text-[color:var(--foreground)] hover:bg-[color:var(--surface-emphasis)]"
-      : "bg-[color:var(--foreground)] text-[color:var(--foreground-inverse)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 hover:bg-[color:var(--foreground-soft)]",
+      ? "border border-border bg-surface-muted !text-foreground hover:bg-surface-emphasis"
+      : "bg-foreground text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:bg-foreground-soft",
   );
 
   const content = (
@@ -88,34 +88,34 @@ export function RouteStateScreen({
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
         <div className="flex justify-end">
-          <ThemeToggle className="h-11 rounded-[var(--radius-sm)] px-4" />
+          <ThemeToggle className="h-11 rounded-sm px-4" />
         </div>
 
         <div className="grid items-stretch gap-4 lg:grid-cols-[0.88fr_1.12fr]">
-          <section className="rounded-[var(--radius-2xl)] border border-[color:var(--border-inverse)] bg-[color:var(--surface-brand)] p-6 text-[color:var(--surface-strong-foreground)] shadow-[var(--shadow-brand)] sm:p-8">
+          <section className="rounded-2xl border border-border-inverse bg-surface-brand p-6 text-surface-strong-foreground shadow-brand sm:p-8">
             <div className="flex h-full flex-col justify-between gap-10">
               <div className="space-y-4">
-                <p className="text-[length:var(--text-label)] font-semibold uppercase tracking-[var(--tracking-label-wide)] text-[color:var(--surface-strong-foreground-muted)]">
+                <p className="label-wide text-surface-strong-foreground-muted">
                   {eyebrow}
                 </p>
                 <div className="space-y-3">
-                  <p className="[font-family:var(--font-display)] text-[length:var(--text-display-lg)] leading-none tracking-[0.08em] text-[color:var(--gold)]">
+                  <p className="font-display text-display-lg leading-none tracking-[0.08em] text-gold">
                     {code}
                   </p>
-                  <h1 className="max-w-md text-4xl font-black tracking-[-0.05em] text-[color:var(--surface-strong-foreground)] sm:text-5xl">
+                  <h1 className="max-w-md text-4xl font-black tracking-[-0.05em] text-surface-strong-foreground sm:text-5xl">
                     {title}
                   </h1>
                 </div>
-                <p className="max-w-lg text-base leading-7 text-[color:var(--surface-strong-foreground-muted)] sm:text-lg">
+                <p className="max-w-lg text-base leading-7 text-surface-strong-foreground-muted sm:text-lg">
                   {description}
                 </p>
               </div>
             </div>
           </section>
 
-          <Card className="border-[color:var(--border-inverse)] bg-[color:var(--surface)]/96 backdrop-blur">
+          <Card className="border-border-inverse bg-surface/96 backdrop-blur">
             <CardHeader className="gap-5 p-6 sm:p-8">
-              <div className="flex size-14 items-center justify-center rounded-[var(--radius-md)] bg-[color:var(--gold-soft)] text-[color:var(--gold)]">
+              <div className="flex size-14 items-center justify-center rounded-md bg-gold-soft text-gold">
                 <AlertTriangle className="size-7" />
               </div>
               <div className="space-y-3">
@@ -125,11 +125,11 @@ export function RouteStateScreen({
             </CardHeader>
 
             <CardContent className="space-y-6 px-6 pb-6 sm:px-8 sm:pb-8">
-              <div className="rounded-[var(--radius-lg)] border border-[color:var(--border)] bg-[color:var(--surface-emphasis)] p-5">
-                <p className="text-[length:var(--text-label-sm)] font-semibold uppercase tracking-[var(--tracking-label)] text-[color:var(--muted-foreground)]">
+              <div className="rounded-lg border border-border bg-surface-emphasis p-5">
+                <p className="label-xs text-muted-foreground">
                   Proxima jogada
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-soft)]">
+                <p className="mt-2 text-sm leading-6 text-foreground-soft">
                   {nextStep}
                 </p>
               </div>
