@@ -90,7 +90,7 @@ function TeamScoreCard({
               {team.displayName}
             </p>
             <div>
-              <h3 className="text-2xl font-black tracking-[-0.04em]">{team.roster}</h3>
+              <h3 className="title">{team.roster}</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-foreground-soft">
                 {team.slogan}
               </p>
@@ -106,10 +106,10 @@ function TeamScoreCard({
 
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="label-xs text-foreground-soft">
+            <p className="caption text-foreground-soft">
               Vitórias
             </p>
-            <p className="font-display text-score leading-none tracking-[0.03em]">
+            <p className="font-display display">
               <span data-testid={`team-wins-${team.id}`}>{wins}</span>
             </p>
           </div>
@@ -123,7 +123,7 @@ function TeamScoreCard({
           <div className="flex items-center justify-between gap-3">
             <label
               htmlFor={noteId}
-              className="label-xs text-foreground-soft"
+              className="caption text-foreground-soft"
             >
               Provocação opcional
             </label>
