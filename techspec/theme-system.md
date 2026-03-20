@@ -2,10 +2,14 @@
 
 ## Arquitetura atual
 
-- Tokens globais em `src/app/globals.css` com Tailwind v4 em três camadas:
+- Dois arquivos de tokens:
+  - `src/app/tokens.css` — Tier 1: escalas de cores brutas, shadow values, font sizes, e literais de surface/border/gradient/app-shell
+  - `src/app/globals.css` — Tier 2-3: tokens semânticos e aliases de componentes; importa tokens.css e usa apenas referências `var()`
+  - Regra: literais em tokens.css; referências `var()` em globals.css
+- Tailwind v4 em três camadas:
   - `@theme {}` — tokens estáticos (radius, tracking, font families); gera classes nativas (`rounded-xl`, `tracking-label`, `font-display`)
   - `@theme inline {}` — mapeia variáveis semânticas para classes Tailwind (`bg-surface`, `text-foreground`, `shadow-brand`, etc.)
-  - `:root` / `.dark` — valores brutos e aliases do shadcn/ui; não geram classes diretamente
+  - `:root` / `.dark` — aliases do shadcn/ui
 - Utilitários de tipografia via `@utility`: `label-xs`, `label`, `label-wide`, `display-sm`, `display-md`, `display-lg`, `score`
 - Provider em `src/components/theme/theme-provider.tsx`: estado, persistência e sincronização com sistema
 - Script inline em `src/app/layout.tsx` evita flash de tema errado antes da hidratação
@@ -21,7 +25,7 @@
 - **Foundation (estáticos em `@theme`):** radius (`--radius-sm` → `--radius-pill`), tracking (`--tracking-label`, `--tracking-label-wide`), font families (`--font-body`, `--font-display`)
 - **Foundation (em `:root`):** shadow values (`--shadow-sm-value` etc.), font sizes (`--text-label`, `--text-display-lg`, etc.)
 - **Semantic surfaces:** `surface`, `surface-emphasis`, `surface-strong`
-- **Brand/team:** `--frontend-soft`, `--backend-soft` e variantes por estado de liderança
+- **Brand/team:** `--team-alpha`, `--team-alpha-soft`, `--team-beta`, `--team-beta-soft` e variantes por estado de liderança
 - **Shell autenticada:** `--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active`
 - **shadcn aliases:** `--primary`, `--card`, `--popover`, `--accent`, `--destructive`, `--input` — apontam para tokens existentes, sem duplicar valores
 - **Composition:** `--hero-gradient`, `--brand-gradient`, `--page-gradient` — convivem com foundations no mesmo arquivo (aceitável no volume atual)
