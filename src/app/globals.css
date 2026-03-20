@@ -1,70 +1,83 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
 :root {
   color-scheme: light;
-  --text-label-sm: 0.68rem;
-  --text-label: 0.72rem;
-  --text-title: clamp(1.9rem, 4vw, 2.7rem);
-  --text-display-sm: clamp(2rem, 4vw, 2.75rem);
-  --text-display-md: clamp(3rem, 4vw, 4.8rem);
-  --text-display-lg: clamp(3.5rem, 10vw, 7.5rem);
-  --text-score: clamp(4rem, 12vw, 6rem);
-  --background: #f1e8d8;
-  --background-subtle: #f8f1e6;
-  --background-strong: #dcc7a4;
-  --foreground: #1f1b17;
-  --foreground-soft: #3f3329;
-  --foreground-inverse: #fffcf5;
-  --muted-foreground: #5c4d40;
-  --surface: rgba(255, 251, 245, 0.96);
-  --surface-muted: rgba(255, 248, 238, 0.84);
-  --surface-emphasis: rgba(255, 254, 250, 0.97);
-  --surface-strong: rgba(32, 27, 23, 0.9);
-  --surface-strong-muted: rgba(255, 246, 231, 0.18);
-  --surface-strong-foreground: #fffbf3;
-  --surface-strong-foreground-muted: rgba(255, 251, 243, 0.92);
-  --surface-success: #e5f1e7;
-  --surface-danger: #fbe5e1;
-  --surface-brand: rgba(18, 43, 32, 0.82);
-  --border: rgba(43, 33, 26, 0.16);
-  --border-strong: rgba(43, 33, 26, 0.24);
-  --border-inverse: rgba(255, 255, 255, 0.14);
-  --ring: rgba(199, 149, 31, 0.9);
-  --danger: #9f3d31;
-  --frontend: #166657;
-  --frontend-soft: #d2e9e0;
-  --backend: #9f3d31;
-  --backend-soft: #efd6d1;
-  --gold: #c7951f;
-  --gold-soft: rgba(199, 149, 31, 0.16);
-  --hero-gradient: linear-gradient(135deg, rgba(255, 252, 246, 0.92), rgba(227, 211, 180, 0.82));
-  --brand-gradient: linear-gradient(135deg, rgba(26, 110, 91, 0.98), rgba(13, 56, 46, 0.96));
-  --page-gradient:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 34%),
-    radial-gradient(circle at 85% 0%, rgba(199, 149, 31, 0.2), transparent 26%),
-    linear-gradient(135deg, #f8f1e6 0%, #ebdfca 46%, #dbc39d 100%);
-  --page-grid: rgba(255, 255, 255, 0.06);
-  --app-shell-sidebar: rgba(15, 47, 36, 0.96);
-  --app-shell-sidebar-border: rgba(255, 255, 255, 0.12);
-  --app-shell-sidebar-foreground: #fffbf3;
-  --app-shell-sidebar-foreground-muted: rgba(255, 251, 243, 0.9);
-  --app-shell-sidebar-foreground-subtle: rgba(255, 251, 243, 0.74);
-  --app-shell-sidebar-hover: rgba(255, 255, 255, 0.12);
-  --app-shell-sidebar-active: rgba(255, 246, 231, 0.14);
-  --app-shell-sidebar-active-strong: rgba(255, 246, 231, 0.26);
-  --app-shell-sidebar-accent: #b6f0d8;
-  --app-shell-sidebar-menu: rgba(18, 55, 42, 0.98);
-  --app-shell-avatar-ring: rgba(11, 34, 27, 0.96);
-  --app-shell-status: #4ade80;
-  --app-shell-content-gradient:
-    radial-gradient(circle at top right, rgba(199, 149, 31, 0.16), transparent 22%),
-    radial-gradient(circle at left 20%, rgba(22, 102, 87, 0.14), transparent 26%);
-  --shadow-sm-value: 0 14px 30px rgba(13, 18, 14, 0.18);
-  --shadow-md-value: 0 20px 45px rgba(19, 74, 50, 0.22);
-  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
-  --shadow-brand-value: 0 20px 45px rgba(19, 74, 50, 0.28);
-  /* shadcn aliases — point to existing tokens, no values duplicated */
-  --primary: var(--foreground);
+
+  /* Font sizes */
+  --text-label-sm: var(--fz-label-sm);
+  --text-label: var(--fz-label);
+  --text-title: var(--fz-title);
+  --text-display-sm: var(--fz-display-sm);
+  --text-display-md: var(--fz-display-md);
+  --text-display-lg: var(--fz-display-lg);
+  --text-score: var(--fz-score);
+
+  /* Backgrounds */
+  --background: var(--neutral-200);
+  --background-subtle: var(--background-subtle-raw);
+  --background-strong: var(--background-strong-raw);
+
+  /* Foregrounds */
+  --foreground: var(--neutral-900);
+  --foreground-soft: var(--neutral-800);
+  --foreground-inverse: var(--neutral-50);
+  --muted-foreground: var(--neutral-700);
+
+  /* Surfaces */
+  --surface: var(--surface-raw);
+  --surface-muted: var(--surface-muted-raw);
+  --surface-emphasis: var(--surface-emphasis-raw);
+  --surface-strong: var(--surface-strong-raw);
+  --surface-strong-muted: var(--surface-strong-muted-raw);
+  --surface-strong-foreground: var(--surface-strong-foreground-raw);
+  --surface-strong-foreground-muted: var(--surface-strong-foreground-muted-raw);
+  --surface-success: var(--surface-success-raw);
+  --surface-danger: var(--surface-danger-raw);
+  --surface-brand: var(--surface-brand-raw);
+
+  /* Borders */
+  --border: var(--border-raw);
+  --border-strong: var(--border-strong-raw);
+  --border-inverse: var(--border-inverse-raw);
+
+  /* Ring */
+  --ring: var(--ring-raw);
+
+  /* Team tokens */
+  --team-alpha: var(--blue-700);
+  --team-alpha-soft: var(--blue-100);
+  --team-beta: var(--red-700);
+  --team-beta-soft: var(--red-100);
+
+  /* Accent colors */
+  --danger: var(--red-700);
+  --gold: var(--gold-500);
+  --gold-soft: var(--gold-soft-raw);
+
+  /* Gradients */
+  --hero-gradient: var(--hero-gradient-raw);
+  --brand-gradient: var(--brand-gradient-raw);
+  --page-gradient: var(--page-gradient-raw);
+  --page-grid: var(--page-grid-raw);
+
+  /* App shell */
+  --app-shell-sidebar: var(--app-shell-sidebar-raw);
+  --app-shell-sidebar-border: var(--app-shell-sidebar-border-raw);
+  --app-shell-sidebar-foreground: var(--app-shell-sidebar-foreground-raw);
+  --app-shell-sidebar-foreground-muted: var(--app-shell-sidebar-foreground-muted-raw);
+  --app-shell-sidebar-foreground-subtle: var(--app-shell-sidebar-foreground-subtle-raw);
+  --app-shell-sidebar-hover: var(--app-shell-sidebar-hover-raw);
+  --app-shell-sidebar-active: var(--app-shell-sidebar-active-raw);
+  --app-shell-sidebar-active-strong: var(--app-shell-sidebar-active-strong-raw);
+  --app-shell-sidebar-accent: var(--app-shell-sidebar-accent-raw);
+  --app-shell-sidebar-menu: var(--app-shell-sidebar-menu-raw);
+  --app-shell-avatar-ring: var(--app-shell-avatar-ring-raw);
+  --app-shell-status: var(--app-shell-status-raw);
+  --app-shell-content-gradient: var(--content-gradient-raw);
+
+  /* shadcn aliases */
+  --primary: var(--green-700);
   --primary-foreground: var(--foreground-inverse);
   --secondary: var(--surface-emphasis);
   --secondary-foreground: var(--foreground);
@@ -80,73 +93,30 @@
 
 .dark {
   color-scheme: dark;
-  --background: #07110d;
-  --background-subtle: #0c1914;
-  --background-strong: #13241d;
-  --foreground: #edf2e7;
-  --foreground-soft: #dbe4d5;
-  --foreground-inverse: #0b1510;
-  --muted-foreground: #9eb2a6;
-  --surface: rgba(10, 20, 16, 0.92);
-  --surface-muted: rgba(255, 255, 255, 0.09);
-  --surface-emphasis: rgba(18, 35, 28, 0.94);
-  --surface-strong: rgba(235, 242, 231, 0.14);
-  --surface-strong-muted: rgba(255, 255, 255, 0.12);
-  --surface-strong-foreground: #f7f8f2;
-  --surface-strong-foreground-muted: rgba(247, 248, 242, 0.72);
-  --surface-success: rgba(31, 78, 57, 0.62);
-  --surface-danger: rgba(117, 48, 39, 0.46);
-  --surface-brand: rgba(12, 33, 24, 0.82);
-  --border: rgba(214, 229, 219, 0.16);
-  --border-strong: rgba(214, 229, 219, 0.26);
-  --border-inverse: rgba(255, 255, 255, 0.14);
-  --ring: rgba(229, 188, 84, 0.88);
-  --danger: #e59b90;
-  --frontend: #3fc49d;
-  --frontend-soft: rgba(63, 196, 157, 0.22);
-  --backend: #d86f61;
-  --backend-soft: rgba(216, 111, 97, 0.24);
-  --gold: #e5bc54;
-  --gold-soft: rgba(229, 188, 84, 0.18);
-  --hero-gradient: linear-gradient(135deg, rgba(16, 31, 24, 0.92), rgba(27, 47, 39, 0.86));
-  --brand-gradient: linear-gradient(135deg, rgba(18, 67, 56, 0.94), rgba(7, 19, 15, 0.98));
-  --page-gradient:
-    radial-gradient(circle at top left, rgba(69, 118, 96, 0.22), transparent 30%),
-    radial-gradient(circle at 85% 0%, rgba(229, 188, 84, 0.12), transparent 24%),
-    linear-gradient(150deg, #08110d 0%, #0b1712 42%, #13241d 100%);
-  --page-grid: rgba(255, 255, 255, 0.05);
-  --app-shell-sidebar: rgba(8, 21, 16, 0.96);
-  --app-shell-sidebar-border: rgba(214, 229, 219, 0.1);
-  --app-shell-sidebar-foreground: #f7f8f2;
-  --app-shell-sidebar-foreground-muted: rgba(247, 248, 242, 0.74);
-  --app-shell-sidebar-foreground-subtle: rgba(247, 248, 242, 0.5);
-  --app-shell-sidebar-hover: rgba(255, 255, 255, 0.06);
-  --app-shell-sidebar-active: rgba(63, 196, 157, 0.18);
-  --app-shell-sidebar-active-strong: #21634f;
-  --app-shell-sidebar-accent: #7ee2bc;
-  --app-shell-sidebar-menu: rgba(10, 25, 19, 0.98);
-  --app-shell-avatar-ring: rgba(8, 21, 16, 0.98);
-  --app-shell-status: #4ade80;
-  --app-shell-content-gradient:
-    radial-gradient(circle at top right, rgba(229, 188, 84, 0.1), transparent 22%),
-    radial-gradient(circle at left 18%, rgba(63, 196, 157, 0.08), transparent 24%);
-  --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
-  --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
-  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
-  --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
-  /* shadcn aliases — point to existing tokens, no values duplicated */
-  --primary: var(--foreground);
-  --primary-foreground: var(--foreground-inverse);
-  --secondary: var(--surface-emphasis);
-  --secondary-foreground: var(--foreground);
-  --card: var(--surface);
-  --card-foreground: var(--foreground);
-  --popover: var(--surface);
-  --popover-foreground: var(--foreground);
-  --accent: var(--surface-emphasis);
-  --accent-foreground: var(--foreground);
-  --destructive: var(--danger);
-  --input: var(--border);
+
+  /* Override backgrounds */
+  --background: var(--neutral-950);
+  --background-subtle: var(--background-subtle-raw);
+  --background-strong: var(--background-strong-raw);
+
+  /* Override foregrounds */
+  --foreground: var(--foreground-raw);
+  --foreground-soft: var(--foreground-soft-raw);
+  --foreground-inverse: var(--foreground-inverse-raw);
+  --muted-foreground: var(--muted-foreground-raw);
+
+  /* Team token dark overrides */
+  --team-alpha: var(--blue-400);
+  --team-alpha-soft: var(--blue-100-alpha);
+  --team-beta: var(--red-400);
+  --team-beta-soft: var(--red-100-alpha);
+
+  /* Accent overrides */
+  --danger: var(--red-400);
+  --gold: var(--gold-400);
+
+  /* shadcn primary stays green */
+  --primary: var(--green-700);
 }
 
 @theme {
@@ -186,10 +156,10 @@
   --color-danger: var(--danger);
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
-  --color-frontend: var(--frontend);
-  --color-frontend-soft: var(--frontend-soft);
-  --color-backend: var(--backend);
-  --color-backend-soft: var(--backend-soft);
+  --color-team-alpha: var(--team-alpha);
+  --color-team-alpha-soft: var(--team-alpha-soft);
+  --color-team-beta: var(--team-beta);
+  --color-team-beta-soft: var(--team-beta-soft);
   /* shadow → generates: shadow-sm, shadow-md, shadow-lg, shadow-brand */
   --shadow-sm: var(--shadow-sm-value);
   --shadow-md: var(--shadow-md-value);
@@ -301,5 +271,5 @@ textarea {
 }
 
 ::selection {
-  background: rgba(199, 149, 31, 0.25);
+  background: var(--selection-bg);
 }
