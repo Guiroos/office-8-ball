@@ -204,41 +204,41 @@
   --color-input: var(--input);
 }
 
-/* Single-purpose font-size utilities — --fz-* lives in :root, outside Tailwind's --text-* namespace */
-@utility text-label-sm {
-  font-size: var(--fz-label-sm);
+/* Compound typography utilities — role-based scale */
+@utility display {
+  font-size: var(--fz-display);
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
-@utility text-label {
-  font-size: var(--fz-label);
+@utility headline {
+  font-size: var(--fz-headline);
+  font-weight: 900;
+  /* tracking intentionally omitted — callers add tracking modifier when needed */
 }
 
-@utility text-title {
+@utility title {
   font-size: var(--fz-title);
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
-@utility text-display-sm {
-  font-size: var(--fz-display-sm);
-}
-
-@utility text-display-md {
-  font-size: var(--fz-display-md);
-}
-
-@utility text-display-lg {
-  font-size: var(--fz-display-lg);
-}
-
-@utility text-score {
-  font-size: var(--fz-score);
-}
-
-/* Compound typography utilities */
-@utility label-xs {
-  font-size: var(--fz-label-sm);
+@utility subtitle {
+  font-size: var(--fz-subtitle);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
+  letter-spacing: -0.03em;
+}
+
+@utility body {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility body-sm {
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 @utility label {
@@ -248,6 +248,13 @@
   letter-spacing: var(--tracking-label);
 }
 
+@utility label-sm {
+  font-size: var(--fz-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label-sm);
+}
+
 @utility label-wide {
   font-size: var(--fz-label);
   font-weight: 600;
@@ -255,25 +262,11 @@
   letter-spacing: var(--tracking-label-wide);
 }
 
-@utility display-sm {
-  font-size: var(--fz-display-sm);
-  font-weight: 900;
-}
-
-@utility display-md {
-  font-size: var(--fz-display-md);
-  font-weight: 900;
-}
-
-@utility display-lg {
-  font-size: var(--fz-display-lg);
-  font-weight: 900;
-}
-
-@utility score {
-  font-size: var(--fz-score);
-  font-weight: 900;
-  letter-spacing: -0.05em;
+@utility caption {
+  font-size: var(--fz-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label-sm);
 }
 
 * {
