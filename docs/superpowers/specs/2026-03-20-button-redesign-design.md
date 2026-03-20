@@ -40,7 +40,7 @@ All variants use uppercase text with wide letter-spacing for the primary CTA fee
 
 The dominant action button. Uses a diagonal gold gradient and a warm shadow. Intended for the main CTA in any context (light or dark bg).
 
-- Background: `linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 100%)` → maps to Tailwind as inline gradient or custom utility
+- Background: add `@utility btn-gold-gradient` in `globals.css` following the existing `@utility display` / `@utility headline` pattern, with `background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 100%)`. Apply via `btn-gold-gradient` class in CVA.
 - Text color: `text-foreground` (dark neutral — `#09342c` / `neutral-950`)
 - Shadow: `shadow-brand` (warm green-gold shadow)
 - Border radius: `rounded-xl` (28px) — smaller than current `rounded-pill`
@@ -90,7 +90,7 @@ Navigation items within the dark app shell. Minimal change from current.
 |---|---|---|---|
 | `sm` | `h-9` | `px-4` | `text-xs` |
 | `default` | `h-11` | `px-5` | `text-sm` |
-| `lg` | `h-13` | `px-6` | `text-base` |
+| `lg` | `h-13` | `px-6` | `text-base` | ← already used and working in current button.tsx (Tailwind 4 generates this from the spacing scale) |
 
 ### Border radius
 
@@ -128,6 +128,7 @@ Unchanged: `disabled:opacity-50 disabled:pointer-events-none`.
 | File | Change |
 |---|---|
 | `src/components/ui/button.tsx` | Rewrite `buttonVariants` CVA — new class values for all variants |
+| `src/app/globals.css` | Add `@utility btn-gold-gradient` for the default gold CTA gradient |
 
 No other files require changes. Consumer components use variant props and will pick up the new styles automatically.
 
