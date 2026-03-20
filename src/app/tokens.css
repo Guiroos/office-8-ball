@@ -1,0 +1,210 @@
+/* src/app/tokens.css */
+/* TIER 1 — Raw primitives. Only literal values here: hex, rgb, clamp(), shadow strings. */
+/* globals.css imports this file and references these via var() only. */
+
+:root {
+  /* Green — application identity */
+  --green-50: #edf6f2;
+  --green-100: #d2e9e0;
+  --green-200: #a9d4c3;
+  --green-300: #7dbfa8;
+  --green-400: #4eaa8e;
+  --green-500: #2b9178;
+  --green-600: #1f7866;
+  --green-700: #166657;
+  --green-800: #0f4d41;
+  --green-900: #09342c;
+  --green-950: #041c18;
+
+  /* Blue — team-alpha color */
+  --blue-50: #eff5fb;
+  --blue-100: #d9eaf7;
+  --blue-200: #b4d4ef;
+  --blue-300: #8ebfe7;
+  --blue-400: #5b9bd5;
+  --blue-500: #3a7fc1;
+  --blue-600: #2e6aab;
+  --blue-700: #2a5f9c;
+  --blue-800: #1f4a7a;
+  --blue-900: #153258;
+  --blue-950: #0c1d35;
+
+  /* Red — team-beta color */
+  --red-50: #fdf0ee;
+  --red-100: #efd6d1;
+  --red-200: #e0b0a9;
+  --red-300: #d08c82;
+  --red-400: #d86f61;
+  --red-500: #c05245;
+  --red-600: #b0463a;
+  --red-700: #9f3d31;
+  --red-800: #7a2e25;
+  --red-900: #541f19;
+  --red-950: #350f0c;
+
+  /* Gold — highlights, rings, icons */
+  --gold-50: #fef9ed;
+  --gold-100: #fbefc9;
+  --gold-200: #f6de95;
+  --gold-300: #f0cc62;
+  --gold-400: #e5bc54;
+  --gold-500: #c7951f;
+  --gold-600: #a97a16;
+  --gold-700: #8b620f;
+  --gold-800: #6d4c09;
+  --gold-900: #4f3705;
+  --gold-950: #281d04;
+
+  /* Warm Neutral — backgrounds, foregrounds, surfaces */
+  --neutral-50: #fffcf5;
+  --neutral-100: #f8f1e6;
+  --neutral-200: #f1e8d8;
+  --neutral-300: #dcc7a4;
+  --neutral-400: #c9ab7e;
+  --neutral-500: #9c7a5a;
+  --neutral-600: #7a5f45;
+  --neutral-700: #5c4d40;
+  --neutral-800: #3f3329;
+  --neutral-900: #1f1b17;
+  --neutral-950: #07110d;
+
+  /* Font sizes */
+  --fz-label-sm: 0.68rem;
+  --fz-label: 0.72rem;
+  --fz-title: clamp(1.9rem, 4vw, 2.7rem);
+  --fz-display-sm: clamp(2rem, 4vw, 2.75rem);
+  --fz-display-md: clamp(3rem, 4vw, 4.8rem);
+  --fz-display-lg: clamp(3.5rem, 10vw, 7.5rem);
+  --fz-score: clamp(4rem, 12vw, 6rem);
+
+  /* Shadow values */
+  --shadow-sm-value: 0 14px 30px rgba(13, 18, 14, 0.18);
+  --shadow-md-value: 0 20px 45px rgba(19, 74, 50, 0.22);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(19, 74, 50, 0.28);
+
+  /* Surface literals */
+  --surface-raw: rgba(255, 251, 245, 0.96);
+  --surface-muted-raw: rgba(255, 248, 238, 0.84);
+  --surface-emphasis-raw: rgba(255, 254, 250, 0.97);
+  --surface-strong-raw: rgba(32, 27, 23, 0.9);
+  --surface-strong-muted-raw: rgba(255, 246, 231, 0.18);
+  --surface-strong-foreground-raw: #fffbf3;
+  --surface-strong-foreground-muted-raw: rgba(255, 251, 243, 0.92);
+  --surface-success-raw: #e5f1e7;
+  --surface-danger-raw: #fbe5e1;
+  --surface-brand-raw: rgba(18, 43, 32, 0.82);
+
+  /* Border literals */
+  --border-raw: rgba(43, 33, 26, 0.16);
+  --border-strong-raw: rgba(43, 33, 26, 0.24);
+  --border-inverse-raw: rgba(255, 255, 255, 0.14);
+
+  /* Ring */
+  --ring-raw: rgba(199, 149, 31, 0.9);
+
+  /* Gold soft */
+  --gold-soft-raw: rgba(199, 149, 31, 0.16);
+
+  /* Gradient literals */
+  --hero-gradient-raw: linear-gradient(135deg, rgba(255, 252, 246, 0.92), rgba(227, 211, 180, 0.82));
+  --brand-gradient-raw: linear-gradient(135deg, rgba(26, 110, 91, 0.98), rgba(13, 56, 46, 0.96));
+  --page-gradient-raw:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 34%),
+    radial-gradient(circle at 85% 0%, rgba(199, 149, 31, 0.2), transparent 26%),
+    linear-gradient(135deg, #f8f1e6 0%, #ebdfca 46%, #dbc39d 100%);
+  --page-grid-raw: rgba(255, 255, 255, 0.06);
+  --content-gradient-raw:
+    radial-gradient(circle at top right, rgba(199, 149, 31, 0.16), transparent 22%),
+    radial-gradient(circle at left 20%, rgba(22, 102, 87, 0.14), transparent 26%);
+
+  /* App shell literals */
+  --app-shell-sidebar-raw: rgba(15, 47, 36, 0.96);
+  --app-shell-sidebar-border-raw: rgba(255, 255, 255, 0.12);
+  --app-shell-sidebar-foreground-raw: #fffbf3;
+  --app-shell-sidebar-foreground-muted-raw: rgba(255, 251, 243, 0.9);
+  --app-shell-sidebar-foreground-subtle-raw: rgba(255, 251, 243, 0.74);
+  --app-shell-sidebar-hover-raw: rgba(255, 255, 255, 0.12);
+  --app-shell-sidebar-active-raw: rgba(255, 246, 231, 0.14);
+  --app-shell-sidebar-active-strong-raw: rgba(255, 246, 231, 0.26);
+  --app-shell-sidebar-accent-raw: #b6f0d8;
+  --app-shell-sidebar-menu-raw: rgba(18, 55, 42, 0.98);
+  --app-shell-avatar-ring-raw: rgba(11, 34, 27, 0.96);
+  --app-shell-status-raw: #4ade80;
+
+  /* Selection */
+  --selection-bg: rgba(199, 149, 31, 0.25);
+
+  /* Background literals not on neutral scale (light has exact neutral matches) */
+  --background-subtle-raw: #f8f1e6;
+  --background-strong-raw: #dcc7a4;
+}
+
+.dark {
+  /* Shadow overrides */
+  --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
+  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
+  --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
+
+  /* Surface dark overrides */
+  --surface-raw: rgba(10, 20, 16, 0.92);
+  --surface-muted-raw: rgba(255, 255, 255, 0.09);
+  --surface-emphasis-raw: rgba(18, 35, 28, 0.94);
+  --surface-strong-raw: rgba(235, 242, 231, 0.14);
+  --surface-strong-muted-raw: rgba(255, 255, 255, 0.12);
+  --surface-strong-foreground-raw: #f7f8f2;
+  --surface-strong-foreground-muted-raw: rgba(247, 248, 242, 0.72);
+  --surface-success-raw: rgba(31, 78, 57, 0.62);
+  --surface-danger-raw: rgba(117, 48, 39, 0.46);
+  --surface-brand-raw: rgba(12, 33, 24, 0.82);
+
+  /* Border dark overrides */
+  --border-raw: rgba(214, 229, 219, 0.16);
+  --border-strong-raw: rgba(214, 229, 219, 0.26);
+
+  /* Ring dark */
+  --ring-raw: rgba(229, 188, 84, 0.88);
+
+  /* Gold soft dark */
+  --gold-soft-raw: rgba(229, 188, 84, 0.18);
+
+  /* Gradient dark overrides */
+  --hero-gradient-raw: linear-gradient(135deg, rgba(16, 31, 24, 0.92), rgba(27, 47, 39, 0.86));
+  --brand-gradient-raw: linear-gradient(135deg, rgba(18, 67, 56, 0.94), rgba(7, 19, 15, 0.98));
+  --page-gradient-raw:
+    radial-gradient(circle at top left, rgba(69, 118, 96, 0.22), transparent 30%),
+    radial-gradient(circle at 85% 0%, rgba(229, 188, 84, 0.12), transparent 24%),
+    linear-gradient(150deg, #08110d 0%, #0b1712 42%, #13241d 100%);
+  --page-grid-raw: rgba(255, 255, 255, 0.05);
+  --content-gradient-raw:
+    radial-gradient(circle at top right, rgba(229, 188, 84, 0.1), transparent 22%),
+    radial-gradient(circle at left 18%, rgba(63, 196, 157, 0.08), transparent 24%);
+
+  /* App shell dark overrides */
+  --app-shell-sidebar-raw: rgba(8, 21, 16, 0.96);
+  --app-shell-sidebar-border-raw: rgba(214, 229, 219, 0.1);
+  --app-shell-sidebar-foreground-raw: #f7f8f2;
+  --app-shell-sidebar-foreground-muted-raw: rgba(247, 248, 242, 0.74);
+  --app-shell-sidebar-foreground-subtle-raw: rgba(247, 248, 242, 0.5);
+  --app-shell-sidebar-hover-raw: rgba(255, 255, 255, 0.06);
+  --app-shell-sidebar-active-raw: rgba(63, 196, 157, 0.18);
+  --app-shell-sidebar-active-strong-raw: #21634f;
+  --app-shell-sidebar-accent-raw: #7ee2bc;
+  --app-shell-sidebar-menu-raw: rgba(10, 25, 19, 0.98);
+  --app-shell-avatar-ring-raw: rgba(8, 21, 16, 0.98);
+
+  /* Dark background values not on neutral scale */
+  --background-subtle-raw: #0c1914;
+  --background-strong-raw: #13241d;
+
+  /* Dark foreground values */
+  --foreground-raw: #edf2e7;
+  --foreground-soft-raw: #dbe4d5;
+  --foreground-inverse-raw: #0b1510;
+  --muted-foreground-raw: #9eb2a6;
+
+  /* Alpha tokens for team-soft in dark mode (rgba equivalents of blue-100/red-100) */
+  --blue-100-alpha: rgba(91, 155, 213, 0.22);
+  --red-100-alpha: rgba(216, 111, 97, 0.24);
+}
