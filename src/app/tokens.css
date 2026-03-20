@@ -201,6 +201,9 @@
   --background-subtle-raw: #0c1914;
   --background-strong-raw: #13241d;
 
+  /* Selection dark override */
+  --selection-bg: rgba(229, 188, 84, 0.25); /* dark gold tint */
+
   /* Dark foreground values */
   --foreground-raw: #edf2e7;
   --foreground-soft-raw: #dbe4d5;
