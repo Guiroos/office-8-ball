@@ -1,9 +1,22 @@
+---
+paths:
+  - "src/lib/auth*.ts"
+  - "src/app/api/**/*.ts"
+  - "middleware.ts"
+---
+
 # Auth
 
 ## Availability Chain
 
-- `isAuthAvailable()` requires both `hasDatabaseUrl()` and `hasAuthSecret()` to be true. Missing `DATABASE_URL` returns 503; `DATABASE_URL` without `NEXTAUTH_SECRET` returns 500 -- never treat it as a degraded fallback. Middleware checks these at module level and throws on misconfiguration.
+- Call `isAuthAvailable()` before any auth operation. It requires both `hasDatabaseUrl()` and `hasAuthSecret()`.
+- Missing `DATABASE_URL` → return 503 (service unavailable — DB is the dependency).
+- `DATABASE_URL` present without `NEXTAUTH_SECRET` → return 500 (misconfiguration — never treat as degraded mode). Middleware checks these at module level and throws on misconfiguration.
+- **Why:** The client error-handling branches on these specific codes. Silently degrading breaks the UX flow and masks real configuration errors in production.
 
 ## Rate Limiting
 
-- Rate limiting is Prisma-backed, keyed by `action:email:ip`. Call sequence: `buildAuthRateLimitKey()`, `getAuthRateLimitStatus()`, `registerAuthFailure()` on failure, `clearAuthRateLimit()` on success. Blocked requests return 429 with `retryAfterSeconds`; block duration escalates exponentially (15m, 30m, 60m max). Unavailable in in-memory mode.
+- Rate limiting is Prisma-backed, keyed by `action:email:ip`. Call sequence: `buildAuthRateLimitKey()`, `getAuthRateLimitStatus()`, `registerAuthFailure()` on failure, `clearAuthRateLimit()` on success.
+- Blocked requests return 429 with `retryAfterSeconds`; block duration escalates exponentially (15m, 30m, 60m max).
+- Not available in in-memory mode — do not call rate-limit functions when `DATABASE_URL` is absent.
+- **Why:** Skipping the sequence (e.g. clearing on failure) silently disables lockout and leaves brute-force protection broken.
