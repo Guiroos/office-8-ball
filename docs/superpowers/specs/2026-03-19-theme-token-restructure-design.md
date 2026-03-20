@@ -61,13 +61,17 @@ Cada paleta com escala completa 50–950. Só valores que existem no CSS atual s
 **Blue** — fallback cor do time alpha
 ```css
 --blue-50 → --blue-950
-/* âncora principal: --blue-700 = azul sutil/dessaturado (~#2a5f9c) */
+/* âncora principal light: --blue-700 = azul sutil/dessaturado (~#2a5f9c) */
+/* âncora principal dark:  --blue-400 = azul mais claro (~#5b9bd5) */
 ```
+
+> **Nota de dark mode:** O token atual `--frontend` em dark mode é teal (`#3fc49d`), não azul. A migração para `--team-alpha` → blue é uma **mudança visual intencional** em dark mode — o time alpha passa de teal para azul. Isso foi decidido durante o brainstorming.
 
 **Red** — fallback cor do time beta
 ```css
 --red-50 → --red-950
-/* âncora atual: --red-700 = #9f3d31 (atual --backend) */
+/* âncora light: --red-700 = #9f3d31 (atual --backend) */
+/* âncora dark:  --red-400 = vermelho sutil mais claro (~#d86f61) */
 ```
 
 **Gold** — destaques, rings, ícones
@@ -142,6 +146,20 @@ As classes `bg-frontend`, `bg-frontend-soft`, `bg-backend`, `bg-backend-soft`, `
 
 ## Impacto em Componentes
 
+### `src/lib/constants.ts`
+
+Os campos `accent` e `accentSoft` nos objetos de time referenciam CSS vars por nome. Devem ser atualizados para as novas vars — os IDs de domínio (`id`, `name`, `displayName`) não mudam:
+
+```ts
+// antes
+{ id: "frontend", ..., accent: "var(--frontend)", accentSoft: "var(--frontend-soft)" }
+{ id: "backend",  ..., accent: "var(--backend)",  accentSoft: "var(--backend-soft)"  }
+
+// depois
+{ id: "frontend", ..., accent: "var(--team-alpha)", accentSoft: "var(--team-alpha-soft)" }
+{ id: "backend",  ..., accent: "var(--team-beta)",  accentSoft: "var(--team-beta-soft)"  }
+```
+
 ### `src/components/ui/button.tsx`
 ```tsx
 // antes
@@ -165,6 +183,8 @@ variant="team-beta"   →  "border-team-beta bg-team-beta-soft text-team-beta"
 ```
 
 ### `src/components/dashboard/index.tsx`
+
+**`teamScoreCardVariants` (background do card):**
 ```tsx
 // antes
 frontend: "bg-frontend-soft"
@@ -175,8 +195,34 @@ frontend: "bg-team-alpha-soft"   // chave do domínio mantida
 backend:  "bg-team-beta-soft"
 ```
 
+**`teamScoreBadgeVariants` (badge de pontuação):**
 ```tsx
-// foco no textarea (antes)
+// antes
+frontend: "bg-frontend"
+backend:  "bg-backend"
+
+// depois
+frontend: "bg-team-alpha"
+backend:  "bg-team-beta"
+```
+
+**`Button variant={team.id}` — mapeamento necessário:**
+
+Após renomear os CVA variants de `button.tsx`, o prop `variant={team.id}` passará `"frontend"` ou `"backend"` para um Button que não tem mais essas variantes — TypeScript error e regressão visual. É necessário um mapa de tradução:
+
+```tsx
+const TEAM_BUTTON_VARIANT = {
+  frontend: "team-alpha",
+  backend:  "team-beta",
+} as const;
+
+// uso
+<Button variant={TEAM_BUTTON_VARIANT[team.id as keyof typeof TEAM_BUTTON_VARIANT]} ...>
+```
+
+**Foco no textarea:**
+```tsx
+// antes
 focus:border-frontend focus:ring-2 focus:ring-frontend-soft
 
 // depois
@@ -185,12 +231,17 @@ focus:border-team-alpha focus:ring-2 focus:ring-team-alpha-soft
 
 ### `src/components/ui/input.tsx`
 ```tsx
-// antes
+// estado normal (antes)
 focus:border-frontend focus:ring-2 focus:ring-frontend-soft
 
-// depois
+// estado normal (depois)
 focus:border-primary focus:ring-2 focus:ring-team-alpha-soft
-// (foco padrão usa --primary, semanticamente correto)
+
+// estado inválido (antes)
+border-danger focus:border-danger focus:ring-2 focus:ring-backend-soft
+
+// estado inválido (depois)
+border-danger focus:border-danger focus:ring-2 focus:ring-team-beta-soft
 ```
 
 ### `src/components/primitives/icon-callout.tsx`
@@ -213,11 +264,17 @@ className="... bg-primary ..."
 
 ### `src/components/login/login-screen.tsx`
 ```tsx
-// antes
+// botão de segmento ativo (antes)
 "bg-frontend text-foreground-inverse shadow-sm"
 
-// depois
+// botão de segmento ativo (depois)
 "bg-primary text-primary-foreground shadow-sm"
+
+// div de erro (antes)
+border-backend-soft bg-surface-danger ... text-danger
+
+// div de erro (depois)
+border-team-beta-soft bg-surface-danger ... text-danger
 ```
 
 ---
@@ -235,13 +292,14 @@ className="... bg-primary ..."
 | `src/components/primitives/icon-callout.tsx` | Classe CSS atualizada |
 | `src/components/authenticated/placeholder-page.tsx` | Classe CSS atualizada |
 | `src/components/login/login-screen.tsx` | Classes CSS atualizadas |
+| `src/lib/constants.ts` | `accent` e `accentSoft` atualizados para `var(--team-alpha)` / `var(--team-beta)` |
 | `techspec/theme-system.md` | Atualizado para refletir nova arquitetura |
 
 ---
 
 ## Fora de Escopo
 
-- IDs de domínio dos times (`"frontend"`, `"backend"`) em `src/lib/constants.ts`, banco, seed e testes
+- IDs de domínio dos times (`"frontend"`, `"backend"`) em banco, seed e testes — os IDs em `src/lib/constants.ts` não mudam, mas os campos `accent`/`accentSoft` **são** atualizados nesta spec pois referenciam CSS vars
 - Multi-team / times customizáveis
 - Mudanças em rotas, API ou autenticação
 - Novos componentes ou variantes além das existentes
