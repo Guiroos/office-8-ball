@@ -36,7 +36,7 @@ export function IconCallout({
       <div
         className={cn(
           "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-pill",
-          tone === "success" && "bg-surface text-frontend",
+          tone === "success" && "bg-surface text-primary",
           tone === "default" && "bg-gold-soft text-foreground",
           isStrong && "text-surface-strong-foreground-muted bg-surface-strong",
         )}
