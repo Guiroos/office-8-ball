@@ -7,18 +7,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-pill text-sm font-semibold transition-all outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 shrink-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-150 ease-out outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 shrink-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "bg-foreground text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:bg-foreground-soft focus-visible:ring-offset-background",
+          "btn-gold-gradient text-foreground shadow-brand font-extrabold uppercase tracking-label hover:-translate-y-[3px] hover:shadow-[0_10px_28px_rgba(199,149,31,0.65)] active:translate-y-px active:scale-[0.98] active:shadow-brand focus-visible:ring-offset-background",
         ghost:
-          "border border-border bg-surface-muted text-foreground hover:bg-surface-emphasis focus-visible:ring-offset-background",
+          "border border-border bg-surface-muted text-foreground hover:-translate-y-0.5 hover:bg-surface-emphasis active:translate-y-px active:scale-[0.98] focus-visible:ring-offset-background",
         "team-alpha":
-          "bg-team-alpha text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
+          "bg-gradient-to-br from-blue-700 to-blue-500 text-foreground-inverse font-extrabold uppercase tracking-label shadow-[0_6px_20px_rgba(42,95,156,0.5)] hover:-translate-y-[3px] hover:shadow-[0_10px_28px_rgba(42,95,156,0.65)] active:translate-y-px active:scale-[0.98] active:shadow-[0_3px_10px_rgba(42,95,156,0.35)] focus-visible:ring-offset-background",
         "team-beta":
-          "bg-team-beta text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
+          "bg-gradient-to-br from-red-700 to-red-500 text-foreground-inverse font-extrabold uppercase tracking-label shadow-[0_6px_20px_rgba(159,61,49,0.5)] hover:-translate-y-[3px] hover:shadow-[0_10px_28px_rgba(159,61,49,0.65)] active:translate-y-px active:scale-[0.98] active:shadow-[0_3px_10px_rgba(159,61,49,0.35)] focus-visible:ring-offset-background",
         sidebar:
           "border border-sidebar-border bg-sidebar-hover text-sidebar-foreground hover:bg-sidebar-active",
       },

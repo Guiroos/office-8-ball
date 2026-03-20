@@ -269,6 +269,10 @@
   letter-spacing: var(--tracking-label-sm);
 }
 
+@utility btn-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 100%);
+}
+
 * {
   box-sizing: border-box;
 }
