@@ -11,10 +11,10 @@ const badgeVariants = cva(
           "border-border-strong bg-surface-emphasis text-muted-foreground",
         gold:
           "border-gold bg-gold-soft text-foreground",
-        frontend:
-          "border-frontend bg-frontend-soft text-frontend",
-        backend:
-          "border-backend bg-backend-soft text-backend",
+        "team-alpha":
+          "border-team-alpha bg-team-alpha-soft text-team-alpha",
+        "team-beta":
+          "border-team-beta bg-team-beta-soft text-team-beta",
         outline:
           "border-border bg-transparent text-foreground",
       },

@@ -17,8 +17,8 @@ const initialScoreboard: ScoreboardResponse = {
         name: "frontend",
         displayName: "Frontend",
         roster: "Gui + Jean",
-        accent: "var(--frontend)",
-        accentSoft: "var(--frontend-soft)",
+        accent: "var(--team-alpha)",
+        accentSoft: "var(--team-alpha-soft)",
         slogan: "Empurra feature e bola no mesmo sprint.",
         wins: 0,
       },
@@ -27,8 +27,8 @@ const initialScoreboard: ScoreboardResponse = {
         name: "backend",
         displayName: "Backend",
         roster: "Adair + Richard",
-        accent: "var(--backend)",
-        accentSoft: "var(--backend-soft)",
+        accent: "var(--team-beta)",
+        accentSoft: "var(--team-beta-soft)",
         slogan: "Consistentes ate quando o deploy cai.",
         wins: 0,
       },
@@ -195,11 +195,11 @@ describe("Dashboard", () => {
     });
 
     expect(frontendCard).toHaveAttribute("data-leader", "true");
-    expect(frontendCard).toHaveClass("bg-frontend-soft");
+    expect(frontendCard).toHaveClass("bg-team-alpha-soft");
     expect(frontendCard).toHaveClass("ring-gold");
     expect(frontendCard).not.toHaveAttribute("style");
     expect(backendCard).toHaveAttribute("data-leader", "false");
-    expect(backendCard).toHaveClass("bg-backend-soft");
+    expect(backendCard).toHaveClass("bg-team-beta-soft");
     expect(backendCard).not.toHaveAttribute("style");
 
     expect(await screen.findByText("Frontend lidera por 1.")).toBeInTheDocument();

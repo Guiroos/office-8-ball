@@ -17,13 +17,18 @@ import { getEnvironmentLabel, getLeaderName } from "./dashboard-utils";
 import { RecentMatchesCard } from "./recent-matches-card";
 import { useDashboardData } from "./use-dashboard-data";
 
+const TEAM_BUTTON_VARIANT = {
+  frontend: "team-alpha",
+  backend: "team-beta",
+} as const;
+
 const teamScoreCardVariants = cva(
   "overflow-hidden border shadow-sm backdrop-blur-sm text-foreground",
   {
     variants: {
       team: {
-        frontend: "bg-frontend-soft",
-        backend: "bg-backend-soft",
+        frontend: "bg-team-alpha-soft",
+        backend: "bg-team-beta-soft",
       },
       leader: {
         true: "border-gold ring-2 ring-gold",
@@ -38,8 +43,8 @@ const teamScoreBadgeVariants = cva(
   {
     variants: {
       team: {
-        frontend: "bg-frontend",
-        backend: "bg-backend",
+        frontend: "bg-team-alpha",
+        backend: "bg-team-beta",
       },
     },
   },
@@ -135,7 +140,7 @@ function TeamScoreCard({
             rows={3}
             disabled={isSubmitting}
             placeholder="Vale zoeira curta, sem tese de retrospectiva."
-            className="min-h-24 w-full resize-none rounded-md border border-border-strong bg-surface-emphasis px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-foreground-soft focus:border-frontend focus:ring-2 focus:ring-frontend-soft disabled:cursor-not-allowed disabled:bg-surface-muted"
+            className="min-h-24 w-full resize-none rounded-md border border-border-strong bg-surface-emphasis px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-foreground-soft focus:border-team-alpha focus:ring-2 focus:ring-team-alpha-soft disabled:cursor-not-allowed disabled:bg-surface-muted"
             onChange={(event) => {
               onNoteChange(team.id, event.target.value);
             }}
@@ -143,7 +148,7 @@ function TeamScoreCard({
         </div>
 
         <Button
-          variant={team.id}
+          variant={TEAM_BUTTON_VARIANT[team.id as keyof typeof TEAM_BUTTON_VARIANT]}
           size="lg"
           className="w-full"
           data-testid={`register-win-${team.id}`}

@@ -15,10 +15,10 @@ const buttonVariants = cva(
           "bg-foreground text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:bg-foreground-soft focus-visible:ring-offset-background",
         ghost:
           "border border-border bg-surface-muted text-foreground hover:bg-surface-emphasis focus-visible:ring-offset-background",
-        frontend:
-          "bg-frontend text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
-        backend:
-          "bg-backend text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
+        "team-alpha":
+          "bg-team-alpha text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
+        "team-beta":
+          "bg-team-beta text-foreground-inverse shadow-sm hover:-translate-y-0.5 hover:brightness-110 focus-visible:ring-offset-background",
         sidebar:
           "border border-[color:var(--app-shell-sidebar-border)] bg-[color:var(--app-shell-sidebar-hover)] text-sidebar-foreground hover:bg-[color:var(--app-shell-sidebar-active)]",
       },
