@@ -287,7 +287,7 @@ export function LoginScreen({
                     </div>
 
                     <div className="space-y-3">
-                      <h1 className="text-xl font-semibold leading-tight tracking-[-0.03em] text-muted-foreground sm:text-2xl">
+                      <h1 className="subtitle leading-tight text-muted-foreground">
                         {isRegisterMode
                           ? "Crie a conta basica para liberar a mesa."
                           : "Entre para registrar a proxima vitoria."}

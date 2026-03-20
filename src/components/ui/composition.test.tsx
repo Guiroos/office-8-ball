@@ -121,7 +121,7 @@ describe("composition ui", () => {
       <StatTile
         label="Total"
         value={
-          <strong className="text-4xl font-black">
+          <strong className="title">
             <ChartColumn />
             12
           </strong>

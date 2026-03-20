@@ -27,7 +27,7 @@ export function DashboardHero({
               title="Office 8 Ball"
               description="Um placar interno para registrar quem saiu da mesa como campeão e quem saiu procurando desculpa técnica."
               className="gap-3"
-              titleClassName="font-display text-[length:var(--text-display-lg)] leading-[0.88] uppercase tracking-[0.06em] text-foreground"
+              titleClassName="font-display headline tracking-[0.06em] uppercase text-foreground"
               descriptionClassName="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg"
             />
           </div>
@@ -35,7 +35,7 @@ export function DashboardHero({
             <p className="label-wide text-muted-foreground">
               Rivalidade operacional
             </p>
-            <p className="mt-3 inline-flex w-fit rounded-pill border border-gold bg-gold-soft px-3 py-1 label-xs text-foreground backdrop-blur-sm">
+            <p className="mt-3 inline-flex w-fit rounded-pill border border-gold bg-gold-soft px-3 py-1 caption text-foreground backdrop-blur-sm">
               {environmentLabel === "Escritório" ? "Modo escritório" : "Modo dev"}
             </p>
           </div>
@@ -44,10 +44,10 @@ export function DashboardHero({
         <div className="grid gap-4 rounded-lg border border-border-strong bg-surface-emphasis p-5 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="label-xs text-muted-foreground">
+              <p className="caption text-muted-foreground">
                 Leitura oficial
               </p>
-              <p className="mt-2 text-xl font-semibold tracking-[-0.03em]">
+              <p className="mt-2 subtitle">
                 {loading || !scoreboard
                   ? "Carregando o tribunal da sinuca..."
                   : getLeadLabel(scoreboard)}
@@ -64,7 +64,7 @@ export function DashboardHero({
             <StatTile
               label="Total"
               value={
-                <strong className="block text-4xl font-black tracking-[-0.05em]">
+                <strong className="block title">
                   {scoreboard?.totalMatches ?? 0}
                 </strong>
               }
@@ -75,7 +75,7 @@ export function DashboardHero({
             <StatTile
               label="Streak"
               value={
-                <strong className="block text-4xl font-black tracking-[-0.05em]">
+                <strong className="block title">
                   {scoreboard?.currentStreak ? `${scoreboard.currentStreak.count}x` : "0x"}
                 </strong>
               }

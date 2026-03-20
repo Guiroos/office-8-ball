@@ -30,7 +30,7 @@ export function StatTile({
     >
       <p
         className={cn(
-          "label-xs",
+          "caption",
           tone === "inverse" ? "text-surface-strong-foreground-muted" : "text-muted-foreground",
         )}
       >

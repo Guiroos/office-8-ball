@@ -4,15 +4,6 @@
 :root {
   color-scheme: light;
 
-  /* Font sizes */
-  --text-label-sm: var(--fz-label-sm);
-  --text-label: var(--fz-label);
-  --text-title: var(--fz-title);
-  --text-display-sm: var(--fz-display-sm);
-  --text-display-md: var(--fz-display-md);
-  --text-display-lg: var(--fz-display-lg);
-  --text-score: var(--fz-score);
-
   /* Backgrounds */
   --background: var(--neutral-200);
   --background-subtle: var(--background-subtle-raw);
@@ -120,7 +111,8 @@
 }
 
 @theme {
-  /* Radius — generates: rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-pill */
+  /* Radius — generates: rounded-xs, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-pill */
+  --radius-xs: 12px;
   --radius-sm: 18px;
   --radius-md: 20px;
   --radius-lg: 22px;
@@ -128,7 +120,8 @@
   --radius-2xl: 32px;
   --radius-pill: 999px;
 
-  /* Letter spacing — generates: tracking-label, tracking-label-wide */
+  /* Letter spacing — generates: tracking-label-sm, tracking-label, tracking-label-wide */
+  --tracking-label-sm: 0.12em;
   --tracking-label: 0.22em;
   --tracking-label-wide: 0.28em;
 
@@ -138,92 +131,142 @@
 }
 
 @theme inline {
+  /* Backgrounds */
   --color-background: var(--background);
   --color-background-subtle: var(--background-subtle);
+
+  /* Foregrounds */
   --color-foreground: var(--foreground);
   --color-foreground-soft: var(--foreground-soft);
   --color-foreground-inverse: var(--foreground-inverse);
   --color-muted-foreground: var(--muted-foreground);
+
+  /* Surfaces */
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
   --color-surface-emphasis: var(--surface-emphasis);
   --color-surface-strong: var(--surface-strong);
   --color-surface-strong-foreground: var(--surface-strong-foreground);
+  --color-surface-strong-foreground-muted: var(--surface-strong-foreground-muted);
   --color-surface-success: var(--surface-success);
   --color-surface-danger: var(--surface-danger);
+  --color-surface-brand: var(--surface-brand);
+
+  /* Borders & Ring */
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+  --color-border-inverse: var(--border-inverse);
+  --color-ring: var(--ring);
+
+  /* Accent & Gold */
   --color-danger: var(--danger);
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
+
+  /* Teams */
   --color-team-alpha: var(--team-alpha);
   --color-team-alpha-soft: var(--team-alpha-soft);
   --color-team-beta: var(--team-beta);
   --color-team-beta-soft: var(--team-beta-soft);
-  /* shadow → generates: shadow-sm, shadow-md, shadow-lg, shadow-brand */
+
+  /* Shadows — generates: shadow-sm, shadow-md, shadow-lg, shadow-brand */
   --shadow-sm: var(--shadow-sm-value);
   --shadow-md: var(--shadow-md-value);
   --shadow-lg: var(--shadow-lg-value);
   --shadow-brand: var(--shadow-brand-value);
-  --color-surface-strong-foreground-muted: var(--surface-strong-foreground-muted);
+
+  /* App shell / Sidebar */
+  --color-sidebar: var(--app-shell-sidebar);
+  --color-sidebar-border: var(--app-shell-sidebar-border);
   --color-sidebar-foreground: var(--app-shell-sidebar-foreground);
   --color-sidebar-foreground-muted: var(--app-shell-sidebar-foreground-muted);
   --color-sidebar-foreground-subtle: var(--app-shell-sidebar-foreground-subtle);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
+  --color-sidebar-hover: var(--app-shell-sidebar-hover);
+  --color-sidebar-active: var(--app-shell-sidebar-active);
+  --color-sidebar-active-strong: var(--app-shell-sidebar-active-strong);
+  --color-sidebar-accent: var(--app-shell-sidebar-accent);
+  --color-sidebar-menu: var(--app-shell-sidebar-menu);
+  --color-avatar-ring: var(--app-shell-avatar-ring);
+  --color-status: var(--app-shell-status);
+
+  /* shadcn aliases */
   --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
 }
 
-@utility label-xs {
-  font-size: var(--text-label-sm);
+/* Compound typography utilities — role-based scale */
+@utility display {
+  font-size: var(--fz-display);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+@utility headline {
+  font-size: var(--fz-headline);
+  font-weight: 900;
+  /* tracking intentionally omitted — callers add tracking modifier when needed */
+}
+
+@utility title {
+  font-size: var(--fz-title);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+@utility subtitle {
+  font-size: var(--fz-subtitle);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
+  letter-spacing: -0.03em;
+}
+
+@utility body {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility body-sm {
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 @utility label {
-  font-size: var(--text-label);
+  font-size: var(--fz-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-label);
 }
 
+@utility label-sm {
+  font-size: var(--fz-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label-sm);
+}
+
 @utility label-wide {
-  font-size: var(--text-label);
+  font-size: var(--fz-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-label-wide);
 }
 
-@utility display-sm {
-  font-size: var(--text-display-sm);
-  font-weight: 900;
-}
-
-@utility display-md {
-  font-size: var(--text-display-md);
-  font-weight: 900;
-}
-
-@utility display-lg {
-  font-size: var(--text-display-lg);
-  font-weight: 900;
-}
-
-@utility score {
-  font-size: var(--text-score);
-  font-weight: 900;
-  letter-spacing: -0.05em;
+@utility caption {
+  font-size: var(--fz-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label-sm);
 }
 
 * {
