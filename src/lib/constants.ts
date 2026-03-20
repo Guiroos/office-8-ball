@@ -4,8 +4,8 @@ export const TEAMS = [
     name: "frontend",
     displayName: "Frontend",
     roster: "Gui + Jean",
-    accent: "var(--frontend)",
-    accentSoft: "var(--frontend-soft)",
+    accent: "var(--team-alpha)",
+    accentSoft: "var(--team-alpha-soft)",
     slogan: "Empurra feature e bola no mesmo sprint.",
   },
   {
@@ -13,8 +13,8 @@ export const TEAMS = [
     name: "backend",
     displayName: "Backend",
     roster: "Adair + Richard",
-    accent: "var(--backend)",
-    accentSoft: "var(--backend-soft)",
+    accent: "var(--team-beta)",
+    accentSoft: "var(--team-beta-soft)",
     slogan: "Consistentes ate quando o deploy cai.",
   },
 ] as const;
