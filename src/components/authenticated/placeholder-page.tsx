@@ -42,7 +42,7 @@ export function PlaceholderPage({
         <CardContent className="px-6 pb-6 sm:px-8 sm:pb-8">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-pill bg-frontend px-5 py-3 text-sm font-semibold text-foreground-inverse shadow-sm transition hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex items-center gap-2 rounded-pill bg-primary px-5 py-3 text-sm font-semibold text-foreground-inverse shadow-sm transition hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Voltar para dashboard
             <ArrowRight className="size-4" />
