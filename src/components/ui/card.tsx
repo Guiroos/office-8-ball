@@ -39,7 +39,7 @@ export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDiv
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h2
-      className={cn("text-title leading-none font-black tracking-[-0.04em]", className)}
+      className={cn("title leading-none", className)}
       {...props}
     />
   );
