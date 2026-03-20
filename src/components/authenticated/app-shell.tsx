@@ -129,7 +129,7 @@ function UserFooter({
           <p className="text-sidebar-foreground truncate text-sm font-semibold">
             {user.username}
           </p>
-          <p className="truncate text-[11px] font-semibold uppercase tracking-label-sm text-sidebar-accent">
+          <p className="truncate caption text-sidebar-accent">
             {membershipLabel}
           </p>
         </div>
