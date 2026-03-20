@@ -15,8 +15,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className={cn(
           "h-13 w-full rounded-md border bg-surface-emphasis px-4 text-foreground outline-none transition disabled:cursor-not-allowed disabled:bg-surface-muted",
           invalid
-            ? "border-danger focus:border-danger focus:ring-2 focus:ring-backend-soft"
-            : "border-border focus:border-frontend focus:ring-2 focus:ring-frontend-soft",
+            ? "border-danger focus:border-danger focus:ring-2 focus:ring-team-beta-soft"
+            : "border-border focus:border-primary focus:ring-2 focus:ring-team-alpha-soft",
           className,
         )}
         {...props}
