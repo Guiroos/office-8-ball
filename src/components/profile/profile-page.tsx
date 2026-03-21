@@ -158,7 +158,7 @@ export function ProfilePage() {
         <div className="flex flex-col gap-6 lg:col-span-1">
           <Card>
             <CardContent className="space-y-4 p-6">
-              <SectionHeader eyebrow="Times" title="Equipes" hideTitle />
+              <SectionHeader eyebrow="Meus Times" title="Equipes" hideTitle />
               <IconCallout
                 icon={<Trophy className="size-5" />}
                 title="Nenhum time ainda"
@@ -207,6 +207,9 @@ export function ProfilePage() {
                 title="Partidas Recentes"
                 hideTitle
               />
+              <p className="text-xs text-muted-foreground">
+                Últimas partidas registradas no sistema
+              </p>
               {matchesError ? (
                 <IconCallout
                   icon={<Trophy className="size-5" />}
