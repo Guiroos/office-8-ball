@@ -172,8 +172,6 @@ export function Dashboard() {
     matches,
     loading,
     submittingTeamId,
-    flashMessage,
-    status,
     registerWin,
   } = useDashboardData();
   const [notesByTeam, setNotesByTeam] = useState<Record<(typeof TEAMS)[number]["id"], string>>({
@@ -271,7 +269,7 @@ export function Dashboard() {
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
         <RecentMatchesCard matches={matches} />
-        <DashboardSidebar flashMessage={flashMessage} status={status} />
+        <DashboardSidebar />
       </section>
     </main>
   );

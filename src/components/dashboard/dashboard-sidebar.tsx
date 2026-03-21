@@ -1,46 +1,12 @@
-import { Flame, Swords, TimerReset, Trophy } from "lucide-react";
+import { Flame, Swords, TimerReset } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 
-import type { DashboardStatus } from "./dashboard-utils";
-
-export function DashboardSidebar({
-  flashMessage,
-  status,
-}: {
-  flashMessage: string | null;
-  status: DashboardStatus;
-}) {
+export function DashboardSidebar() {
   return (
     <div className="grid gap-6">
-      <Card className="border-border-strong bg-surface/94 backdrop-blur">
-        <CardContent className="space-y-5 p-6">
-          <SectionHeader eyebrow="Clima da mesa" title="Leitura oficial" />
-
-          <div className="grid gap-4">
-            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
-              <IconCallout
-                icon={<Trophy className="size-4" />}
-                title="Mensagem"
-                description={flashMessage ?? "Registre a próxima vitória para liberar a zoeira."}
-                className="border-none bg-transparent p-4"
-              />
-            </div>
-
-            <div className="rounded-lg border border-border-strong bg-surface-emphasis p-1">
-              <IconCallout
-                icon={<status.icon className="size-4" />}
-                title={status.title}
-                description={status.description}
-                className="border-none bg-transparent p-4"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       <Card variant="brand">
         <CardContent className="space-y-4 p-6">
           <SectionHeader eyebrow="Painel rápido" title="Painel rápido" inverse hideTitle className="gap-0" />
