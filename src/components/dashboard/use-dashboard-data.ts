@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 
 import type {
@@ -8,8 +9,6 @@ import type {
   ScoreboardResponse,
   TeamId,
 } from "@/lib/types";
-
-import { getStatusMessage } from "./dashboard-utils";
 
 type DashboardState = {
   scoreboard: ScoreboardData | null;
@@ -47,17 +46,14 @@ export function useDashboardData() {
   });
   const [loading, setLoading] = useState(true);
   const [submittingTeamId, setSubmittingTeamId] = useState<TeamId | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [flashMessage, setFlashMessage] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
       try {
         const dashboardData = await fetchDashboardData();
-        setError(null);
         setState(dashboardData);
       } catch (loadError) {
-        setError(
+        toast.error(
           loadError instanceof Error
             ? loadError.message
             : "Não foi possível carregar o placar.",
@@ -70,15 +66,11 @@ export function useDashboardData() {
 
   async function registerWin({ teamId, note }: RegisterWinInput) {
     setSubmittingTeamId(teamId);
-    setError(null);
-    setFlashMessage(null);
 
-    try {
+    const execute = async () => {
       const response = await fetch("/api/matches", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ winnerTeamId: teamId, note }),
       });
 
@@ -90,16 +82,26 @@ export function useDashboardData() {
       }
 
       const payload = (await response.json()) as CreateMatchResponse;
-      setFlashMessage(payload.message);
       const dashboardData = await fetchDashboardData();
       setState(dashboardData);
+      return payload.message;
+    };
+
+    // execute() cria a promise uma vez. toast.promise cuida do feedback visual;
+    // o await abaixo dirige a atualização de estado e o valor de retorno.
+    const promise = execute();
+
+    toast.promise(promise, {
+      loading: "Registrando partida...",
+      success: (msg) => msg,
+      error: (err) =>
+        err instanceof Error ? err.message : "Não foi possível salvar a partida.",
+    });
+
+    try {
+      await promise;
       return true;
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "Não foi possível salvar a partida.",
-      );
+    } catch {
       return false;
     } finally {
       setSubmittingTeamId(null);
@@ -111,8 +113,6 @@ export function useDashboardData() {
     matches: state.matches,
     loading,
     submittingTeamId,
-    flashMessage,
-    status: getStatusMessage(error),
     registerWin,
   };
 }

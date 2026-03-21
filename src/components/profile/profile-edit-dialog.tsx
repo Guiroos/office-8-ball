@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -61,17 +62,18 @@ export function ProfileEditDialog({
 
       if (!res.ok) {
         if (res.status === 503) {
-          setError("Serviço indisponível. Tente novamente mais tarde.");
+          toast.error("Serviço indisponível. Tente novamente mais tarde.");
         } else {
           const body = (await res.json().catch(() => ({}))) as {
             error?: string;
           };
-          setError(body.error ?? "Erro ao salvar. Tente novamente.");
+          toast.error(body.error ?? "Erro ao salvar. Tente novamente.");
         }
         return;
       }
 
       const updated = (await res.json()) as ProfileResponse;
+      toast.success("Perfil atualizado.");
       onSave(updated);
       onOpenChange(false);
     } finally {

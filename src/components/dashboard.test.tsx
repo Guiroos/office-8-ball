@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { toast } from "sonner";
 
 import { Dashboard } from "@/components/dashboard";
 import type {
@@ -8,6 +9,14 @@ import type {
   MatchesResponse,
   ScoreboardResponse,
 } from "@/lib/types";
+
+vi.mock("sonner", () => ({
+  toast: {
+    promise: vi.fn(),
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
 
 const initialScoreboard: ScoreboardResponse = {
   scoreboard: {
@@ -88,6 +97,7 @@ function jsonResponse(body: unknown, ok = true, status = 200) {
 describe("Dashboard", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it("loads and renders the scoreboard and empty state", async () => {
@@ -127,10 +137,9 @@ describe("Dashboard", () => {
 
     render(<Dashboard />);
 
-    expect(
-      await screen.findByText("Não foi possível carregar o placar."),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Falha ao sincronizar a mesa.")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Não foi possível carregar o placar.");
+    });
   });
 
   it("posts a win, reloads data and displays the returned message", async () => {
@@ -191,7 +200,14 @@ describe("Dashboard", () => {
     await userEvent.click(screen.getByRole("button", { name: "Vitória Frontend" }));
 
     await waitFor(() => {
-      expect(screen.getByText(createMatchResponse.message)).toBeInTheDocument();
+      expect(toast.promise).toHaveBeenCalledWith(
+        expect.any(Promise),
+        expect.objectContaining({
+          loading: "Registrando partida...",
+          success: expect.any(Function),
+          error: expect.any(Function),
+        }),
+      );
     });
 
     expect(frontendCard).toHaveAttribute("data-leader", "true");
@@ -250,9 +266,15 @@ describe("Dashboard", () => {
     await userEvent.type(backendNote, "quase uma humilhação");
     await userEvent.click(screen.getByRole("button", { name: "Vitória Backend" }));
 
-    expect(
-      await screen.findByText("Não foi possível salvar a partida."),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(toast.promise).toHaveBeenCalledWith(
+        expect.any(Promise),
+        expect.objectContaining({
+          loading: "Registrando partida...",
+          error: expect.any(Function),
+        }),
+      );
+    });
     expect(backendNote).toHaveValue("quase uma humilhação");
   });
 

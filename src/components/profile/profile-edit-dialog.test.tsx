@@ -1,7 +1,16 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { toast } from "sonner";
 
 import { ProfileEditDialog } from "@/components/profile/profile-edit-dialog";
+
+vi.mock("sonner", () => ({
+  toast: {
+    promise: vi.fn(),
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -65,6 +74,7 @@ describe("ProfileEditDialog", () => {
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(updatedProfile);
       expect(onOpenChange).toHaveBeenCalledWith(false);
+      expect(toast.success).toHaveBeenCalledWith("Perfil atualizado.");
     });
   });
 
@@ -75,9 +85,26 @@ describe("ProfileEditDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/serviço indisponível/i),
-      ).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalledWith(
+        "Serviço indisponível. Tente novamente mais tarde.",
+      );
     });
+    expect(screen.queryByText(/serviço indisponível/i)).not.toBeInTheDocument();
+  });
+
+  it("shows generic API error message for non-503 failures", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({ error: "Erro customizado do servidor." }),
+    });
+
+    render(<ProfileEditDialog {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Erro customizado do servidor.");
+    });
+    expect(screen.queryByText(/erro customizado/i)).not.toBeInTheDocument();
   });
 });
