@@ -55,7 +55,7 @@ Adotar **Sonner** como infraestrutura global de toast para todas as rotas autent
 - Remover `flashMessage` e `status` do objeto retornado pelo hook; `getStatusMessage` deixa de ser chamado
 
 ### `src/components/dashboard/dashboard-utils.tsx`
-- Remover a função `getStatusMessage` e o tipo `DashboardStatus` — tornam-se código morto após a migração. Manter apenas `getLeaderName` e `getEnvironmentLabel` que permanecem em uso
+- Remover a função `getStatusMessage` e o tipo `DashboardStatus` — tornam-se código morto após a migração. Manter `formatMatchDate`, `getLeadLabel`, `getLeaderName` e `getEnvironmentLabel` — todos têm consumidores em outros arquivos
 
 ### `src/components/dashboard/index.tsx`
 - Remover `flashMessage` e `status` do destructuring de `useDashboardData`
