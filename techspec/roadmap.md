@@ -46,15 +46,7 @@ Prioridade: media
 - Avaliar `SonarQube Cloud` para code smells e quality gate de maintainability
 - Manter contratos de API e fluxo da UI sincronizados em qualquer evolucao
 
-### 4. Snackbars / Toast de feedback
-
-Prioridade: media
-
-- Adicionar feedback visual para acoes do usuario: registrar partida, salvar perfil, erros de API
-- Instalar cedo pois e infraestrutura de UX usada por todos os fluxos futuros
-- shadcn/ui disponibiliza o `Sonner` como componente de toast pronto para uso
-
-### 5. Exclusao ou desfazer de partida
+### 4. Exclusao ou desfazer de partida
 
 Prioridade: media
 
@@ -63,7 +55,7 @@ Prioridade: media
 - Nao abrir CRUD completo de partidas — apenas reverter o ultimo registro do usuario autenticado
 - Requer nova rota de API e verificacao de ownership da partida no backend
 
-### 6. Evolucao do schema de User
+### 5. Evolucao do schema de User
 
 Prioridade: media
 
@@ -74,16 +66,16 @@ Prioridade: media
 - O `/profile` ja existe mas edita apenas `displayName`; com mais campos a pagina ganha substancia real
 - Qualquer adicao de campo requer migracao Prisma + atualizacao do `ProfileResponse` e da API
 
-### 7. Adocao de times (user <-> team)
+### 6. Adocao de times (user <-> team)
 
-Prioridade: media (depende do item 6)
+Prioridade: media (depende do item 5)
 
 - Permitir que cada usuario escolha seu time (`frontend` ou `backend`) no perfil ou no cadastro
 - Abre caminho para o `/times` sair de placeholder e mostrar membros por time
 - Futuramente permite filtrar partidas ou estatisticas por membro
 - Os ids de time continuam fixos em `constants.ts`; nao generalizar para multi-team
 
-### 8. Troca de senha
+### 7. Troca de senha
 
 Prioridade: baixa
 
@@ -91,7 +83,7 @@ Prioridade: baixa
 - Nao requer mudanca de schema — apenas nova rota de API com validacao de senha atual e hash da nova
 - Pode ser implementado de forma independente antes do `/settings` estar totalmente funcional
 
-### 9. Paginacao no historico de partidas
+### 8. Paginacao no historico de partidas
 
 Prioridade: baixa
 
@@ -99,22 +91,22 @@ Prioridade: baixa
 - Introducir paginacao ou limite com "ver mais" no `RecentMatchesCard` seria preventivo
 - O calculo do placar deve continuar derivado de todas as partidas; apenas a exibicao e paginada
 
-### 10. Pagina /times funcional
+### 9. Pagina /times funcional
 
-Prioridade: futura (depende do item 7)
+Prioridade: futura (depende do item 6)
 
 - Substituir o placeholder atual por view real com membros de cada time e estatisticas
 - So iniciar apos adocao de times estar implementada e estavel
 
-### 11. Paginas /ranking e /settings funcionais
+### 10. Paginas /ranking e /settings funcionais
 
 Prioridade: futura
 
 - `/ranking`: historico de partidas com possibilidade de filtros e evolucao do placar ao longo do tempo
-- `/settings`: preferencias de usuario (tema, notificacoes); troca de senha pode vir antes via item 8
+- `/settings`: preferencias de usuario (tema, notificacoes); troca de senha pode vir antes via item 7
 - Ambas sao placeholders atualmente; podem evoluir de forma independente
 
-### 12. Expansao de dominio
+### 11. Expansao de dominio
 
 Prioridade: futura
 
