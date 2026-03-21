@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import {
   Calendar,
   Check,
@@ -74,7 +73,7 @@ export function ProfilePage() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => flushSync(() => setCopied(false)), 2000);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
   }, []);
 
   const handleSave = useCallback((updated: ProfileResponse) => {
@@ -85,8 +84,8 @@ export function ProfilePage() {
     return (
       <IconCallout
         icon={<Trophy className="size-5" />}
-        title="Perfil indisponível"
-        description="Sem conexão ao banco de dados. Tente novamente mais tarde."
+        title="Perfil indisponível sem conexão ao banco de dados."
+        description="Tente novamente mais tarde."
       />
     );
   }

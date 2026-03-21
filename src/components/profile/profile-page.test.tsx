@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProfilePage } from "@/components/profile/profile-page";
@@ -108,7 +108,7 @@ describe("ProfilePage", () => {
     fireEvent.click(screen.getByText("Compartilhar"));
     expect(screen.getByText("Copiado!")).toBeInTheDocument();
 
-    vi.advanceTimersByTime(2001);
+    act(() => { vi.advanceTimersByTime(2001); });
     expect(screen.getByText("Compartilhar")).toBeInTheDocument();
 
     vi.useRealTimers();
