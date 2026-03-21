@@ -217,7 +217,7 @@ export function Dashboard() {
         environmentLabel={getEnvironmentLabel()}
       />
 
-      <Card className="text-surface-strong-foreground overflow-hidden border-border-inverse bg-surface-brand shadow-brand">
+      <Card className="text-surface-strong-foreground overflow-hidden border-border-inverse bg-surface-brand shadow-lg shadow-gold/35">
         <CardContent className="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
           <SectionHeader
             eyebrow="Placar atual"

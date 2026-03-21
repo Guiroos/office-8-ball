@@ -262,7 +262,7 @@ export function LoginScreen({
       <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 lg:h-full lg:min-h-0 lg:px-8 lg:py-5">
         <section className="flex min-h-0 flex-1 lg:overflow-hidden">
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
-            <aside className="relative hidden min-h-0 overflow-hidden rounded-2xl border border-border-inverse bg-surface-brand shadow-brand lg:flex">
+            <aside className="relative hidden min-h-0 overflow-hidden rounded-2xl border border-border-inverse bg-surface-brand shadow-lg shadow-gold/35 lg:flex">
               <Image
                 src={LoginPageImage}
                 alt="Mesa de sinuca estilizada representando a rivalidade entre frontend e backend."
@@ -403,7 +403,7 @@ export function LoginScreen({
                     <Button
                       type="submit"
                       size="lg"
-                      className="h-14 w-full rounded-md text-base shadow-brand"
+                      className="h-14 w-full rounded-md text-base"
                       disabled={isSubmitDisabled}
                       data-testid="login-submit"
                     >

@@ -12,7 +12,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-gold-gradient text-foreground shadow-sm shadow-gold/35 font-extrabold uppercase tracking-label hover:-translate-y-0.5 hover:shadow-md hover:shadow-gold/35 active:translate-y-px active:scale-98 active:shadow-sm active:shadow-gold/35 focus-visible:ring-offset-background",
+          "bg-gold-gradient text-foreground shadow-sm shadow-gold/35 font-extrabold uppercase tracking-label hover:-translate-y-0.5 hover:shadow-md hover:shadow-gold/35 active:translate-y-px active:scale-98 active:shadow-xs active:shadow-gold/35 focus-visible:ring-offset-background",
         ghost:
           "border border-border bg-surface-muted text-foreground hover:-translate-y-0.5 hover:bg-surface-emphasis active:translate-y-px active:scale-98 focus-visible:ring-offset-background",
         "team-alpha":

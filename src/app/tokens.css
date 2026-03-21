@@ -76,6 +76,9 @@
   --fz-headline: clamp(3.5rem, 10vw, 7.5rem);
   --fz-display: clamp(4rem, 12vw, 6rem);
 
+  /* Transform scale */
+  --scale-98-value: 0.98;
+
   /* Shadow scale — two-layer (key light + ambient), color-composable via --tw-shadow-color */
   --shadow-xs-value:
     0 1px 3px var(--tw-shadow-color, rgba(0, 0, 0, 0.08)),

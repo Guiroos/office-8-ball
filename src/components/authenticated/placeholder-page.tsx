@@ -18,7 +18,7 @@ export function PlaceholderPage({
 }: PlaceholderPageProps) {
   return (
     <main className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-      <section className="relative overflow-hidden rounded-2xl border border-border-inverse bg-[image:var(--brand-gradient)] px-6 py-8 text-surface-strong-foreground shadow-brand sm:px-8 sm:py-10">
+      <section className="relative overflow-hidden rounded-2xl border border-border-inverse bg-[image:var(--brand-gradient)] px-6 py-8 text-surface-strong-foreground shadow-lg shadow-gold/35 sm:px-8 sm:py-10">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_30%)]"

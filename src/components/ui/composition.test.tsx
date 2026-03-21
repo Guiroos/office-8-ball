@@ -180,7 +180,8 @@ describe("composition ui", () => {
 
     let panel = screen.getByTestId("panel");
     expect(panel).toHaveClass("bg-surface-brand");
-    expect(panel).toHaveClass("shadow-brand");
+    expect(panel).toHaveClass("shadow-lg");
+    expect(panel).toHaveClass("shadow-gold/35");
     expect(panel).toHaveClass("p-6");
 
     rerender(

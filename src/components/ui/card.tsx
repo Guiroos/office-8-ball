@@ -10,7 +10,7 @@ const cardVariants = cva("rounded-xl border", {
       strong:
         "text-surface-strong-foreground border-border-inverse bg-surface-strong",
       brand:
-        "text-surface-strong-foreground border-border-inverse bg-surface-brand shadow-brand backdrop-blur-xl",
+        "text-surface-strong-foreground border-border-inverse bg-surface-brand shadow-lg shadow-gold/35 backdrop-blur-xl",
     },
     padded: {
       true: "p-6",

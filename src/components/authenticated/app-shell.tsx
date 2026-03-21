@@ -80,7 +80,7 @@ function UserAvatar({ user }: { user: SessionUser }) {
 function SidebarBrand() {
   return (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-brand-gradient shadow-md">
+      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-brand-gradient shadow-sm">
         <Globe className="size-5" />
       </div>
 
