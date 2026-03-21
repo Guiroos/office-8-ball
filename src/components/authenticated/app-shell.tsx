@@ -69,7 +69,7 @@ function UserAvatar({ user }: { user: SessionUser }) {
 
   return (
     <div className="relative">
-      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-sidebar-border bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.04))] text-sm font-bold uppercase tracking-label-sm">
+      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-sidebar-border bg-avatar-gradient text-sm font-bold uppercase tracking-label-sm">
         {initials || "OB"}
       </div>
       <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-avatar-ring bg-status" />
@@ -80,7 +80,7 @@ function UserAvatar({ user }: { user: SessionUser }) {
 function SidebarBrand() {
   return (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-[image:var(--brand-gradient)] shadow-[0_10px_24px_rgba(0,0,0,0.24)]">
+      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-brand-gradient shadow-sm">
         <Globe className="size-5" />
       </div>
 
@@ -148,7 +148,7 @@ function UserFooter({
             className="fixed inset-0 z-10 cursor-default"
             onClick={onClose}
           />
-          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-3 shadow-[0_22px_50px_rgba(0,0,0,0.38)]">
+          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-3 shadow-xl">
             <UserMenu pathname={pathname} user={user} onClose={onClose} />
           </div>
         </>
@@ -213,7 +213,7 @@ function UserMenu({
             className={cn(
               "flex items-center gap-3 rounded-sm border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar-menu",
               link.active
-                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
+                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-sm"
                 : "border-transparent text-sidebar-foreground-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
             )}
           >
@@ -301,9 +301,9 @@ function SidebarNavigation({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-4 rounded-xs border px-4 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+              "flex items-center gap-4 rounded-xs border px-4 py-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
               isActive
-                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-[0_14px_28px_rgba(0,0,0,0.18)]"
+                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-sm"
                 : "border-transparent text-sidebar-foreground-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
             )}
             aria-current={isActive ? "page" : undefined}
@@ -330,7 +330,7 @@ export function AppShell({ user, children }: AppShellProps) {
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col bg-[image:var(--app-shell-content-gradient)]">
+        <div className="flex min-w-0 flex-1 flex-col bg-content-gradient">
           <header className="flex items-center justify-between border-b border-border bg-surface/92 px-4 py-3 backdrop-blur lg:hidden">
             <SidebarBrand />
 
@@ -357,7 +357,7 @@ export function AppShell({ user, children }: AppShellProps) {
             aria-label="Fechar navegacao"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
-          <div className="text-sidebar-foreground absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+          <div className="text-sidebar-foreground absolute inset-y-0 left-0 flex w-[88vw] max-w-[260px] flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <SidebarBrand />
               <Button

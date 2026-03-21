@@ -92,7 +92,7 @@ export function RouteStateScreen({
         </div>
 
         <div className="grid items-stretch gap-4 lg:grid-cols-[0.88fr_1.12fr]">
-          <section className="rounded-2xl border border-border-inverse bg-surface-brand p-6 text-surface-strong-foreground shadow-brand sm:p-8">
+          <section className="rounded-2xl border border-border-inverse bg-surface-brand p-6 text-surface-strong-foreground shadow-lg shadow-gold/35 sm:p-8">
             <div className="flex h-full flex-col justify-between gap-10">
               <div className="space-y-4">
                 <p className="label-wide text-surface-strong-foreground-muted">

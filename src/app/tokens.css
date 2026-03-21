@@ -76,11 +76,28 @@
   --fz-headline: clamp(3.5rem, 10vw, 7.5rem);
   --fz-display: clamp(4rem, 12vw, 6rem);
 
-  /* Shadow values */
-  --shadow-sm-value: 0 14px 30px rgba(13, 18, 14, 0.18);
-  --shadow-md-value: 0 20px 45px rgba(19, 74, 50, 0.22);
-  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12);
-  --shadow-brand-value: 0 20px 45px rgba(19, 74, 50, 0.28);
+  /* Transform scale */
+  --scale-98-value: 0.98;
+
+  /* Shadow scale — two-layer (key light + ambient), color-composable via --tw-shadow-color */
+  --shadow-xs-value:
+    0 1px 3px var(--tw-shadow-color, rgba(0, 0, 0, 0.08)),
+    0 1px 2px var(--tw-shadow-color, rgba(0, 0, 0, 0.05));
+  --shadow-sm-value:
+    0 3px 8px var(--tw-shadow-color, rgba(0, 0, 0, 0.10)),
+    0 2px 4px var(--tw-shadow-color, rgba(0, 0, 0, 0.06));
+  --shadow-md-value:
+    0 8px 20px var(--tw-shadow-color, rgba(0, 0, 0, 0.12)),
+    0 3px 8px  var(--tw-shadow-color, rgba(0, 0, 0, 0.08));
+  --shadow-lg-value:
+    0 16px 36px var(--tw-shadow-color, rgba(0, 0, 0, 0.14)),
+    0 6px 14px  var(--tw-shadow-color, rgba(0, 0, 0, 0.09));
+  --shadow-xl-value:
+    0 28px 56px var(--tw-shadow-color, rgba(0, 0, 0, 0.18)),
+    0 10px 20px var(--tw-shadow-color, rgba(0, 0, 0, 0.12));
+
+  /* App shell gradient literals */
+  --avatar-gradient-raw: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
 
   /* Surface literals */
   --surface-raw: rgba(255, 251, 245, 0.96);
@@ -142,12 +159,6 @@
 .dark {
   /* Note: --foreground-raw and similar vars are defined here (dark only) because
      globals.css :root uses neutral scale vars directly for light mode foregrounds. */
-
-  /* Shadow overrides */
-  --shadow-sm-value: 0 14px 30px rgba(0, 0, 0, 0.3);
-  --shadow-md-value: 0 20px 45px rgba(0, 0, 0, 0.24);
-  --shadow-lg-value: 0 24px 60px rgba(49, 37, 27, 0.12); /* same as light — intentional */
-  --shadow-brand-value: 0 20px 45px rgba(0, 0, 0, 0.28);
 
   /* Surface dark overrides */
   --surface-raw: rgba(10, 20, 16, 0.92);
