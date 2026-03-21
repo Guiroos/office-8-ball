@@ -63,3 +63,11 @@ export type ApiErrorResponse = {
   fieldErrors?: Partial<Record<"username" | "email" | "password", string>>;
   retryAfterSeconds?: number;
 };
+
+export type ProfileResponse = {
+  id: string;
+  username: string;
+  email: string;
+  displayName: string | null;
+  createdAt: string; // ISO date string
+};
