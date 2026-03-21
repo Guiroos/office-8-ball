@@ -346,7 +346,7 @@ export function AppShell({ user, children }: AppShellProps) {
             </Button>
           </header>
 
-          <div className="min-w-0 flex-1">{children}</div>
+          <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">{children}</div>
         </div>
       </div>
 
