@@ -19,6 +19,7 @@ import { type ComponentType, type ReactNode, useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/types";
 
@@ -380,6 +381,8 @@ export function AppShell({ user, children }: AppShellProps) {
           </div>
         </div>
       ) : null}
+
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
