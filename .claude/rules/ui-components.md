@@ -13,7 +13,7 @@ paths:
 
 ## CVA Variants
 
-- Use `cva()` at module scope for any component with visual variants; apply via variant props with semantic design tokens (`bg-frontend-soft`, `border-gold`).
+- Use `cva()` at module scope for any component with visual variants; apply via variant props with semantic design tokens (`bg-team-alpha-soft`, `border-gold`).
 - Combine with `cn()` from `@/lib/utils` for conditional class merging.
 - Components without variants do not need CVA.
 
@@ -24,7 +24,9 @@ When modifying tokens, CSS variables, or the theme system, read `techspec/theme-
 ## Styling Constraints
 
 - Use semantic design tokens — no arbitrary Tailwind values (`[#abc123]`, `[var(--some-token)]`). **Why:** Arbitrary values bypass the theme system and break dark/light mode consistency.
-- Use native token classes (`rounded-xl`, `shadow-brand`) over inline style attributes.
+- Use native token classes (`rounded-xl`, `shadow-sm shadow-gold/35`) over inline style attributes. Shadows compose size + color + opacity as separate classes (`shadow-sm shadow-gold/35`) — never create component-specific shadow tokens.
+- Shadow opacity calibration: `gold/35`, `team-alpha/30`, `team-beta/28`. Omitting the opacity modifier applies the color as solid, which is always wrong for shadows.
+- Shadow state mapping for interactive components: `shadow-sm` at rest → `shadow-md` on hover → `shadow-xs` on active/press.
 - Never use `style={{}}` for values that have a token equivalent.
 
 ## Imports

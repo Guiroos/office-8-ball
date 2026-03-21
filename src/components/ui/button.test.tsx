@@ -3,20 +3,20 @@ import { describe, expect, it } from "vitest"
 import { Button } from "@/components/ui/button"
 
 describe("Button variants", () => {
-  it("default variant applies gold gradient and brand shadow", () => {
+  it("default variant applies gold gradient and gold shadow", () => {
     render(<Button>Click</Button>)
     const btn = screen.getByRole("button", { name: "Click" })
-    expect(btn).toHaveClass("btn-gold-gradient")
+    expect(btn).toHaveClass("bg-gold-gradient")
     expect(btn).toHaveClass("text-foreground")
-    expect(btn).toHaveClass("shadow-brand")
+    expect(btn).toHaveClass("shadow-gold/35")
     expect(btn).toHaveClass("rounded-xl")
   })
 
   it("team-alpha variant applies blue gradient and bold weight", () => {
     render(<Button variant="team-alpha">Frontend</Button>)
     const btn = screen.getByRole("button", { name: "Frontend" })
-    expect(btn).toHaveClass("from-blue-700")
-    expect(btn).toHaveClass("to-blue-500")
+    expect(btn).toHaveClass("from-team-alpha")
+    expect(btn).toHaveClass("to-team-alpha-light")
     expect(btn).toHaveClass("text-foreground-inverse")
     expect(btn).toHaveClass("rounded-xl")
   })
@@ -24,8 +24,8 @@ describe("Button variants", () => {
   it("team-beta variant applies red gradient", () => {
     render(<Button variant="team-beta">Backend</Button>)
     const btn = screen.getByRole("button", { name: "Backend" })
-    expect(btn).toHaveClass("from-red-700")
-    expect(btn).toHaveClass("to-red-500")
+    expect(btn).toHaveClass("from-team-beta")
+    expect(btn).toHaveClass("to-team-beta-light")
     expect(btn).toHaveClass("text-foreground-inverse")
   })
 

@@ -44,6 +44,7 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 - `src/components/dashboard/` — main scoreboard feature
 - `src/components/authenticated/` — app shell and sidebar layout
 - `src/components/login/` — login/register screen
+- `src/components/theme/` — theme provider, toggle, and core system
 - `src/app/(authenticated)/` — protected route group
 - `techspec/` — architecture and operational docs
 - `prisma/` — schema, migrations, seed
@@ -60,10 +61,8 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 
 ## Architecture Decisions
 
-- Scoreboard is always derived from match history — never store aggregate counters.
-- Two teams only: `frontend` and `backend`, defined in `src/lib/constants.ts` and seeded into DB.
-- Dual-mode persistence: Prisma + Postgres when `DATABASE_URL` is set; in-memory fallback otherwise (local dev only, no auth).
-- Auth requires both `DATABASE_URL` and `NEXTAUTH_SECRET` — missing one is invalid configuration, not a degraded mode.
+See `.claude/rules/architecture.md`, `domain.md`, and `auth.md` for the full constraint set. Key conventions not covered there:
+
 - Import with `@/` alias — no relative `../` paths.
 - Named exports everywhere except Next.js page/layout/route files.
 - Dashboard state managed with React hooks only — no client-side state library.
@@ -106,20 +105,15 @@ When sources disagree: `src/` and `prisma/` > `README.md` and `techspec/` > `PRD
 ## Warnings
 
 - `getScoreboard()` must fetch ALL matches with no limit — adding a limit silently produces wrong `wins`, `leadBy`, and `currentStreak`.
-- `DATABASE_URL` set without `NEXTAUTH_SECRET` is invalid — never treat as a degraded fallback.
-- Do not generalize to multi-team, add admin concepts, or introduce stored aggregate counters.
 - Prisma client is auto-generated on `postinstall` — run `npm run prisma:generate` manually after schema changes.
 
 ## Context Engineering (Main Agent Discipline)
 
-The main agent is an **orchestrator**, not a worker.
+For non-trivial tasks (multi-file changes, broad exploration, builds/tests), the main agent is an **orchestrator** — delegate implementation and exploration to sub-agents.
 
-**Main agent role:** Coordinate files, spawn sub-agents, process
-summaries, communicate with the user.
+**Main agent role:** Coordinate files, spawn sub-agents, process summaries, communicate with the user.
 
-**Main agent NEVER:** Explores the codebase broadly, implements code
-changes, runs builds/tests, processes large command output.
-All of these get delegated to sub-agents.
+**Delegate to sub-agents:** Broad codebase exploration, multi-file implementation, running builds/tests, processing large command output. Trivial single-file changes can be done directly.
 
 ### Sub-agent Communication Protocol
 
