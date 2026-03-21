@@ -7,7 +7,6 @@ let currentUser: { id: string; username: string; email: string } | null = {
 };
 
 const mockFindUnique = vi.fn();
-const mockUpdate = vi.fn();
 
 vi.mock("@/lib/auth", async () => {
   const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
@@ -21,7 +20,6 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: mockFindUnique,
-      update: mockUpdate,
     },
   },
 }));
@@ -38,10 +36,10 @@ const MOCK_DB_USER = {
 
 describe("GET /api/profile", () => {
   beforeEach(() => {
+    vi.resetModules();
     delete process.env.DATABASE_URL;
     currentUser = { id: "user-1", username: "gui.dev", email: "gui@office8ball.dev" };
     mockFindUnique.mockResolvedValue(MOCK_DB_USER);
-    vi.resetModules();
   });
 
   it("returns 503 when DATABASE_URL is not set", async () => {
