@@ -21,21 +21,21 @@ describe("auth rate limit helpers", () => {
     deleteManyMock.mockReset();
   });
 
-  it("uses the first forwarded ip and normalizes the email", async () => {
+  it("uses the first forwarded ip", async () => {
     const authRateLimit = await import("@/lib/auth-rate-limit");
 
     expect(
       authRateLimit.buildAuthRateLimitKey({
         action: "login",
-        email: " GUI@office8ball.dev ",
+        username: "gui",
         headers: {
           "x-forwarded-for": "203.0.113.10, 10.0.0.1",
         },
       }),
     ).toEqual({
-      id: "login:gui@office8ball.dev:203.0.113.10",
+      id: "login:gui:203.0.113.10",
       action: "login",
-      email: "gui@office8ball.dev",
+      username: "gui",
       ip: "203.0.113.10",
     });
   });
@@ -46,10 +46,10 @@ describe("auth rate limit helpers", () => {
     expect(
       authRateLimit.buildAuthRateLimitKey({
         action: "register",
-        email: "gui@office8ball.dev",
+        username: "gui",
       }),
     ).toMatchObject({
-      id: "register:gui@office8ball.dev:unknown",
+      id: "register:gui:unknown",
       ip: "unknown",
     });
   });
@@ -64,9 +64,9 @@ describe("auth rate limit helpers", () => {
     await expect(
       authRateLimit.getAuthRateLimitStatus(
         {
-          id: "login:gui@office8ball.dev:unknown",
+          id: "login:gui:unknown",
           action: "login",
-          email: "gui@office8ball.dev",
+          username: "gui",
           ip: "unknown",
         },
         now,
@@ -85,9 +85,9 @@ describe("auth rate limit helpers", () => {
     await expect(
       authRateLimit.registerAuthFailure(
         {
-          id: "login:gui@office8ball.dev:unknown",
+          id: "login:gui:unknown",
           action: "login",
-          email: "gui@office8ball.dev",
+          username: "gui",
           ip: "unknown",
         },
         now,
@@ -98,7 +98,7 @@ describe("auth rate limit helpers", () => {
     });
 
     expect(upsertMock).toHaveBeenCalledWith({
-      where: { id: "login:gui@office8ball.dev:unknown" },
+      where: { id: "login:gui:unknown" },
       create: expect.objectContaining({
         failCount: 1,
         blockLevel: 0,
@@ -117,9 +117,9 @@ describe("auth rate limit helpers", () => {
   it("blocks after the fifth failure and escalates the first block to 15 minutes", async () => {
     const now = new Date("2026-03-15T12:00:00.000Z");
     findUniqueMock.mockResolvedValue({
-      id: "login:gui@office8ball.dev:unknown",
+      id: "login:gui:unknown",
       action: "login",
-      email: "gui@office8ball.dev",
+      username: "gui",
       ip: "unknown",
       failCount: 4,
       blockLevel: 0,
@@ -131,9 +131,9 @@ describe("auth rate limit helpers", () => {
     await expect(
       authRateLimit.registerAuthFailure(
         {
-          id: "login:gui@office8ball.dev:unknown",
+          id: "login:gui:unknown",
           action: "login",
-          email: "gui@office8ball.dev",
+          username: "gui",
           ip: "unknown",
         },
         now,
@@ -144,7 +144,7 @@ describe("auth rate limit helpers", () => {
     });
 
     expect(upsertMock).toHaveBeenCalledWith({
-      where: { id: "login:gui@office8ball.dev:unknown" },
+      where: { id: "login:gui:unknown" },
       create: expect.objectContaining({
         failCount: 0,
         blockLevel: 1,
@@ -162,14 +162,14 @@ describe("auth rate limit helpers", () => {
     const authRateLimit = await import("@/lib/auth-rate-limit");
 
     await authRateLimit.clearAuthRateLimit({
-      id: "register:gui@office8ball.dev:unknown",
+      id: "register:gui:unknown",
       action: "register",
-      email: "gui@office8ball.dev",
+      username: "gui",
       ip: "unknown",
     });
 
     expect(deleteManyMock).toHaveBeenCalledWith({
-      where: { id: "register:gui@office8ball.dev:unknown" },
+      where: { id: "register:gui:unknown" },
     });
   });
 });

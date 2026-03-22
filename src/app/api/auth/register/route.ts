@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const { email, username } = validation.data;
   const rateLimitKey = buildAuthRateLimitKey({
     action: "register",
-    email,
+    username,
     headers: request.headers,
   });
   const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);

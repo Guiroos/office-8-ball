@@ -116,7 +116,7 @@ export function getAuthOptions(): NextAuthOptions {
       CredentialsProvider({
         name: "Email e senha",
         credentials: {
-          email: { label: "Email", type: "email" },
+          username: { label: "Username", type: "text" },
           password: { label: "Senha", type: "password" },
         },
         async authorize(credentials, request) {
@@ -125,7 +125,7 @@ export function getAuthOptions(): NextAuthOptions {
           }
 
           const validation = validateLoginPayload({
-            email: String(credentials?.email ?? ""),
+            username: String(credentials?.username ?? ""),
             password: String(credentials?.password ?? ""),
           });
 
@@ -133,10 +133,10 @@ export function getAuthOptions(): NextAuthOptions {
             return null;
           }
 
-          const { email, password } = validation.data;
+          const { username, password } = validation.data;
           const rateLimitKey = buildAuthRateLimitKey({
             action: "login",
-            email,
+            username,
             headers: (request as AuthRequestLike | undefined)?.headers,
           });
           const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);
@@ -146,7 +146,7 @@ export function getAuthOptions(): NextAuthOptions {
           }
 
           const user = await prisma.user.findUnique({
-            where: { email },
+            where: { username },
           });
 
           if (!user) {

@@ -45,7 +45,7 @@ model User {
 model AuthRateLimit {
   id              String    @id @db.Text
   action          String    @db.Text
-  email           String    @db.Text
+  username        String    @db.Text
   ip              String    @db.Text
   failCount       Int       @default(0) @map("fail_count")
   blockLevel      Int       @default(0) @map("block_level")
@@ -54,6 +54,6 @@ model AuthRateLimit {
   lastFailedAt    DateTime? @map("last_failed_at") @db.Timestamptz(6)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  @@index([action, email])
+  @@index([action, username])
   @@map("auth_rate_limits")
 }
