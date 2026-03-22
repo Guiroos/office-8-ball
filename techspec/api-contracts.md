@@ -105,16 +105,18 @@ Payload:
 ```json
 {
   "username": "gui",
-  "email": "gui@example.com",
-  "password": "12345678"
+  "password": "12345678",
+  "email": "gui@example.com"
 }
 ```
 
 Regras:
 
 - validacao usa os schemas compartilhados de `src/lib/auth-validation.ts`
-- email e username devem ser unicos
-- quando auth esta habilitado, falhas repetidas usam rate limit por `email + ip`
+- `email` e opcional; quando ausente o usuario e criado sem email (`NULL` no banco)
+- dois usuarios sem email nao conflitam entre si (unicidade de `NULL` no Postgres)
+- quando `email` e fornecido, deve ser unico; username deve ser sempre unico
+- quando auth esta habilitado, falhas repetidas usam rate limit por `identifier + ip` (onde `identifier` e `email ?? username`)
 
 Sucesso:
 
@@ -130,6 +132,8 @@ Sucesso:
   }
 }
 ```
+
+O campo `email` no body pode ser `null` quando nao fornecido no cadastro.
 
 Erros:
 
@@ -147,6 +151,65 @@ Exemplo de bloqueio:
   "retryAfterSeconds": 900
 }
 ```
+
+## `GET /api/profile`
+
+Requer sessao autenticada. Retorna os dados do perfil do usuario logado.
+
+Sucesso:
+
+- retorna `200`
+- body:
+
+```json
+{
+  "id": "uuid",
+  "username": "gui",
+  "email": "gui@example.com",
+  "displayName": "Gui",
+  "avatarUrl": "https://example.com/avatar.png",
+  "bio": "Desenvolvedor full-stack.",
+  "createdAt": "2026-03-22T00:00:00.000Z"
+}
+```
+
+Os campos `email`, `displayName`, `avatarUrl` e `bio` podem ser `null`.
+
+Erros:
+
+- sem sessao valida retorna `401`
+
+## `PUT /api/profile`
+
+Requer sessao autenticada. Atualiza parcialmente o perfil do usuario logado (patch — apenas os campos enviados sao alterados).
+
+Payload (todos os campos sao opcionais):
+
+```json
+{
+  "displayName": "Gui",
+  "email": "gui@example.com",
+  "avatarUrl": "https://example.com/avatar.png",
+  "bio": "Desenvolvedor full-stack."
+}
+```
+
+Regras:
+
+- `displayName`: quando enviado, deve ter entre 2 e 50 caracteres
+- `email`: quando enviado, deve ser email valido; aceita `null` para remover
+- `avatarUrl`: quando enviado, deve ser URL valida (max 500 chars); aceita `null` para remover
+- `bio`: quando enviado, max 200 chars; aceita `null` para remover
+- campos ausentes no payload nao sao alterados
+
+Sucesso:
+
+- retorna `200` com o `ProfileResponse` completo atualizado
+
+Erros:
+
+- sem sessao valida retorna `401`
+- payload invalido retorna `400` com `fieldErrors`
 
 ## Compatibilidade com a UI atual
 

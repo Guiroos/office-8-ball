@@ -7,8 +7,8 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 ## Estado atual
 
 - Auth via `Auth.js` com credenciais
-- Login com `email + password`
-- Cadastro com `username + email + password`
+- Login com `username + password`
+- Cadastro com `username + password`; `email` e opcional
 - Usuarios persistidos via Prisma em `users`
 - Rate limit persistido via Prisma para `login` e `signup`
 - O fluxo autenticado real e `/dashboard`
@@ -21,7 +21,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Os schemas `zod` sao compartilhados entre frontend e backend
 - Erros locais aparecem por blur ou tentativa de submit
 - Erros remotos continuam aparecendo como field errors ou erro geral de submit
-- Login e cadastro usam protecao por `email + ip` com janela progressiva de bloqueio
+- Login e cadastro usam protecao por `identifier + ip` (onde `identifier` e o username no login e `email ?? username` no cadastro) com janela progressiva de bloqueio
 - `/` redireciona para `/dashboard` quando ha sessao e para `/login` quando nao ha
 - `middleware.ts` na raiz protege a area autenticada com `withAuth` quando `DATABASE_URL` esta configurado
 - `/dashboard` redireciona para `/login` quando nao existe usuario autenticado
@@ -52,9 +52,8 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 - Nao ha provedores sociais
 - Nao ha recuperacao de senha
 - Nao ha verificacao de email
-- Nao ha perfil de usuario alem do cadastro basico
-- Nao ha RBAC implementado
-- O rate limit usa `email + ip`, bloqueia apos `5` falhas em `10` minutos e dobra `15 -> 30 -> 60` minutos ate sucesso resetar o estado
+- Nao ha RBAC implementado alem da exigencia de sessao
+- O rate limit usa `identifier + ip`, bloqueia apos `5` falhas em `10` minutos e dobra `15 -> 30 -> 60` minutos ate sucesso resetar o estado
 
 ## Pontos tecnicos relevantes
 

@@ -22,8 +22,9 @@ Documentar como persistencia, schema, seed e fallback em memoria se relacionam n
 ### `prisma/schema.prisma`
 
 - define as tabelas `teams`, `matches`, `users` e `auth_rate_limits`
+- `users` inclui `email` (nullable, unico quando presente), `avatar_url` e `bio` alem dos campos base
 - preserva relacao entre `Match.winnerTeamId` e `Team.id`
-- persiste o estado agregado do rate limit de auth por chave `action + email + ip`
+- persiste o estado agregado do rate limit de auth por chave `action + identifier + ip` (coluna interna chamada `email` por compatibilidade historica)
 
 ### `prisma/seed.mjs`
 
