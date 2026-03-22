@@ -14,7 +14,12 @@ const updateProfileSchema = z.object({
   displayName: z
     .string()
     .min(2, "Mínimo 2 caracteres.")
-    .max(50, "Máximo 50 caracteres."),
+    .max(50, "Máximo 50 caracteres.")
+    .nullable()
+    .optional(),
+  email: z.string().email("Informe um email válido.").nullable().optional(),
+  avatarUrl: z.string().url("URL inválida.").nullable().optional(),
+  bio: z.string().max(200, "Máximo 200 caracteres.").nullable().optional(),
 });
 
 export async function GET() {
@@ -59,9 +64,24 @@ export async function PUT(request: Request) {
     );
   }
 
+  const { email, displayName, avatarUrl, bio } = result.data;
+
+  if (email) {
+    const existing = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (existing && existing.id !== user.id) {
+      return NextResponse.json<ApiErrorResponse>(
+        { error: "Este email já está em uso." },
+        { status: 409 },
+      );
+    }
+  }
+
   const updated = await prisma.user.update({
     where: { id: user.id },
-    data: { displayName: result.data.displayName },
+    data: { displayName, email, avatarUrl, bio },
   });
 
   return NextResponse.json<ProfileResponse>({
