@@ -21,7 +21,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 - Os schemas `zod` sao compartilhados entre frontend e backend
 - Erros locais aparecem por blur ou tentativa de submit
 - Erros remotos continuam aparecendo como field errors ou erro geral de submit
-- Login e cadastro usam protecao por `identifier + ip` (onde `identifier` e o username no login e `email ?? username` no cadastro) com janela progressiva de bloqueio
+- Login e cadastro usam protecao por `identifier + ip` (onde `identifier` e o `username` em ambos os casos) com janela progressiva de bloqueio
 - `/` redireciona para `/dashboard` quando ha sessao e para `/login` quando nao ha
 - `middleware.ts` na raiz protege a area autenticada com `withAuth` quando `DATABASE_URL` esta configurado
 - `/dashboard` redireciona para `/login` quando nao existe usuario autenticado

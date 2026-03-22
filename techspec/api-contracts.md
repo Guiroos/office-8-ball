@@ -105,18 +105,15 @@ Payload:
 ```json
 {
   "username": "gui",
-  "password": "12345678",
-  "email": "gui@example.com"
+  "password": "12345678"
 }
 ```
 
 Regras:
 
 - validacao usa os schemas compartilhados de `src/lib/auth-validation.ts`
-- `email` e opcional; quando ausente o usuario e criado sem email (`NULL` no banco)
-- dois usuarios sem email nao conflitam entre si (unicidade de `NULL` no Postgres)
-- quando `email` e fornecido, deve ser unico; username deve ser sempre unico
-- quando auth esta habilitado, falhas repetidas usam rate limit por `identifier + ip` (onde `identifier` e `email ?? username`)
+- `username` deve ser unico; `password` precisa ter no minimo 8 caracteres
+- quando auth esta habilitado, falhas repetidas usam rate limit por `username + ip`
 
 Sucesso:
 
@@ -127,18 +124,15 @@ Sucesso:
 {
   "user": {
     "id": "uuid",
-    "username": "gui",
-    "email": "gui@example.com"
+    "username": "gui"
   }
 }
 ```
 
-O campo `email` no body pode ser `null` quando nao fornecido no cadastro.
-
 Erros:
 
 - payload invalido retorna `400` com `fieldErrors` quando aplicavel
-- conflito de email ou username retorna `409`
+- conflito de username retorna `409`
 - bloqueio temporario por rate limit retorna `429` com `retryAfterSeconds`
 - auth indisponivel retorna `503` sem `DATABASE_URL`
 - auth configurado de forma invalida retorna `500` quando falta `NEXTAUTH_SECRET`
