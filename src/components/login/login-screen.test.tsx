@@ -50,13 +50,13 @@ describe("LoginScreen", () => {
 
     render(<LoginScreen authAvailable />);
 
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Username"), "gui.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Entrar" })[1]);
 
     await waitFor(() => {
       expect(signInMock).toHaveBeenCalledWith("credentials", {
-        email: "gui@office8ball.dev",
+        username: "gui.dev",
         password: "secret123",
         redirect: false,
         callbackUrl: "/dashboard",
@@ -72,16 +72,16 @@ describe("LoginScreen", () => {
 
     render(<LoginScreen authAvailable />);
 
-    const emailInput = screen.getByLabelText("E-mail corporativo");
+    const usernameInput = screen.getByLabelText("Username");
 
-    await user.click(emailInput);
+    await user.click(usernameInput);
     await user.tab();
 
-    expect(screen.getByText("Informe um email valido.")).toBeInTheDocument();
+    expect(screen.getByText("Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.")).toBeInTheDocument();
 
-    await user.type(emailInput, "gui@office8ball.dev");
+    await user.type(usernameInput, "gui.dev");
 
-    expect(screen.queryByText("Informe um email valido.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.")).not.toBeInTheDocument();
   });
 
   it("validates invalid login submit before calling signIn", async () => {
@@ -92,7 +92,7 @@ describe("LoginScreen", () => {
     expect(screen.getAllByRole("button", { name: "Entrar" })[1]).toBeEnabled();
     await user.click(screen.getAllByRole("button", { name: "Entrar" })[1]);
 
-    expect(screen.getByText("Informe um email valido.")).toBeInTheDocument();
+    expect(screen.getByText("Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.")).toBeInTheDocument();
     expect(screen.getByText("Informe a senha.")).toBeInTheDocument();
     expect(signInMock).not.toHaveBeenCalled();
   });
@@ -116,7 +116,6 @@ describe("LoginScreen", () => {
 
     await user.click(screen.getByRole("button", { name: "Criar conta" }));
     await user.type(screen.getByLabelText("Username"), "gui.dev");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
@@ -128,14 +127,13 @@ describe("LoginScreen", () => {
         },
         body: JSON.stringify({
           username: "gui.dev",
-          email: "gui@office8ball.dev",
           password: "secret123",
         }),
       });
     });
 
     expect(signInMock).toHaveBeenCalledWith("credentials", {
-      email: "gui@office8ball.dev",
+      username: "gui.dev",
       password: "secret123",
       redirect: false,
       callbackUrl: "/dashboard",
@@ -163,7 +161,6 @@ describe("LoginScreen", () => {
 
     await user.click(screen.getByRole("button", { name: "Criar conta" }));
     await user.type(screen.getByLabelText("Username"), "gui.dev");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
@@ -190,7 +187,6 @@ describe("LoginScreen", () => {
         "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Informe um email valido.")).toBeInTheDocument();
     expect(screen.getByText("A senha precisa ter pelo menos 8 caracteres.")).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
@@ -207,7 +203,6 @@ describe("LoginScreen", () => {
         error: "Ja existe uma conta com esses dados.",
         fieldErrors: {
           username: "Este username ja esta em uso.",
-          email: "Este email ja esta em uso.",
         },
       }),
     } as Response);
@@ -216,12 +211,10 @@ describe("LoginScreen", () => {
 
     await user.click(screen.getByRole("button", { name: "Criar conta" }));
     await user.type(screen.getByLabelText("Username"), "gui.dev");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
     expect(await screen.findByText("Este username ja esta em uso.")).toBeInTheDocument();
-    expect(screen.getByText("Este email ja esta em uso.")).toBeInTheDocument();
     expect(screen.getByText("Ja existe uma conta com esses dados.")).toBeInTheDocument();
     expect(signInMock).not.toHaveBeenCalled();
 
@@ -245,7 +238,6 @@ describe("LoginScreen", () => {
 
     await user.click(screen.getByRole("button", { name: "Criar conta" }));
     await user.type(screen.getByLabelText("Username"), "gui.dev");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
@@ -265,7 +257,7 @@ describe("LoginScreen", () => {
 
     render(<LoginScreen authAvailable />);
 
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
+    await user.type(screen.getByLabelText("Username"), "gui.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Entrar" })[1]);
 
@@ -299,7 +291,6 @@ describe("LoginScreen", () => {
     ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText("Username"), "gui.dev");
-    await user.type(screen.getByLabelText("E-mail corporativo"), "gui@office8ball.dev");
     await user.type(screen.getByLabelText("Senha"), "secret123");
     await user.click(screen.getAllByRole("button", { name: "Criar conta" })[1]);
 
@@ -311,7 +302,7 @@ describe("LoginScreen", () => {
       screen.queryByText("Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore."),
     ).not.toBeInTheDocument();
     expect(screen.queryByText("Este username ja esta em uso.")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Username")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("E-mail corporativo")).not.toBeInTheDocument();
 
     fetchMock.mockRestore();
   });

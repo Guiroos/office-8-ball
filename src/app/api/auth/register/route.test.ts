@@ -45,7 +45,6 @@ describe("/api/auth/register", () => {
     createMock.mockResolvedValue({
       id: "user-1",
       username: "gui.dev",
-      email: "gui@office8ball.dev",
     });
 
     const route = await import("@/app/api/auth/register/route");
@@ -56,7 +55,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "Gui.Dev",
-          email: "GUI@office8ball.dev",
           password: "secret123",
         }),
       }),
@@ -66,24 +64,22 @@ describe("/api/auth/register", () => {
     expect(hashMock).toHaveBeenCalledWith("secret123", 12);
     expect(findFirstMock).toHaveBeenCalledWith({
       where: {
-        OR: [{ email: "gui@office8ball.dev" }, { username: "gui.dev" }],
+        OR: [{ username: "gui.dev" }],
       },
       select: {
-        email: true,
         username: true,
       },
     });
     expect(createMock).toHaveBeenCalled();
     expect(deleteManyMock).toHaveBeenCalledWith({
       where: {
-        id: "register:gui@office8ball.dev:unknown",
+        id: "register:gui.dev:unknown",
       },
     });
     await expect(response.json()).resolves.toEqual({
       user: {
         id: "user-1",
         username: "gui.dev",
-        email: "gui@office8ball.dev",
       },
     });
   });
@@ -97,7 +93,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "x",
-          email: "invalido",
           password: "123",
         }),
       }),
@@ -109,7 +104,6 @@ describe("/api/auth/register", () => {
       fieldErrors: {
         username:
           "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
-        email: "Informe um email valido.",
         password: "A senha precisa ter pelo menos 8 caracteres.",
       },
     });
@@ -122,7 +116,6 @@ describe("/api/auth/register", () => {
     createMock.mockResolvedValue({
       id: "user-1",
       username: "gui.dev",
-      email: "gui@office8ball.dev",
     });
 
     const route = await import("@/app/api/auth/register/route");
@@ -133,7 +126,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: " Gui.Dev ",
-          email: " GUI@office8ball.dev ",
           password: "secret123",
         }),
       }),
@@ -142,10 +134,9 @@ describe("/api/auth/register", () => {
     expect(response.status).toBe(201);
     expect(findFirstMock).toHaveBeenCalledWith({
       where: {
-        OR: [{ email: "gui@office8ball.dev" }, { username: "gui.dev" }],
+        OR: [{ username: "gui.dev" }],
       },
       select: {
-        email: true,
         username: true,
       },
     });
@@ -155,7 +146,6 @@ describe("/api/auth/register", () => {
     findUniqueMock.mockResolvedValue(null);
     findFirstMock.mockResolvedValue({
       username: "gui.dev",
-      email: "gui@office8ball.dev",
     });
 
     const route = await import("@/app/api/auth/register/route");
@@ -166,7 +156,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "gui.dev",
-          email: "gui@office8ball.dev",
           password: "secret123",
         }),
       }),
@@ -174,14 +163,13 @@ describe("/api/auth/register", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: "Ja existe uma conta com esses dados.",
+      error: "Já existe uma conta com esses dados.",
       fieldErrors: {
-        username: "Este username ja esta em uso.",
-        email: "Este email ja esta em uso.",
+        username: "Este usuário já está em uso.",
       },
     });
     expect(upsertMock).toHaveBeenCalledWith({
-      where: { id: "register:gui@office8ball.dev:unknown" },
+      where: { id: "register:gui.dev:unknown" },
       create: expect.objectContaining({
         failCount: 1,
       }),
@@ -204,7 +192,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "gui.dev",
-          email: "gui@office8ball.dev",
           password: "secret123",
         }),
       }),
@@ -228,7 +215,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "gui.dev",
-          email: "gui@office8ball.dev",
           password: "secret123",
         }),
       }),
@@ -250,7 +236,6 @@ describe("/api/auth/register", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: "gui.dev",
-          email: "gui@office8ball.dev",
           password: "secret123",
         }),
       }),

@@ -15,14 +15,12 @@ describe("auth-validation", () => {
   it("normalizes register fields when the payload is valid", () => {
     const result = validateRegisterPayload({
       username: " Gui.Dev ",
-      email: " GUI@office8ball.dev ",
       password: "secret123",
     });
 
     expect(result).toEqual({
       data: {
         username: "gui.dev",
-        email: "gui@office8ball.dev",
         password: "secret123",
       },
       fieldErrors: undefined,
@@ -33,13 +31,11 @@ describe("auth-validation", () => {
     expect(
       getRegisterFieldErrors({
         username: "x",
-        email: "invalido",
         password: "123",
       }),
     ).toEqual({
       username:
         "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
-      email: "Informe um email valido.",
       password: "A senha precisa ter pelo menos 8 caracteres.",
     });
   });

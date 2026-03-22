@@ -15,10 +15,17 @@ vi.mock("sonner", () => ({
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+const defaultProfile = {
+  displayName: "Guilherme",
+  email: "gui@office8ball.dev",
+  avatarUrl: null,
+  bio: null,
+};
+
 const defaultProps = {
   open: true,
   onOpenChange: vi.fn(),
-  currentDisplayName: "Guilherme",
+  profile: defaultProfile,
   onSave: vi.fn(),
 };
 
@@ -33,13 +40,51 @@ describe("ProfileEditDialog", () => {
     expect(input).toHaveValue("Guilherme");
   });
 
+  it("renders the dialog with current email", () => {
+    render(<ProfileEditDialog {...defaultProps} />);
+    const input = screen.getByPlaceholderText("gui@office8ball.dev");
+    expect(input).toHaveValue("gui@office8ball.dev");
+  });
+
   it("shows validation error when displayName is too short", async () => {
-    render(<ProfileEditDialog {...defaultProps} currentDisplayName="" />);
+    render(
+      <ProfileEditDialog
+        {...defaultProps}
+        profile={{ ...defaultProfile, displayName: "" }}
+      />,
+    );
     const input = screen.getByPlaceholderText("Como quer ser chamado?");
     fireEvent.change(input, { target: { value: "x" } });
     fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
     await waitFor(() => {
       expect(screen.getByText(/mínimo 2 caracteres/i)).toBeInTheDocument();
+    });
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("blocks submission when email is invalid", async () => {
+    render(
+      <ProfileEditDialog
+        {...defaultProps}
+        profile={{ ...defaultProfile, email: "invalido" }}
+      />,
+    );
+    // Fire submit on the form directly to bypass jsdom HTML5 constraint validation
+    // so our Zod validation runs (type="email" would otherwise block the submit event)
+    fireEvent.submit(document.querySelector("form")!);
+    await waitFor(() => {
+      expect(screen.getByText(/informe um email/i)).toBeInTheDocument();
+    });
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("shows validation error when avatarUrl is invalid", async () => {
+    render(<ProfileEditDialog {...defaultProps} />);
+    const avatarInput = screen.getByPlaceholderText("https://gravatar.com/avatar/...");
+    fireEvent.change(avatarInput, { target: { value: "not-a-url" } });
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/url inválida/i)).toBeInTheDocument();
     });
     expect(mockFetch).not.toHaveBeenCalled();
   });
@@ -50,6 +95,8 @@ describe("ProfileEditDialog", () => {
       username: "gui.dev",
       email: "gui@office8ball.dev",
       displayName: "Novo Nome",
+      avatarUrl: null,
+      bio: null,
       createdAt: "2025-01-01T00:00:00.000Z",
     };
     mockFetch.mockResolvedValueOnce({
@@ -75,6 +122,46 @@ describe("ProfileEditDialog", () => {
       expect(onSave).toHaveBeenCalledWith(updatedProfile);
       expect(onOpenChange).toHaveBeenCalledWith(false);
       expect(toast.success).toHaveBeenCalledWith("Perfil atualizado.");
+    });
+  });
+
+  it("sends null for empty optional fields", async () => {
+    const updatedProfile = {
+      id: "user-1",
+      username: "gui.dev",
+      email: null,
+      displayName: null,
+      avatarUrl: null,
+      bio: null,
+      createdAt: "2025-01-01T00:00:00.000Z",
+    };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedProfile,
+    });
+
+    render(
+      <ProfileEditDialog
+        {...defaultProps}
+        profile={{ displayName: "", email: "", avatarUrl: "", bio: "" }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        "/api/profile",
+        expect.objectContaining({
+          method: "PUT",
+          body: JSON.stringify({
+            displayName: null,
+            email: null,
+            avatarUrl: null,
+            bio: null,
+          }),
+        }),
+      );
     });
   });
 
