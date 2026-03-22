@@ -58,7 +58,7 @@ const navigationItems: NavigationItem[] = [
 
 function UserAvatar({ user }: { user: SessionUser }) {
   const initials = useMemo(() => {
-    const base = user.username.trim() || user.email.trim();
+    const base = user.username.trim() || (user.email ?? "").trim();
 
     return base
       .split(/\s+/)

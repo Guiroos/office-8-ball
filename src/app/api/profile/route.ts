@@ -37,6 +37,8 @@ export async function GET() {
     username: profile.username,
     email: profile.email,
     displayName: profile.displayName,
+    avatarUrl: profile.avatarUrl,
+    bio: profile.bio,
     createdAt: profile.createdAt.toISOString(),
   });
 }
@@ -67,6 +69,8 @@ export async function PUT(request: Request) {
     username: updated.username,
     email: updated.email,
     displayName: updated.displayName,
+    avatarUrl: updated.avatarUrl,
+    bio: updated.bio,
     createdAt: updated.createdAt.toISOString(),
   });
 }

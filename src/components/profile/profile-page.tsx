@@ -90,7 +90,7 @@ export function ProfilePage() {
     );
   }
 
-  const initials = profile ? getInitials(profile.username, profile.email) : "";
+  const initials = profile ? getInitials(profile.username, profile.email ?? "") : "";
 
   return (
     <div className="flex flex-col gap-8">
