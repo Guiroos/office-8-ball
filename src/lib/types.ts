@@ -51,7 +51,6 @@ export type CreateMatchResponse = {
 export type SessionUser = {
   id: string;
   username: string;
-  email: string | null;
 };
 
 export type RegisterUserResponse = {

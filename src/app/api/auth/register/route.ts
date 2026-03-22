@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, username } = validation.data;
+  const { username } = validation.data;
   const rateLimitKey = buildAuthRateLimitKey({
     action: "register",
     username,
@@ -54,10 +54,9 @@ export async function POST(request: Request) {
 
   const existingUser = await prisma.user.findFirst({
     where: {
-      OR: [{ email }, { username }],
+      OR: [{ username }],
     },
     select: {
-      email: true,
       username: true,
     },
   });
@@ -77,17 +76,13 @@ export async function POST(request: Request) {
 
     const fieldErrors: NonNullable<ApiErrorResponse["fieldErrors"]> = {};
 
-    if (existingUser.email === email) {
-      fieldErrors.email = "Este email ja esta em uso.";
-    }
-
     if (existingUser.username === username) {
-      fieldErrors.username = "Este username ja esta em uso.";
+      fieldErrors.username = "Este usuário já está em uso.";
     }
 
     return NextResponse.json<ApiErrorResponse>(
       {
-        error: "Ja existe uma conta com esses dados.",
+        error: "Já existe uma conta com esses dados.",
         fieldErrors,
       },
       { status: 409 },
@@ -98,13 +93,11 @@ export async function POST(request: Request) {
     data: {
       id: crypto.randomUUID(),
       username,
-      email,
       passwordHash: await hash(validation.data.password, 12),
     },
     select: {
       id: true,
       username: true,
-      email: true,
     },
   });
 
