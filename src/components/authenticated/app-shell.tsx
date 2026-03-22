@@ -58,15 +58,14 @@ const navigationItems: NavigationItem[] = [
 
 function UserAvatar({ user }: { user: SessionUser }) {
   const initials = useMemo(() => {
-    const base = user.username.trim() || (user.email ?? "").trim();
-
-    return base
+    return user.username
+      .trim()
       .split(/\s+/)
       .slice(0, 2)
-      .map((chunk) => chunk.charAt(0).toUpperCase())
+      .map((chunk: string) => chunk.charAt(0).toUpperCase())
       .join("")
       .slice(0, 2);
-  }, [user.email, user.username]);
+  }, [user.username]);
 
   return (
     <div className="relative">
@@ -194,9 +193,6 @@ function UserMenu({
           <div className="min-w-0">
             <p className="text-sidebar-foreground truncate text-sm font-semibold">
               {user.username}
-            </p>
-            <p className="text-sidebar-foreground-muted truncate text-xs">
-              {user.email}
             </p>
           </div>
         </div>
