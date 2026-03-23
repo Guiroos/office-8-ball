@@ -1,118 +1,222 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
-let currentUser: { id: string; username: string; email: string } | null = {
-  id: "user-1",
+let currentUser: { id: string; username: string } | null = {
+  id: "user-abc",
   username: "gui.dev",
-  email: "gui@office8ball.dev",
 };
 
 vi.mock("@/lib/auth", async () => {
   const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
-
   return {
     ...actual,
     getAuthenticatedUser: vi.fn(async () => currentUser),
   };
 });
 
+const mockListMatches = vi.fn();
+const mockCreateMatch = vi.fn();
+
+vi.mock("@/lib/data", () => ({
+  listMatches: (...args: unknown[]) => mockListMatches(...args),
+  createMatch: (...args: unknown[]) => mockCreateMatch(...args),
+}));
+
+const mockIsTeamMember = vi.fn();
+
+vi.mock("@/lib/teams", () => ({
+  isTeamMember: (...args: unknown[]) => mockIsTeamMember(...args),
+}));
+
+// Mock Prisma for team status checks inline in the route
+const mockTeamFindMany = vi.fn();
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    team: {
+      findMany: (...args: unknown[]) => mockTeamFindMany(...args),
+    },
+  },
+}));
+
+const fakeMatch = {
+  id: "match-1",
+  teamAId: "team-a",
+  teamBId: "team-b",
+  winnerTeamId: "team-a",
+  loserTeamId: "team-b",
+  playedAt: "2026-03-22T10:00:00.000Z",
+  note: null,
+};
+
 describe("/api/matches", () => {
   beforeEach(() => {
-    delete process.env.DATABASE_URL;
-    currentUser = {
-      id: "user-1",
-      username: "gui.dev",
-      email: "gui@office8ball.dev",
-    };
+    process.env.DATABASE_URL = "postgresql://test";
     vi.resetModules();
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-12T10:00:00.000Z"));
+    mockListMatches.mockReset();
+    mockCreateMatch.mockReset();
+    mockIsTeamMember.mockReset();
+    mockTeamFindMany.mockReset();
+    currentUser = { id: "user-abc", username: "gui.dev" };
   });
 
-  it("returns created matches and keeps the newest first", async () => {
-    const route = await import("@/app/api/matches/route");
+  afterEach(() => {
+    delete process.env.DATABASE_URL;
+  });
 
-    const firstResponse = await route.POST(
-      new Request("http://localhost/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ winnerTeamId: "frontend" }),
-      }),
-    );
+  describe("GET", () => {
+    it("returns matches for the authenticated user's teams", async () => {
+      mockListMatches.mockResolvedValue([fakeMatch]);
 
-    vi.setSystemTime(new Date("2026-03-12T10:01:00.000Z"));
+      const { GET } = await import("@/app/api/matches/route");
+      const response = await GET();
 
-    const secondResponse = await route.POST(
-      new Request("http://localhost/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ winnerTeamId: "backend", note: "boa tacada" }),
-      }),
-    );
-
-    const listResponse = await route.GET();
-    const firstPayload = await firstResponse.json();
-    const secondPayload = await secondResponse.json();
-    const listPayload = await listResponse.json();
-
-    expect(firstResponse.status).toBe(201);
-    expect(secondResponse.status).toBe(201);
-    expect(firstPayload.match.winnerTeamId).toBe("frontend");
-    expect(secondPayload.match).toMatchObject({
-      winnerTeamId: "backend",
-      note: "boa tacada",
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.matches).toHaveLength(1);
+      expect(body.matches[0].teamAId).toBe("team-a");
+      expect(mockListMatches).toHaveBeenCalledWith("user-abc");
     });
-    expect(listPayload.matches).toHaveLength(2);
-    expect(listPayload.matches[0].winnerTeamId).toBe("backend");
-    expect(listPayload.matches[1].winnerTeamId).toBe("frontend");
-  });
 
-  it("rejects invalid team ids", async () => {
-    const route = await import("@/app/api/matches/route");
-
-    const response = await route.POST(
-      new Request("http://localhost/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ winnerTeamId: "mobile" }),
-      }),
-    );
-
-    await expect(response.json()).resolves.toEqual({
-      error: "winnerTeamId must be 'frontend' or 'backend'.",
+    it("returns 401 when not authenticated", async () => {
+      currentUser = null;
+      const { GET } = await import("@/app/api/matches/route");
+      const response = await GET();
+      expect(response.status).toBe(401);
     });
-    expect(response.status).toBe(400);
   });
 
-  it("rejects notes longer than 140 characters", async () => {
-    const route = await import("@/app/api/matches/route");
+  describe("POST", () => {
+    it("registers a match and returns 201", async () => {
+      // Both teams are active
+      mockTeamFindMany.mockResolvedValue([
+        { id: "team-a", status: "active" },
+        { id: "team-b", status: "active" },
+      ]);
+      // User is member of teamA
+      mockIsTeamMember.mockResolvedValue(true);
+      mockCreateMatch.mockResolvedValue({ match: fakeMatch });
 
-    const response = await route.POST(
-      new Request("http://localhost/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          winnerTeamId: "frontend",
-          note: "x".repeat(141),
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-a",
+          }),
         }),
-      }),
-    );
+      );
 
-    await expect(response.json()).resolves.toEqual({
-      error: "note must be a string with at most 140 characters.",
+      expect(response.status).toBe(201);
+      const body = await response.json();
+      expect(body.match.winnerTeamId).toBe("team-a");
     });
-    expect(response.status).toBe(400);
-  });
 
-  it("rejects unauthenticated access", async () => {
-    currentUser = null;
-
-    const route = await import("@/app/api/matches/route");
-
-    const response = await route.GET();
-
-    await expect(response.json()).resolves.toEqual({
-      error: "Autenticacao obrigatoria.",
+    it("returns 400 when teamAId equals teamBId", async () => {
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-a",
+            winnerTeamId: "team-a",
+          }),
+        }),
+      );
+      expect(response.status).toBe(400);
     });
-    expect(response.status).toBe(401);
+
+    it("returns 400 when winnerTeamId is not one of the two teams", async () => {
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-c",
+          }),
+        }),
+      );
+      expect(response.status).toBe(400);
+    });
+
+    it("returns 422 when a team is archived", async () => {
+      mockTeamFindMany.mockResolvedValue([
+        { id: "team-a", status: "archived" },
+        { id: "team-b", status: "active" },
+      ]);
+
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-a",
+          }),
+        }),
+      );
+      expect(response.status).toBe(422);
+    });
+
+    it("returns 403 when user is not a member of either team", async () => {
+      mockTeamFindMany.mockResolvedValue([
+        { id: "team-a", status: "active" },
+        { id: "team-b", status: "active" },
+      ]);
+      mockIsTeamMember.mockResolvedValue(false);
+
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-a",
+          }),
+        }),
+      );
+      expect(response.status).toBe(403);
+    });
+
+    it("returns 400 when note exceeds 140 characters", async () => {
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-a",
+            note: "x".repeat(141),
+          }),
+        }),
+      );
+      expect(response.status).toBe(400);
+    });
+
+    it("returns 401 when not authenticated", async () => {
+      currentUser = null;
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ teamAId: "a", teamBId: "b", winnerTeamId: "a" }),
+        }),
+      );
+      expect(response.status).toBe(401);
+    });
   });
 });
