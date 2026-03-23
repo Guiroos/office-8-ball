@@ -19,6 +19,8 @@ import { StatTile } from "@/components/primitives/stat-tile";
 import { TEAMS } from "@/lib/constants";
 import type { MatchRecord, MatchesResponse, ProfileResponse } from "@/lib/types";
 
+import Image from "next/image";
+
 import { ProfileEditDialog } from "./profile-edit-dialog";
 
 function getInitials(username: string): string {
@@ -73,7 +75,6 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (!profile?.username) return;
-    setAvatarLoadError(false);
     const encoder = new TextEncoder();
     crypto.subtle
       .digest("SHA-256", encoder.encode(profile.username.toLowerCase().trim()))
@@ -82,6 +83,7 @@ export function ProfilePage() {
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
         setGravatarUrl(`https://www.gravatar.com/avatar/${hash}?d=identicon&s=96`);
+        setAvatarLoadError(false);
       });
   }, [profile?.username]);
 
@@ -145,9 +147,11 @@ export function ProfilePage() {
         <div className="flex flex-col items-center gap-6 md:flex-row">
           <div className="flex size-24 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-2xl font-bold uppercase text-foreground overflow-hidden">
             {avatarSrc && !avatarLoadError ? (
-              <img
+              <Image
                 src={avatarSrc}
-                alt={profile?.username}
+                alt={profile?.username || ""}
+                width={360}
+                height={360}
                 className="size-full object-cover"
                 onError={() => setAvatarLoadError(true)}
               />
