@@ -29,19 +29,16 @@ type AuthMode = "login" | "register";
 
 type FormState = {
   username: string;
-  email: string;
   password: string;
 };
 
 const INITIAL_FORM: FormState = {
   username: "",
-  email: "",
   password: "",
 };
 
 const INITIAL_FIELD_ERRORS = {
   username: "",
-  email: "",
   password: "",
 };
 
@@ -49,7 +46,6 @@ type FieldErrorState = typeof INITIAL_FIELD_ERRORS;
 
 const INITIAL_TOUCHED_FIELDS = {
   username: false,
-  email: false,
   password: false,
 };
 
@@ -91,7 +87,6 @@ export function LoginScreen({
   function toFieldErrorState(fieldErrors: AuthFieldErrors): FieldErrorState {
     return {
       username: fieldErrors.username ?? "",
-      email: fieldErrors.email ?? "",
       password: fieldErrors.password ?? "",
     };
   }
@@ -101,7 +96,7 @@ export function LoginScreen({
       nextMode === "register"
         ? getRegisterFieldErrors(nextForm)
         : getLoginFieldErrors({
-            email: nextForm.email,
+            username: nextForm.username,
             password: nextForm.password,
           });
 
@@ -158,7 +153,6 @@ export function LoginScreen({
       },
       body: JSON.stringify({
         username: form.username,
-        email: form.email,
         password: form.password,
       }),
     });
@@ -167,7 +161,6 @@ export function LoginScreen({
       const payload = (await response.json().catch(() => null)) as ApiErrorResponse | null;
       setRemoteFieldErrors({
         username: payload?.fieldErrors?.username ?? "",
-        email: payload?.fieldErrors?.email ?? "",
         password: payload?.fieldErrors?.password ?? "",
       });
       setGeneralError(payload?.error ?? "Nao foi possivel criar a conta.");
@@ -175,7 +168,7 @@ export function LoginScreen({
     }
 
     const signInResult = await signIn("credentials", {
-      email: form.email,
+      username: form.username,
       password: form.password,
       redirect: false,
       callbackUrl: "/dashboard",
@@ -189,7 +182,7 @@ export function LoginScreen({
 
   async function handleLogin() {
     const signInResult = await signIn("credentials", {
-      email: form.email,
+      username: form.username,
       password: form.password,
       redirect: false,
       callbackUrl: "/dashboard",
@@ -199,7 +192,7 @@ export function LoginScreen({
       setGeneralError(
         signInResult?.error === AUTH_RATE_LIMIT_ERROR
           ? "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente."
-          : "Email ou senha invalidos.",
+          : "Username ou senha invalidos.",
       );
       throw new Error(signInResult?.error ?? "signin_failed");
     }
@@ -244,7 +237,6 @@ export function LoginScreen({
   const isRegisterMode = mode === "register";
   const visibleFieldErrors = {
     username: getVisibleFieldError("username"),
-    email: getVisibleFieldError("email"),
     password: getVisibleFieldError("password"),
   };
   const areControlsDisabled = !isHydrated || isSubmitting;
@@ -330,46 +322,26 @@ export function LoginScreen({
                   </div>
 
                   <form className="space-y-4" onSubmit={handleSubmit}>
-                    {isRegisterMode ? (
-                      <Field>
-                        <Label htmlFor="username" className="text-sm font-semibold text-muted-foreground">Username</Label>
-                        <Input
-                          id="username"
-                          name="username"
-                          type="text"
-                          placeholder="gui.dev"
-                          autoComplete="username"
-                          value={form.username}
-                          onChange={(event) => updateField("username", event.target.value)}
-                          onBlur={() => touchField("username")}
-                          disabled={areControlsDisabled || !authAvailable}
-                          invalid={Boolean(visibleFieldErrors.username)}
-                          aria-describedby={
-                            visibleFieldErrors.username ? "username-error" : undefined
-                          }
-                        />
-                        <FieldError id="username-error">
-                          {visibleFieldErrors.username}
-                        </FieldError>
-                      </Field>
-                    ) : null}
-
                     <Field>
-                      <Label htmlFor="email" className="text-sm font-semibold text-muted-foreground">E-mail corporativo</Label>
+                      <Label htmlFor="username" className="text-sm font-semibold text-muted-foreground">Username</Label>
                       <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="gui@office8ball.dev"
-                        autoComplete="email"
-                        value={form.email}
-                        onChange={(event) => updateField("email", event.target.value)}
-                        onBlur={() => touchField("email")}
+                        id="username"
+                        name="username"
+                        type="text"
+                        placeholder="gui.dev"
+                        autoComplete="username"
+                        value={form.username}
+                        onChange={(event) => updateField("username", event.target.value)}
+                        onBlur={() => touchField("username")}
                         disabled={areControlsDisabled || !authAvailable}
-                        invalid={Boolean(visibleFieldErrors.email)}
-                        aria-describedby={visibleFieldErrors.email ? "email-error" : undefined}
+                        invalid={Boolean(visibleFieldErrors.username)}
+                        aria-describedby={
+                          visibleFieldErrors.username ? "username-error" : undefined
+                        }
                       />
-                      <FieldError id="email-error">{visibleFieldErrors.email}</FieldError>
+                      <FieldError id="username-error">
+                        {visibleFieldErrors.username}
+                      </FieldError>
                     </Field>
 
                     <Field>

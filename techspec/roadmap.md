@@ -10,7 +10,8 @@ Organizar os proximos passos tecnicos do projeto sem misturar backlog futuro com
 - A UI principal ja usa `Tailwind CSS` com primitives locais no estilo `shadcn/ui`
 - Auth.js por credenciais ja protege a shell autenticada em `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings` e as APIs do placar
 - O cadastro inicial de usuarios ja existe via Postgres
-- A pagina de perfil ja existe com edicao de `displayName`
+- A pagina de perfil ja existe com edicao de `displayName`, `email`, `avatarUrl` e `bio`; avatar exibe identicon via Gravatar como fallback
+- Login migrou de email para username como identificador principal; email e opcional no cadastro
 - O campo `note` ja e exposto na UI tanto na criacao de partida quanto no historico
 - O dominio continua fixo em dois times globais
 
@@ -55,27 +56,16 @@ Prioridade: media
 - Nao abrir CRUD completo de partidas — apenas reverter o ultimo registro do usuario autenticado
 - Requer nova rota de API e verificacao de ownership da partida no backend
 
-### 5. Evolucao do schema de User
+### 5. Adocao de times (user <-> team)
 
 Prioridade: media
-
-- Novos campos candidatos no modelo `User`:
-  - `teamId` — vinculo com um dos dois times fixos
-  - `avatarUrl` — foto de perfil
-  - `bio` — campo livre curto
-- O `/profile` ja existe mas edita apenas `displayName`; com mais campos a pagina ganha substancia real
-- Qualquer adicao de campo requer migracao Prisma + atualizacao do `ProfileResponse` e da API
-
-### 6. Adocao de times (user <-> team)
-
-Prioridade: media (depende do item 5)
 
 - Permitir que cada usuario escolha seu time (`frontend` ou `backend`) no perfil ou no cadastro
 - Abre caminho para o `/times` sair de placeholder e mostrar membros por time
 - Futuramente permite filtrar partidas ou estatisticas por membro
 - Os ids de time continuam fixos em `constants.ts`; nao generalizar para multi-team
 
-### 7. Troca de senha
+### 6. Troca de senha
 
 Prioridade: baixa
 
@@ -83,7 +73,7 @@ Prioridade: baixa
 - Nao requer mudanca de schema — apenas nova rota de API com validacao de senha atual e hash da nova
 - Pode ser implementado de forma independente antes do `/settings` estar totalmente funcional
 
-### 8. Paginacao no historico de partidas
+### 7. Paginacao no historico de partidas
 
 Prioridade: baixa
 
@@ -91,22 +81,22 @@ Prioridade: baixa
 - Introducir paginacao ou limite com "ver mais" no `RecentMatchesCard` seria preventivo
 - O calculo do placar deve continuar derivado de todas as partidas; apenas a exibicao e paginada
 
-### 9. Pagina /times funcional
+### 8. Pagina /times funcional
 
-Prioridade: futura (depende do item 6)
+Prioridade: futura (depende do item 5)
 
 - Substituir o placeholder atual por view real com membros de cada time e estatisticas
 - So iniciar apos adocao de times estar implementada e estavel
 
-### 10. Paginas /ranking e /settings funcionais
+### 9. Paginas /ranking e /settings funcionais
 
 Prioridade: futura
 
 - `/ranking`: historico de partidas com possibilidade de filtros e evolucao do placar ao longo do tempo
-- `/settings`: preferencias de usuario (tema, notificacoes); troca de senha pode vir antes via item 7
+- `/settings`: preferencias de usuario (tema, notificacoes); troca de senha pode vir antes via item 6
 - Ambas sao placeholders atualmente; podem evoluir de forma independente
 
-### 11. Expansao de dominio
+### 10. Expansao de dominio
 
 Prioridade: futura
 

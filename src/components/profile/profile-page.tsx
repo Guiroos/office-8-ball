@@ -19,11 +19,13 @@ import { StatTile } from "@/components/primitives/stat-tile";
 import { TEAMS } from "@/lib/constants";
 import type { MatchRecord, MatchesResponse, ProfileResponse } from "@/lib/types";
 
+import Image from "next/image";
+
 import { ProfileEditDialog } from "./profile-edit-dialog";
 
-function getInitials(username: string, email: string): string {
-  const base = username.trim() || email.trim();
-  return base
+function getInitials(username: string): string {
+  return username
+    .trim()
     .split(/\s+/)
     .slice(0, 2)
     .map((c) => c.charAt(0).toUpperCase())
@@ -53,6 +55,8 @@ export function ProfilePage() {
   const [matchesError, setMatchesError] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [gravatarUrl, setGravatarUrl] = useState<string | null>(null);
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -68,6 +72,20 @@ export function ProfilePage() {
       .then((data: MatchesResponse) => setMatches(data.matches.slice(0, 5)))
       .catch(() => setMatchesError(true));
   }, []);
+
+  useEffect(() => {
+    if (!profile?.username) return;
+    const encoder = new TextEncoder();
+    crypto.subtle
+      .digest("SHA-256", encoder.encode(profile.username.toLowerCase().trim()))
+      .then((buffer) => {
+        const hash = Array.from(new Uint8Array(buffer))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        setGravatarUrl(`https://www.gravatar.com/avatar/${hash}?d=identicon&s=96`);
+        setAvatarLoadError(false);
+      });
+  }, [profile?.username]);
 
   const handleShare = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -90,7 +108,8 @@ export function ProfilePage() {
     );
   }
 
-  const initials = profile ? getInitials(profile.username, profile.email) : "";
+  const initials = profile ? getInitials(profile.username) : "";
+  const avatarSrc = profile?.avatarUrl ?? gravatarUrl;
 
   return (
     <div className="flex flex-col gap-8">
@@ -126,8 +145,19 @@ export function ProfilePage() {
       {/* Hero */}
       <section className="relative overflow-hidden rounded-xl border border-primary/20 bg-primary/10 p-6 lg:p-10">
         <div className="flex flex-col items-center gap-6 md:flex-row">
-          <div className="flex size-24 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-2xl font-bold uppercase text-foreground">
-            {initials || "OB"}
+          <div className="flex size-24 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-2xl font-bold uppercase text-foreground overflow-hidden">
+            {avatarSrc && !avatarLoadError ? (
+              <Image
+                src={avatarSrc}
+                alt={profile?.username || ""}
+                width={360}
+                height={360}
+                className="size-full object-cover"
+                onError={() => setAvatarLoadError(true)}
+              />
+            ) : (
+              initials || "OB"
+            )}
           </div>
           <div className="text-center md:text-left">
             <h2 className="text-xl font-bold">
@@ -256,7 +286,7 @@ export function ProfilePage() {
         <ProfileEditDialog
           open={editOpen}
           onOpenChange={setEditOpen}
-          currentDisplayName={profile.displayName}
+          profile={profile}
           onSave={handleSave}
         />
       ) : null}

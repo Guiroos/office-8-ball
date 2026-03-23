@@ -4,7 +4,6 @@ import { expect, type Page } from "@playwright/test";
 
 type Credentials = {
   username: string;
-  email: string;
   password: string;
 };
 
@@ -17,7 +16,6 @@ export function createCredentials(seed: string): Credentials {
 
   return {
     username,
-    email: `e2e-${safeSeed}-${uniqueSuffix}@office8ball.dev`,
     password: "secret123",
   };
 }
@@ -26,7 +24,6 @@ export async function signUp(page: Page, credentials: Credentials) {
   await page.goto("/login");
   await page.getByTestId("login-mode-register").click();
   await page.getByLabel("Username").fill(credentials.username);
-  await page.getByLabel("E-mail corporativo").fill(credentials.email);
   await page.getByLabel("Senha").fill(credentials.password);
   await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);
@@ -34,7 +31,7 @@ export async function signUp(page: Page, credentials: Credentials) {
 
 export async function login(page: Page, credentials: Credentials) {
   await page.goto("/login");
-  await page.getByLabel("E-mail corporativo").fill(credentials.email);
+  await page.getByLabel("Username").fill(credentials.username);
   await page.getByLabel("Senha").fill(credentials.password);
   await page.getByTestId("login-submit").click();
   await expect(page).toHaveURL(/\/dashboard$/);

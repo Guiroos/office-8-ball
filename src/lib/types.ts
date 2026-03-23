@@ -51,7 +51,6 @@ export type CreateMatchResponse = {
 export type SessionUser = {
   id: string;
   username: string;
-  email: string;
 };
 
 export type RegisterUserResponse = {
@@ -67,7 +66,9 @@ export type ApiErrorResponse = {
 export type ProfileResponse = {
   id: string;
   username: string;
-  email: string;
+  email: string | null;
   displayName: string | null;
-  createdAt: string; // ISO date string
+  avatarUrl: string | null;
+  bio: string | null;
+  createdAt: string;
 };

@@ -114,9 +114,9 @@ export function getAuthOptions(): NextAuthOptions {
     },
     providers: [
       CredentialsProvider({
-        name: "Email e senha",
+        name: "Usuário e senha",
         credentials: {
-          email: { label: "Email", type: "email" },
+          username: { label: "Username", type: "text" },
           password: { label: "Senha", type: "password" },
         },
         async authorize(credentials, request) {
@@ -125,7 +125,7 @@ export function getAuthOptions(): NextAuthOptions {
           }
 
           const validation = validateLoginPayload({
-            email: String(credentials?.email ?? ""),
+            username: String(credentials?.username ?? ""),
             password: String(credentials?.password ?? ""),
           });
 
@@ -133,10 +133,10 @@ export function getAuthOptions(): NextAuthOptions {
             return null;
           }
 
-          const { email, password } = validation.data;
+          const { username, password } = validation.data;
           const rateLimitKey = buildAuthRateLimitKey({
             action: "login",
-            email,
+            username,
             headers: (request as AuthRequestLike | undefined)?.headers,
           });
           const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);
@@ -146,7 +146,7 @@ export function getAuthOptions(): NextAuthOptions {
           }
 
           const user = await prisma.user.findUnique({
-            where: { email },
+            where: { username },
           });
 
           if (!user) {
@@ -175,7 +175,6 @@ export function getAuthOptions(): NextAuthOptions {
 
           return {
             id: user.id,
-            email: user.email,
             name: user.username,
             username: user.username,
           };
@@ -191,9 +190,8 @@ export function getAuthOptions(): NextAuthOptions {
         return token;
       },
       async session({ session, token }) {
-        if (session.user && token.sub && token.email) {
+        if (session.user && token.sub) {
           session.user.id = token.sub;
-          session.user.email = token.email;
           session.user.username = String(token.username ?? session.user.name ?? "");
           session.user.name = session.user.username;
         }
@@ -215,13 +213,12 @@ export async function getAuthSession() {
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {
   const session = await getAuthSession();
 
-  if (!session?.user?.id || !session.user.email || !session.user.username) {
+  if (!session?.user?.id || !session.user.username) {
     return null;
   }
 
   return {
     id: session.user.id,
-    email: session.user.email,
     username: session.user.username,
   };
 }

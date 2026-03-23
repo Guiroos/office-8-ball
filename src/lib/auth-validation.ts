@@ -24,13 +24,6 @@ const usernameSchema = z
       "Use de 3 a 24 caracteres com letras, numeros, ponto, tracinho ou underscore.",
   });
 
-const emailSchema = z
-  .string()
-  .transform(normalizeEmail)
-  .refine((value) => EMAIL_PATTERN.test(value), {
-    message: "Informe um email valido.",
-  });
-
 const passwordSchema = z.string().min(PASSWORD_MIN_LENGTH, {
   message: `A senha precisa ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`,
 });
@@ -41,12 +34,11 @@ const loginPasswordSchema = z.string().min(1, {
 
 export const registerSchema = z.object({
   username: usernameSchema,
-  email: emailSchema,
   password: passwordSchema,
 });
 
 export const loginSchema = z.object({
-  email: emailSchema,
+  username: usernameSchema,
   password: loginPasswordSchema,
 });
 

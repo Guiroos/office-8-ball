@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 type AuthorizeFn = (
   credentials:
     | {
-        email?: string;
+        username?: string;
         password?: string;
       }
     | undefined,
@@ -164,7 +164,7 @@ describe("auth helpers", () => {
     await expect(
       authorize?.(
         {
-          email: "gui@office8ball.dev",
+          username: "gui.dev",
           password: "secret123",
         },
         {
@@ -198,7 +198,7 @@ describe("auth helpers", () => {
     await expect(
       authorize?.(
         {
-          email: "gui@office8ball.dev",
+          username: "gui.dev",
           password: "secret123",
         },
         {
@@ -210,7 +210,7 @@ describe("auth helpers", () => {
     ).resolves.toBeNull();
 
     expect(upsertMock).toHaveBeenCalledWith({
-      where: { id: "login:gui@office8ball.dev:203.0.113.10" },
+      where: { id: "login:gui.dev:203.0.113.10" },
       create: expect.objectContaining({
         failCount: 1,
       }),
@@ -240,7 +240,7 @@ describe("auth helpers", () => {
     await expect(
       authorize?.(
         {
-          email: "gui@office8ball.dev",
+          username: "gui.dev",
           password: "secret123",
         },
         {
@@ -251,13 +251,12 @@ describe("auth helpers", () => {
       ),
     ).resolves.toEqual({
       id: "user-1",
-      email: "gui@office8ball.dev",
       name: "gui.dev",
       username: "gui.dev",
     });
 
     expect(deleteManyMock).toHaveBeenCalledWith({
-      where: { id: "login:gui@office8ball.dev:203.0.113.10" },
+      where: { id: "login:gui.dev:203.0.113.10" },
     });
   });
 });

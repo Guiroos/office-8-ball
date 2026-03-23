@@ -64,7 +64,6 @@ describe("AppShell", () => {
         user={{
           id: "user-1",
           username: "Gui Dev",
-          email: "gui@office8ball.dev",
         }}
       >
         <div>Conteudo interno</div>
@@ -93,7 +92,6 @@ describe("AppShell", () => {
         user={{
           id: "user-1",
           username: "Gui Dev",
-          email: "gui@office8ball.dev",
         }}
       >
         <div>Conteudo interno</div>

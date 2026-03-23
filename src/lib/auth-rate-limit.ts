@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { normalizeEmail } from "@/lib/auth-validation";
 
 const WINDOW_MINUTES = 10;
 const FAILURE_LIMIT = 5;
@@ -18,7 +17,7 @@ type HeaderBag = Headers | Record<string, string | string[] | undefined> | undef
 export type AuthRateLimitKey = {
   id: string;
   action: AuthRateLimitAction;
-  email: string;
+  username: string;
   ip: string;
 };
 
@@ -66,16 +65,15 @@ export function resolveClientIp(headers: HeaderBag) {
 
 export function buildAuthRateLimitKey(input: {
   action: AuthRateLimitAction;
-  email: string;
+  username: string;
   headers?: HeaderBag;
 }) {
-  const email = normalizeEmail(input.email);
   const ip = resolveClientIp(input.headers);
 
   return {
-    id: `${input.action}:${email}:${ip}`,
+    id: `${input.action}:${input.username}:${ip}`,
     action: input.action,
-    email,
+    username: input.username,
     ip,
   } satisfies AuthRateLimitKey;
 }
@@ -174,7 +172,7 @@ export async function registerAuthFailure(
     },
     update: {
       action: key.action,
-      email: key.email,
+      username: key.username,
       ip: key.ip,
       failCount,
       windowStartedAt,
