@@ -29,10 +29,7 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
                   className="grid gap-3 rounded-lg border border-border-strong bg-surface-emphasis p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <div className="space-y-1">
-                    <strong className="block text-lg font-semibold">{match.winnerName}</strong>
-                    <p className="text-sm text-muted-foreground">
-                      {match.winnerRoster}
-                    </p>
+                    <strong className="block text-lg font-semibold">{match.winnerTeamId}</strong>
                   </div>
 
                   <div className="grid gap-1 text-left sm:justify-items-end sm:text-right">

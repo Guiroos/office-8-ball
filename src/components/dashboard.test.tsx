@@ -7,8 +7,18 @@ import { Dashboard } from "@/components/dashboard";
 import type {
   CreateMatchResponse,
   MatchesResponse,
-  ScoreboardResponse,
 } from "@/lib/types";
+
+// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
+type ScoreboardResponse = {
+  scoreboard: {
+    teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
+    leaderTeamId: string | null;
+    leadBy: number;
+    totalMatches: number;
+    currentStreak: { teamId: string; teamName: string; count: number } | null;
+  };
+};
 
 vi.mock("sonner", () => ({
   toast: {
@@ -72,9 +82,10 @@ const updatedMatches: MatchesResponse = {
   matches: [
     {
       id: "match-1",
+      teamAId: "frontend",
+      teamBId: "backend",
       winnerTeamId: "frontend",
-      winnerName: "Frontend",
-      winnerRoster: "Gui + Jean",
+      loserTeamId: "backend",
       playedAt: "2026-03-12T10:00:00.000Z",
       note: null,
     },
@@ -83,7 +94,6 @@ const updatedMatches: MatchesResponse = {
 
 const createMatchResponse: CreateMatchResponse = {
   match: updatedMatches.matches[0],
-  message: "Frontend ganhou. Backend abriu um ticket para investigar.",
 };
 
 function jsonResponse(body: unknown, ok = true, status = 200) {

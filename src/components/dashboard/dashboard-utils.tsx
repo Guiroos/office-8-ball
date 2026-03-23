@@ -1,4 +1,11 @@
-import type { ScoreboardData } from "@/lib/types";
+// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
+type ScoreboardData = {
+  teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
+  leaderTeamId: string | null;
+  leadBy: number;
+  totalMatches: number;
+  currentStreak: { teamId: string; teamName: string; count: number } | null;
+};
 
 export function formatMatchDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {

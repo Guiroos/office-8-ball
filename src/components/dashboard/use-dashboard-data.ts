@@ -5,10 +5,18 @@ import type {
   CreateMatchResponse,
   MatchesResponse,
   MatchRecord,
-  ScoreboardData,
-  ScoreboardResponse,
-  TeamId,
 } from "@/lib/types";
+
+// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
+type ScoreboardData = {
+  teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
+  leaderTeamId: string | null;
+  leadBy: number;
+  totalMatches: number;
+  currentStreak: { teamId: string; teamName: string; count: number } | null;
+};
+
+type ScoreboardResponse = { scoreboard: ScoreboardData };
 
 type DashboardState = {
   scoreboard: ScoreboardData | null;
@@ -16,7 +24,7 @@ type DashboardState = {
 };
 
 type RegisterWinInput = {
-  teamId: TeamId;
+  teamId: string;
   note: string;
 };
 
@@ -45,7 +53,7 @@ export function useDashboardData() {
     matches: [],
   });
   const [loading, setLoading] = useState(true);
-  const [submittingTeamId, setSubmittingTeamId] = useState<TeamId | null>(null);
+  const [submittingTeamId, setSubmittingTeamId] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -81,10 +89,10 @@ export function useDashboardData() {
         throw new Error(payload?.error ?? "Não foi possível salvar a partida.");
       }
 
-      const payload = (await response.json()) as CreateMatchResponse;
+      await response.json() as CreateMatchResponse;
       const dashboardData = await fetchDashboardData();
       setState(dashboardData);
-      return payload.message;
+      return "Partida registrada com sucesso.";
     };
 
     // execute() cria a promise uma vez. toast.promise cuida do feedback visual;
