@@ -9,7 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
-import { TEAMS } from "@/lib/constants";
+// TODO(Task 5+): replace with dynamic teams fetched from /api/teams
+const TEAMS = [
+  {
+    id: "frontend",
+    name: "frontend",
+    displayName: "Frontend",
+    roster: "Gui + Jean",
+    accent: "var(--team-alpha)",
+    accentSoft: "var(--team-alpha-soft)",
+    slogan: "Empurra feature e bola no mesmo sprint.",
+  },
+  {
+    id: "backend",
+    name: "backend",
+    displayName: "Backend",
+    roster: "Adair + Richard",
+    accent: "var(--team-beta)",
+    accentSoft: "var(--team-beta-soft)",
+    slogan: "Consistentes ate quando o deploy cai.",
+  },
+] as const;
 
 import { DashboardHero } from "./dashboard-hero";
 import { DashboardSidebar } from "./dashboard-sidebar";

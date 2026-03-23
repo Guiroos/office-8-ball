@@ -1,42 +1,42 @@
-export type TeamId = "frontend" | "backend";
+// Team domain
 
-export type Team = {
-  id: TeamId;
-  name: string;
-  displayName: string;
-  roster: string;
-  accent: string;
-  accentSoft: string;
-  slogan: string;
+export type TeamStatus = "active" | "archived";
+
+export type TeamMemberRecord = {
+  userId: string;
+  joinedAt: string;
 };
+
+export type TeamRecord = {
+  id: string;
+  name: string;
+  status: TeamStatus;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  members: TeamMemberRecord[];
+};
+
+// Match domain
 
 export type MatchRecord = {
   id: string;
-  winnerTeamId: TeamId;
-  winnerName: string;
-  winnerRoster: string;
+  teamAId: string;
+  teamBId: string;
+  winnerTeamId: string;
+  loserTeamId: string;
   playedAt: string;
   note: string | null;
 };
 
-export type TeamScore = Team & {
-  wins: number;
+// API responses
+
+export type TeamResponse = {
+  team: TeamRecord;
 };
 
-export type ScoreboardData = {
-  teams: TeamScore[];
-  leaderTeamId: TeamId | null;
-  leadBy: number;
-  totalMatches: number;
-  currentStreak: {
-    teamId: TeamId;
-    teamName: string;
-    count: number;
-  } | null;
-};
-
-export type ScoreboardResponse = {
-  scoreboard: ScoreboardData;
+export type TeamsResponse = {
+  teams: TeamRecord[];
 };
 
 export type MatchesResponse = {
@@ -45,7 +45,15 @@ export type MatchesResponse = {
 
 export type CreateMatchResponse = {
   match: MatchRecord;
-  message: string;
+};
+
+export type UserLookupResponse = {
+  user: {
+    id: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
 };
 
 export type SessionUser = {

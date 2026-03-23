@@ -8,28 +8,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TeamStatus {
+  active
+  archived
+}
+
 model Team {
-  id          String  @id @db.Text
-  name        String  @unique @db.Text
-  displayName String  @map("display_name") @db.Text
-  matches     Match[]
+  id        String     @id @default(cuid()) @db.Text
+  name      String     @unique @db.Text
+  status    TeamStatus @default(active)
+  createdBy String     @map("created_by") @db.Text
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  creator    User         @relation("TeamCreator", fields: [createdBy], references: [id])
+  members    TeamMember[] @relation("TeamMembers")
+  matchesAsA Match[]      @relation("MatchTeamA")
+  matchesAsB Match[]      @relation("MatchTeamB")
+  matchWins  Match[]      @relation("MatchWinner")
 
   @@map("teams")
 }
 
+model TeamMember {
+  teamId   String   @map("team_id") @db.Text
+  userId   String   @map("user_id") @db.Text
+  joinedAt DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+
+  team     Team     @relation("TeamMembers", fields: [teamId], references: [id])
+  user     User     @relation("UserTeams", fields: [userId], references: [id])
+
+  @@id([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}
+
 model Match {
-  id           String   @id @db.Text
+  id           String   @id @default(cuid()) @db.Text
+  teamAId      String   @map("team_a_id") @db.Text
+  teamBId      String   @map("team_b_id") @db.Text
   winnerTeamId String   @map("winner_team_id") @db.Text
   playedAt     DateTime @default(now()) @map("played_at") @db.Timestamptz(6)
   note         String?  @db.Text
-  winnerTeam   Team     @relation(fields: [winnerTeamId], references: [id])
 
+  teamA        Team     @relation("MatchTeamA", fields: [teamAId], references: [id])
+  teamB        Team     @relation("MatchTeamB", fields: [teamBId], references: [id])
+  winnerTeam   Team     @relation("MatchWinner", fields: [winnerTeamId], references: [id])
+
+  @@index([teamAId])
+  @@index([teamBId])
   @@index([winnerTeamId])
   @@map("matches")
 }
 
 model User {
-  id           String   @id @db.Text
+  id           String   @id @default(cuid()) @db.Text
   username     String   @unique @db.Text
   passwordHash String   @map("password_hash") @db.Text
   email        String?  @unique @db.Text
@@ -38,6 +72,9 @@ model User {
   bio          String?  @db.Text
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  teamsCreated Team[]       @relation("TeamCreator")
+  teams        TeamMember[] @relation("UserTeams")
 
   @@map("users")
 }

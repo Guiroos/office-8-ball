@@ -16,7 +16,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
-import { TEAMS } from "@/lib/constants";
+// TODO(Task 5+): replace with dynamic teams fetched from /api/teams
+const TEAMS = [
+  { id: "frontend", displayName: "Frontend" },
+  { id: "backend", displayName: "Backend" },
+] as const;
 import type { MatchRecord, MatchesResponse, ProfileResponse } from "@/lib/types";
 
 import Image from "next/image";
@@ -263,7 +267,7 @@ export function ProfilePage() {
                       >
                         <div className="space-y-0.5">
                           <p className="text-sm font-semibold">
-                            {match.winnerName}
+                            {match.winnerTeamId}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             vs {loser?.displayName ?? "—"}

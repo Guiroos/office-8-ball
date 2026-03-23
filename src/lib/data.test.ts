@@ -1,65 +1,86 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("data layer", () => {
+const mockFindMany = vi.fn();
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    teamMember: { findMany: (...args: unknown[]) => mockFindMany(...args) },
+    match: {
+      findMany: (...args: unknown[]) => mockFindMany(...args),
+      create: (...args: unknown[]) => mockFindMany(...args),
+    },
+  },
+}));
+
+describe("data.ts", () => {
   beforeEach(() => {
-    delete process.env.DATABASE_URL;
     vi.resetModules();
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-12T10:00:00.000Z"));
+    mockFindMany.mockReset();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    delete process.env.DATABASE_URL;
   });
 
-  it("returns an empty scoreboard before any match is registered", async () => {
-    const { getScoreboard, listMatches } = await import("@/lib/data");
+  describe("listMatches", () => {
+    it("returns empty array when DATABASE_URL is not set", async () => {
+      delete process.env.DATABASE_URL;
+      const { listMatches } = await import("@/lib/data");
+      const result = await listMatches("user-abc");
+      expect(result).toEqual([]);
+      expect(mockFindMany).not.toHaveBeenCalled();
+    });
 
-    await expect(listMatches()).resolves.toEqual([]);
-    await expect(getScoreboard()).resolves.toMatchObject({
-      leaderTeamId: null,
-      leadBy: 0,
-      totalMatches: 0,
-      currentStreak: null,
+    it("returns empty array when user has no team memberships", async () => {
+      process.env.DATABASE_URL = "postgresql://test";
+      mockFindMany.mockResolvedValueOnce([]); // teamMember.findMany returns no memberships
+
+      const { listMatches } = await import("@/lib/data");
+      const result = await listMatches("user-abc");
+      expect(result).toEqual([]);
+    });
+
+    it("derives loserTeamId from teamAId/teamBId/winnerTeamId", async () => {
+      process.env.DATABASE_URL = "postgresql://test";
+      // First call: teamMember.findMany
+      mockFindMany.mockResolvedValueOnce([{ teamId: "team-a" }]);
+      // Second call: match.findMany
+      mockFindMany.mockResolvedValueOnce([
+        {
+          id: "match-1",
+          teamAId: "team-a",
+          teamBId: "team-b",
+          winnerTeamId: "team-a",
+          playedAt: new Date("2026-03-22T10:00:00.000Z"),
+          note: null,
+        },
+      ]);
+
+      const { listMatches } = await import("@/lib/data");
+      const result = await listMatches("user-abc");
+      expect(result[0].loserTeamId).toBe("team-b");
     });
   });
 
-  it("derives leader, leadBy and streak from match history in memory mode", async () => {
-    const { createMatch, getScoreboard, listMatches } = await import("@/lib/data");
+  describe("createMatch", () => {
+    it("returns the created match with derived loserTeamId", async () => {
+      process.env.DATABASE_URL = "postgresql://test";
+      mockFindMany.mockResolvedValueOnce({
+        id: "match-1",
+        teamAId: "team-a",
+        teamBId: "team-b",
+        winnerTeamId: "team-b",
+        playedAt: new Date("2026-03-22T10:00:00.000Z"),
+        note: null,
+      });
 
-    await createMatch({ winnerTeamId: "frontend" });
-    vi.setSystemTime(new Date("2026-03-12T10:01:00.000Z"));
-    await createMatch({ winnerTeamId: "frontend", note: "  virou passeio  " });
-    vi.setSystemTime(new Date("2026-03-12T10:02:00.000Z"));
-    await createMatch({ winnerTeamId: "backend" });
-
-    const scoreboard = await getScoreboard();
-    const matches = await listMatches();
-
-    expect(scoreboard).toMatchObject({
-      leaderTeamId: "frontend",
-      leadBy: 1,
-      totalMatches: 3,
-      currentStreak: {
-        teamId: "backend",
-        teamName: "Backend",
-        count: 1,
-      },
-    });
-    expect(scoreboard.teams).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: "frontend", wins: 2 }),
-        expect.objectContaining({ id: "backend", wins: 1 }),
-      ]),
-    );
-    expect(matches).toHaveLength(3);
-    expect(matches[0]).toMatchObject({
-      winnerTeamId: "backend",
-      note: null,
-    });
-    expect(matches[1]).toMatchObject({
-      winnerTeamId: "frontend",
-      note: "virou passeio",
+      const { createMatch } = await import("@/lib/data");
+      const result = await createMatch({
+        teamAId: "team-a",
+        teamBId: "team-b",
+        winnerTeamId: "team-b",
+      });
+      expect(result.match.loserTeamId).toBe("team-a");
     });
   });
 });
