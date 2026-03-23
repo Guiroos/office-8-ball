@@ -18,9 +18,10 @@ const MOCK_MATCHES = {
   matches: [
     {
       id: "m1",
+      teamAId: "frontend",
+      teamBId: "backend",
       winnerTeamId: "frontend",
-      winnerName: "Frontend",
-      winnerRoster: "Gui + Jean",
+      loserTeamId: "backend",
       playedAt: "2026-03-01T10:00:00.000Z",
       note: null,
     },
@@ -117,9 +118,10 @@ describe("ProfilePage", () => {
   it("displays up to 5 recent matches", async () => {
     const manyMatches = Array.from({ length: 7 }, (_, i) => ({
       id: `m${i}`,
+      teamAId: "frontend",
+      teamBId: "backend",
       winnerTeamId: "frontend",
-      winnerName: "Frontend",
-      winnerRoster: "Gui + Jean",
+      loserTeamId: "backend",
       playedAt: "2026-03-01T10:00:00.000Z",
       note: null,
     }));
@@ -129,7 +131,7 @@ describe("ProfilePage", () => {
     );
     render(<ProfilePage />);
     await waitFor(() => {
-      const items = screen.getAllByText("Frontend");
+      const items = screen.getAllByText("frontend");
       expect(items.length).toBeLessThanOrEqual(5);
     });
   });
