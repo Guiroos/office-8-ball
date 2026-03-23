@@ -91,10 +91,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const isMemberA = await isTeamMember(teamAId, user.id);
-  const isMemberB = isMemberA ? true : await isTeamMember(teamBId, user.id);
+  const isMember =
+    (await isTeamMember(teamAId, user.id)) ||
+    (await isTeamMember(teamBId, user.id));
 
-  if (!isMemberA && !isMemberB) {
+  if (!isMember) {
     return NextResponse.json<ApiErrorResponse>(
       { error: "Você precisa ser membro de pelo menos um dos times." },
       { status: 403 },
