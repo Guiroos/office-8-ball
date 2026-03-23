@@ -7,5 +7,29 @@
     "context7@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo '$CLAUDE_TOOL_INPUT' | grep -qE '\"file_path\".*\\.env'; then echo 'Blocked: direct edits to .env files are not allowed'; exit 1; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/guiroos/Documentos/Projects/office-8-ball && npm run typecheck 2>&1 | tail -20"
+          }
+        ]
+      }
+    ]
   }
 }
