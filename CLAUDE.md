@@ -122,3 +122,307 @@ For non-trivial tasks (multi-file changes, broad exploration, builds/tests), the
 - Target 10-20 lines of actionable info per result
 - Chain sub-agents: pass only relevant fields between them
 
+<!-- GSD:project-start source:PROJECT.md -->
+## Project
+
+**Office Sinuca Tracker**
+
+App de rastreamento de partidas de sinuca para o escritório. Colegas criam times (duplas ou solo), registram resultados de partidas e acompanham o ranking geral por vitórias/derrotas. A tela principal é a classificação — quem está no topo agora.
+
+**Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
+
+### Constraints
+
+- **Tech stack:** Next.js + Prisma + PostgreSQL — não introduzir serviço backend separado
+- **Dois modos:** App deve continuar funcionando em modo in-memory (sem DATABASE_URL) para dev e testes — qualquer nova rota precisa respeitar esse guard
+- **Schema:** Nunca modificar `prisma/schema.prisma` sem aprovação explícita — mudanças requerem migration e seed atualizados juntos
+- **Auth:** Credenciais apenas (email/senha) — sem OAuth para v1
+- **Deploy:** Vercel + GitHub Actions; migrations rodadas antes do build no CI
+<!-- GSD:project-end -->
+
+<!-- GSD:stack-start source:codebase/STACK.md -->
+## Technology Stack
+
+## Languages
+- TypeScript 5 - Application code, all `.ts` and `.tsx` files
+- JavaScript ES2017 - Configuration files, migration seeds
+- JSX/TSX - React component markup
+- CSS - Tailwind-generated styles via PostCSS
+- HTML - Server-rendered via Next.js
+## Runtime
+- Node.js (via Next.js/Vercel) - All execution
+- Browser (Chrome/Chromium) - E2E testing via Playwright
+- npm - Dependency management
+- Lockfile: `package-lock.json` (present, committed)
+## Frameworks & Core Libraries
+- Next.js 16.1.6 - Full-stack framework with App Router
+- React 19.2.3 - Component library and hooks
+- Tailwind CSS 4.2.1 - Utility-first styling
+- shadcn/ui 4.0.8 - Headless component library (Radix UI wrappers)
+- class-variance-authority 0.7.1 - Type-safe component variants
+- clsx 2.1.1 - Conditional classname merging
+- tailwind-merge 3.5.0 - Tailwind class conflict resolution
+- next-themes 0.4.6 - Theme provider (light/dark/sepia via localStorage)
+- Geist Font (next/font/google) - Default typeface
+- Vitest 4.1.0 - Unit and component test runner
+- @testing-library/react 16.3.2 - Component testing utilities
+- @testing-library/jest-dom 6.9.1 - DOM matchers
+- @testing-library/user-event 14.6.1 - User interaction simulation
+- jsdom 28.1.0 - DOM implementation for test environment
+- Playwright 1.58.2 - Headless browser automation
+## Build & Development Tools
+- Next.js dev server - Hot reload on file changes
+- npm run dev - Localhost:3000
+- Next.js build (`next build`) - Static and server-side rendering
+- Turbopack - Bundler (default for next dev and next build)
+- TypeScript 5 with strict mode
+- ESLint 9 - JavaScript linting
+- Prettier - Presumed for formatting (not explicitly configured; shadcn installs it)
+- Prisma 6.19.2 - ORM and schema management
+## Key Dependencies
+- next-auth 4.24.13 - Session and credential-based authentication
+- bcryptjs 3.0.3 - Password hashing (for credential validation)
+- @prisma/client 6.19.2 - Database client for PostgreSQL
+- @radix-ui/react-dialog 1.1.15 - Modal/dialog primitives
+- @radix-ui/react-scroll-area 1.2.10 - Custom scrollbar
+- @radix-ui/react-separator 1.1.8 - Visual divider
+- @radix-ui/react-slot 1.2.4 - Slot composition pattern
+- lucide-react 0.577.0 - Icon library (SVG icons as React components)
+- @base-ui/react 1.3.0 - Base unstyled UI components
+- Zod 4.3.6 - Schema validation and TypeScript inference
+- sonner 2.0.7 - Toast notifications (presumed from package name)
+- tw-animate-css 1.4.0 - Tailwind animation utilities
+- @vercel/speed-insights 2.0.0 - Core Web Vitals monitoring
+- dotenv 17.3.1 - Environment variable loading for Prisma config
+## Configuration Files
+- `tsconfig.json` - Strict mode, ES2017 target, Next.js plugin, path aliases
+- `next.config.ts - Security headers (CSP, X-Frame-Options, HSTS in production), remote image patterns
+- `prisma.config.ts` - PostgreSQL datasource, schema at `prisma/schema.prisma`, migrations at `prisma/migrations`, seed at `prisma/seed.mjs`
+- `vitest.config.ts` - jsdom, `@/` path alias, mock for `next/image`, coverage via v8
+- `playwright.config.ts` - Chromium only, baseURL from `PLAYWRIGHT_BASE_URL`, test dir `e2e/`, HTML reporter
+- `postcss.config.mjs` - Tailwind v4 PostCSS plugin + custom wildcard font-size removal for Turbopack
+- `eslint.config.mjs` - ESLint 9 flat config with Next.js defaults
+- `package.json` - Scripts for dev, build, test, lint, typecheck, e2e, prisma
+## Environment Variables
+- `DATABASE_URL` - PostgreSQL connection string (Neon Postgres recommended)
+- `NEXTAUTH_SECRET` - Auth.js session signing secret (only required when DATABASE_URL is set)
+- `NEXTAUTH_URL` - Session callback URL (defaults to `http://localhost:3000` in dev)
+- `NEXT_PUBLIC_APP_ENV` - Shown in UI; values: "development", "preview", "production"
+- `PLAYWRIGHT_BASE_URL` - Test server URL (defaults to `http://127.0.0.1:3000`)
+- `CI` - Set by CI runner; triggers single-worker Playwright mode and retries
+- Authentication is disabled
+- Matches and users are stored in RAM
+- Used for local development and unit test isolation
+## Platform Requirements
+- Node.js (version managed by project; run `node --version` to verify)
+- PostgreSQL (or Neon Postgres account for remote DB)
+- Chromium (installed via `npm run e2e:install` for Playwright)
+- Vercel (primary deployment platform)
+- PostgreSQL database (Neon or compatible)
+- Node.js runtime environment
+- Modern browsers (Chrome/Edge/Firefox/Safari)
+- E2E tests only run on Chromium (Desktop Chrome profile)
+<!-- GSD:stack-end -->
+
+<!-- GSD:conventions-start source:CONVENTIONS.md -->
+## Conventions
+
+## Language & Tooling
+- **TypeScript** strict mode — `tsconfig.json` targets ES2017+, `moduleResolution: bundler`
+- **ESLint** via `next/core-web-vitals` + `@typescript-eslint`; run with `npm run lint`
+- **Prettier** for formatting (implicit via Next.js toolchain)
+- All source files in `src/` use `"use client"` directive only when needed (RSC-first)
+## Import Conventions
+- **Always** use `@/` path alias — never relative `../` paths
+- Named imports for everything except Next.js page/layout/route files
+- Group order: external packages → `@/lib/*` → `@/components/*` → local
+## Naming
+| Artifact | Convention | Example |
+|----------|------------|---------|
+| Files | `kebab-case` | `dashboard-hero.tsx`, `use-dashboard-data.ts` |
+| React components | `PascalCase` | `DashboardHero`, `StatTile` |
+| Functions/variables | `camelCase` | `getAuthenticatedUser`, `currentUser` |
+| Types/interfaces | `PascalCase` | `TeamRecord`, `MatchRecord`, `SessionUser` |
+| Constants | `SCREAMING_SNAKE` | `TEAMS`, `AUTH_RATE_LIMIT_ERROR` |
+| Route handlers | Named exports matching HTTP verbs | `export async function GET()` |
+| Hooks | `use` prefix | `useDashboardData` |
+## Component Patterns
+### CVA for Variants
+### Styling Rules
+- **Semantic design tokens only** — no arbitrary Tailwind values (`[#abc123]`, `[var(--token)]`)
+- Shadow pattern: `shadow-sm shadow-{color}/{opacity}` (e.g., `shadow-sm shadow-gold/35`)
+- Shadow states: `shadow-sm` rest → `shadow-md` hover → `shadow-xs` active
+- Never use `style={{}}` when a token class exists
+### Client vs Server Components
+- Server components by default (no `"use client"`)
+- Add `"use client"` only when using browser APIs, event handlers, or React hooks
+- Data fetching hooks (`use-dashboard-data.ts`) are client-side
+## Type Patterns
+### Domain Types
+### API Response Types
+## API Route Patterns
+### Auth Guard (every protected route)
+### Input Validation
+- Use Zod schemas for request body validation
+- Return HTTP 400 with `{ error: string }` on validation failure
+- Validate before any DB write
+### HTTP Status Codes (do not change without updating client-side handlers)
+| Status | Meaning |
+|--------|---------|
+| 200 | Successful GET |
+| 201 | Successful POST (creation) |
+| 400 | Validation error |
+| 401 | Not authenticated |
+| 403 | Forbidden (not a team member) |
+| 404 | Resource not found |
+| 409 | Conflict (duplicate) |
+| 422 | Business rule violation |
+| 429 | Rate limited |
+| 500 | Internal server error |
+| 503 | Auth/DB unavailable |
+## Error Handling
+### Server Side
+- Auth failures: use `getAuthRequiredResponse()` / `getAuthUnavailableResponse()` from `@/lib/auth`
+- Validation failures: Zod `safeParse` + return 400 with first issue message
+- Not found: return 404 with `{ error: "..." }`
+- Business violations: return 422 with descriptive message
+### Client Side
+- API errors surface through `use-dashboard-data.ts` hook state
+- Toast notifications via `sonner` for user-facing feedback
+## Language in Code
+- Error messages and validation messages in **Brazilian Portuguese**
+- Code identifiers, comments, and type names in **English**
+- Git commits in English (conventional commits)
+- PR bodies in Portuguese (sections: "O que muda" / "Como testar")
+## In-Memory Fallback Pattern
+## Component Layer Rules
+- `ui/` components: shadcn primitives only, no domain logic
+- `primitives/` components: domain-aware reusables (StatTile, SectionHeader)
+- Feature components import from `ui/` and `primitives/` — never cross-feature imports
+<!-- GSD:conventions-end -->
+
+<!-- GSD:architecture-start source:ARCHITECTURE.md -->
+## Architecture
+
+## Pattern Overview
+- Next.js 16 App Router with route groups for authentication
+- Layered architecture: domain layer → API routes → client components
+- Session-based auth (Auth.js v4 with JWT) with optional in-memory fallback
+- Prisma ORM with PostgreSQL; dual-mode support (database or in-memory for testing)
+- Client-side state via React hooks only (no Redux/Zustand)
+- All data derivation on-demand — no persisted scoreboard counters
+## Layers
+- Purpose: React components for rendering pages and features
+- Location: `src/components/` (organized by feature and primitives)
+- Contains: Page components, feature-specific components, UI primitives
+- Depends on: Domain types, client-side data hooks, theme system
+- Used by: Next.js pages in `src/app/`
+- Purpose: Constants, types, derived data calculations
+- Location: `src/lib/constants.ts`, `src/lib/types.ts`, `src/lib/data.ts`
+- Contains: Type definitions (TeamRecord, MatchRecord, etc.), data normalization, helper functions
+- Depends on: Prisma client
+- Used by: API routes, components via custom hooks
+- Purpose: REST endpoints for authentication, teams, matches, profile
+- Location: `src/app/api/*/route.ts` (organized by feature)
+- Contains: Request validation (Zod), auth guards, domain function calls, response serialization
+- Depends on: Domain functions, auth utilities, Prisma
+- Used by: Client components and external integrations
+- Purpose: Credential validation, session management, rate limiting
+- Location: `src/lib/auth.ts`, `src/lib/auth-validation.ts`, `src/lib/auth-rate-limit.ts`
+- Contains: Auth configuration (NextAuthOptions), user session extraction, password validation, request-based rate limiting
+- Depends on: bcryptjs, next-auth, Prisma
+- Used by: Middleware, API routes, protected layouts
+- Purpose: Database schema and client initialization
+- Location: `prisma/schema.prisma`, `src/lib/prisma.ts`
+- Contains: Prisma Client singleton, database models (User, Team, TeamMember, Match, AuthRateLimit)
+- Depends on: PostgreSQL database
+- Used by: Domain functions and API routes
+- Purpose: Request interception and protected route enforcement
+- Location: `middleware.ts` (root)
+- Contains: Auth guard middleware that redirects unauthenticated users to `/login`
+- Depends on: next-auth/middleware
+- Used by: Next.js router
+## Data Flow
+- Dashboard state (scoreboard, matches) stored in React hook state via `useState`
+- All derivations computed fresh from match history on each load
+- No Redux/Zustand; no client-side normalized cache
+- Scoreboard counters (wins, leadBy, streak) derived from match array, not persisted
+## Key Abstractions
+- Purpose: Normalized team with member roster and metadata
+- Examples: `src/lib/types.ts` (type definition), `src/lib/teams.ts` (normalization function)
+- Pattern: Prisma raw response normalized to ISO dates and snake_case → camelCase
+- Purpose: Normalized match with winner/loser IDs and playedAt timestamp
+- Examples: `src/lib/data.ts` (createMatch, listMatches)
+- Pattern: Derived loser from teamA/teamB and winnerTeamId; dates converted to ISO
+- Purpose: Request validation and field-level error reporting
+- Examples: `createMatchSchema`, `createTeamSchema` in route handlers
+- Pattern: `safeParse()` used; errors returned as 400 with field errors in response
+- Purpose: Per-action (login/register) throttling based on username + IP
+- Examples: `src/lib/auth-rate-limit.ts`
+- Pattern: In-memory state stored in AuthRateLimit table; time-window based blocking
+## Entry Points
+- Location: `src/app/page.tsx`
+- Triggers: Direct visit to `/`
+- Responsibilities: Extract authenticated user, redirect to `/dashboard` if logged in, else `/login`
+- Location: `src/app/(authenticated)/dashboard/page.tsx`
+- Triggers: User navigates after login
+- Responsibilities: Render scoreboard, teams, recent matches via `useDashboardData()` hook
+- Location: `src/app/(authenticated)/layout.tsx`
+- Triggers: Any route under `/(authenticated)/*`
+- Responsibilities: Enforce authentication, render AppShell with sidebar and user menu
+- Location: `src/app/api/auth/[...nextauth]/route.ts`
+- Triggers: `POST /api/auth/signin`, `POST /api/auth/signout`, etc. (Auth.js internal)
+- Responsibilities: Delegate to CredentialsProvider, manage JWT session
+- Location: `src/app/api/auth/register/route.ts`
+- Triggers: `POST /api/auth/register`
+- Responsibilities: Validate payload, check rate limit, hash password, create user, return 201
+- Location: `src/app/api/teams/route.ts` (GET/POST), `src/app/api/teams/[id]/route.ts` (GET/PATCH/DELETE)
+- Triggers: Team CRUD operations
+- Responsibilities: List user teams, create team, fetch team details, archive team
+- Location: `src/app/api/matches/route.ts`
+- Triggers: `GET /api/matches` (recent matches), `POST /api/matches` (register result)
+- Responsibilities: Validate team membership, register match, return normalized records
+- Location: `src/app/api/scoreboard/route.ts`
+- Triggers: `GET /api/scoreboard`
+- Responsibilities: Fetch all user's team matches, compute wins/streaks, return aggregated stats
+## Error Handling
+- **401 Unauthorized:** No authenticated session; return `getAuthRequiredResponse()` (error message, status 401)
+- **400 Bad Request:** Validation failure; return Zod errors or business logic errors (invalid teams, duplicate names)
+- **403 Forbidden:** User not member of team; return permission error
+- **404 Not Found:** Resource (team, user) not found
+- **409 Conflict:** Duplicate constraint (username, team name already taken); Prisma P2002 caught and mapped to 400 with user message
+- **429 Too Many Requests:** Rate limit exceeded (login/register); return retryAfterSeconds
+- **503 Service Unavailable:** Database not configured (DATABASE_URL missing); return auth unavailable error
+- **500 Internal Server Error:** Unexpected errors propagated; not caught in routes
+## Cross-Cutting Concerns
+- Request payloads validated with Zod before mutation
+- Auth payload validated with `validateLoginPayload()` and `validateRegisterPayload()`
+- Team IDs validated: teams must exist, be active, user must be member
+- All protected routes call `getAuthenticatedUser()` at handler start
+- Middleware enforces authentication for `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings`
+- Public routes: `/`, `/login`, `/api/auth/*`, `/api/auth/register`
+- Session stored as JWT in HttpOnly cookie; strategy set in `getAuthOptions()`
+- User can only see own teams and matches
+- User must be team member to register a match for that team
+- Team archived by creator or admin (not yet implemented)
+<!-- GSD:architecture-end -->
+
+<!-- GSD:workflow-start source:GSD defaults -->
+## GSD Workflow Enforcement
+
+Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+
+Use these entry points:
+- `/gsd:quick` for small fixes, doc updates, and ad-hoc tasks
+- `/gsd:debug` for investigation and bug fixing
+- `/gsd:execute-phase` for planned phase work
+
+Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+<!-- GSD:workflow-end -->
+
+<!-- GSD:profile-start -->
+## Developer Profile
+
+> Profile not yet configured. Run `/gsd:profile-user` to generate your developer profile.
+> This section is managed by `generate-claude-profile` -- do not edit manually.
+<!-- GSD:profile-end -->
