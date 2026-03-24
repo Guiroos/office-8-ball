@@ -28,6 +28,26 @@ These are not bugs — they are intentional design constraints that are easy to 
 | No separate backend service | Adds operational complexity with no user benefit at this scale |
 | In-memory fallback must remain | Test harness and local dev path — breaking it breaks all unit/route tests |
 
+## Active Incomplete Work (In-Progress Features)
+
+### Scoreboard API Disabled (High-Severity)
+- `src/app/api/scoreboard/route.ts` always returns 503 with a placeholder message
+- **Impact:** Any client consuming `/api/scoreboard` receives an error — the endpoint is non-functional
+- **Root cause:** Suspended during dynamic teams refactor; needs reimplementation for dynamic team aggregation
+- **File:** `src/app/api/scoreboard/route.ts`
+
+### Dashboard Has Hardcoded Teams (High-Severity)
+- `src/components/dashboard/index.tsx` (lines 13–32) defines a local `TEAMS` constant with hardcoded `frontend`/`backend` entries including display names, rosters, and slogans
+- A `// TODO(Task 5+): replace with dynamic teams fetched from /api/teams` comment marks this as incomplete
+- **Impact:** Dashboard cannot display dynamically created teams from `/api/teams`; UI is disconnected from the dynamic teams API
+- **File:** `src/components/dashboard/index.tsx:12`
+
+### Direct Prisma Import in Route Handler
+- `src/app/api/matches/route.ts` imports `prisma` directly (line 12) for team status checks
+- This bypasses the data layer abstraction in `src/lib/data.ts` / `src/lib/teams.ts`
+- **Risk:** Business logic leaks into the route handler; harder to test and maintain
+- **File:** `src/app/api/matches/route.ts:12`
+
 ## Known Technical Debt
 
 ### Rate Limiter Storage (Low-Severity)
