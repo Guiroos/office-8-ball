@@ -13,9 +13,15 @@ enum TeamStatus {
   archived
 }
 
+enum TeamType {
+  solo
+  duo
+}
+
 model Team {
   id        String     @id @default(cuid()) @db.Text
   name      String     @unique @db.Text
+  type      TeamType   @default(duo)
   status    TeamStatus @default(active)
   createdBy String     @map("created_by") @db.Text
   createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
