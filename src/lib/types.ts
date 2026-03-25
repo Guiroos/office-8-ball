@@ -10,6 +10,7 @@ export type TeamMemberRecord = {
 export type TeamRecord = {
   id: string;
   name: string;
+  type: 'solo' | 'duo';
   status: TeamStatus;
   createdBy: string;
   createdAt: string;

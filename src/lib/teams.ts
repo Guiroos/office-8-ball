@@ -4,6 +4,7 @@ import type { TeamRecord } from "@/lib/types";
 function normalizeTeam(team: {
   id: string;
   name: string;
+  type: 'solo' | 'duo';
   status: string;
   createdBy: string;
   createdAt: Date;
@@ -13,6 +14,7 @@ function normalizeTeam(team: {
   return {
     id: team.id,
     name: team.name,
+    type: team.type,
     status: team.status as "active" | "archived",
     createdBy: team.createdBy,
     createdAt: team.createdAt.toISOString(),
