@@ -58,7 +58,9 @@
 5. Scoreboard query has no limits (fetches ALL matches; prevents silent data corruption)
 6. API performance < 500ms for office scale (100+ matches per team)
 
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 02-01-PLAN.md — Reactivate GET /api/scoreboard: add ScoreboardResponse types, implement getScoreboard() in data layer (no query limits), rewrite route handler, full test coverage
+- [ ] 02-02-PLAN.md — Refactor dashboard to use dynamic teams: remove TEAMS constant, add useTeamsData() hook, fix registerWin payload to send teamAId+teamBId+winnerTeamId
 
 **UI hint:** yes
 
@@ -133,7 +135,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
-| 2. Scoreboard Reactivation & Match Recording | 0/? | Not started | - |
+| 2. Scoreboard Reactivation & Match Recording | 0/2 | Planning   | - |
 | 3. Stats Computation Module | 0/? | Not started | - |
 | 4. Ranking & Team Details | 0/? | Not started | - |
 | 5. User Profiles & Advanced Features | 0/? | Not started | - |
@@ -163,3 +165,4 @@
 
 *Roadmap created: 2026-03-23*
 *Phase 1 executed: 2026-03-25*
+*Phase 2 planned: 2026-03-25*
