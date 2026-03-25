@@ -1,8 +1,21 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: planning
+last_updated: "2026-03-25T00:26:55.895Z"
+progress:
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
+---
+
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Roadmap created, awaiting planning phase execution
-**Last updated:** 2026-03-23
+**Status:** Ready to plan
+**Last updated:** 2026-03-25
 
 ---
 
@@ -10,9 +23,10 @@
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** v1 launch — dynamic team management, live scoreboard, ranked standings
+**Current Focus:** Phase 01 — dynamic-team-management
 
 **Scope Boundaries:**
+
 - v1: Dynamic teams, match recording, ranking page, user profiles
 - v1.x (deferred): Advanced filtering, deep customization, competitive features
 - v2+: Mobile app, ELO system, tournaments, real-time notifications
@@ -21,17 +35,8 @@
 
 ## Current Position
 
-**Milestone:** Office Sinuca Tracker v1
-**Phase:** Roadmap phase (planning complete; awaiting plan creation)
-**Plan:** None (awaiting `/gsd:plan-phase 1`)
-**Progress:** 0/5 phases started
-
-```
-[ROADMAP] → [PLANNING PHASE 1] → [EXECUTING PHASE 1] → [PLANNING PHASE 2] → ...
-    ✓ Done          ← You are here
-```
-
----
+Phase: 2
+Plan: Not started
 
 ## Roadmap Summary
 
@@ -52,17 +57,20 @@
 ## Performance Metrics
 
 **Code Health:**
+
 - Lines of code (base): ~8,000 (Next.js app) — TBD after Phase 1
 - Test coverage (target): 80%+ for stats module, 60%+ for routes
 - Build time (target): < 30 seconds (Next.js 16)
 - Dev server startup (target): < 5 seconds
 
 **Runtime Performance:**
+
 - Scoreboard API: < 500ms for office scale (100+ matches/team)
 - Ranking page load: < 1 second cold; < 100ms cached
 - Match recording: < 2 seconds (includes validation + API call)
 
 **User Experience:**
+
 - Match → ranking update: < 1 second (cache revalidation)
 - Team creation → visibility in dashboard: Immediate
 - No hardcoded team constants visible in UI
@@ -88,6 +96,22 @@
 4. **Team-centric ranking** (not player-centric initially)
    - Rationale: Office context is team-based league; individual profiles come later
    - Implication: Phase 4 ranking focuses on team standings; Phase 5 adds player profiles
+
+5. **TeamType enum follows TeamStatus enum pattern** (Plan 01-01)
+   - Rationale: Consistent enum pattern in schema; type safety at DB level
+   - Implication: solo = 1 member (creator only); duo = 2 members (creator + secondMemberUserId)
+
+6. **Seed script requires no team changes** (Plan 01-01)
+   - Rationale: Teams are created at runtime by users; no hardcoded seed teams
+   - Implication: No seed migration needed for type field
+
+7. **Member management endpoints return 503 without DATABASE_URL** (Plan 01-02)
+   - Rationale: No in-memory fallback for team member operations (per D-10)
+   - Implication: POST/DELETE /api/teams/:id/members require DATABASE_URL to function
+
+8. **Async params pattern for all dynamic route handlers** (Plan 01-02)
+   - Rationale: Next.js 15+ requires params as Promise; existing codebase uses this pattern
+   - Implication: All `[id]/route.ts` files use `{ params }: { params: Promise<{...}> }` with `await params`
 
 **Pitfalls to Avoid:**
 
@@ -127,4 +151,4 @@
 ---
 
 *STATE.md created: 2026-03-23*
-*Ready for: `/gsd:plan-phase 1`*
+*Last session: 2026-03-25 — Completed 01-02-PLAN.md (team member management API)*

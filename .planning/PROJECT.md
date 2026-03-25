@@ -23,12 +23,13 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 - ✓ Usuário pode arquivar um time — existing
 - ✓ Usuário pode registrar resultado de partida (deve ser membro do time) — existing
 - ✓ Shell do app com sidebar e navegação — existing
+- ✓ Usuário pode criar time do tipo solo (1v1) com `type: solo` — Validated in Phase 01: dynamic-team-management
+- ✓ Usuário pode adicionar e remover membros de um time com guards de permissão — Validated in Phase 01: dynamic-team-management
 
 ### Active
 
 <!-- Scope atual. Construindo em direção a estes. -->
 
-- [ ] Usuário pode criar time do tipo solo (1v1) — estrutura igual ao duo, validado como `type: solo`
 - [ ] Dashboard exibe times buscados dinamicamente de `/api/teams` (remover hardcode)
 - [ ] API `/api/scoreboard` retorna W/L agregado por time (reimplementar para times dinâmicos)
 - [ ] Página de ranking exibe todos os times ordenados por vitórias
@@ -69,7 +70,7 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Times como entidade única (solo e duo) com `type` field | Mantém schema uniforme; evita duplicar lógica de partidas e stats por tipo | — Pending |
+| Times como entidade única (solo e duo) com `type` field | Mantém schema uniforme; evita duplicar lógica de partidas e stats por tipo | ✓ Validated Phase 01 |
 | Ranking baseado em W/L simples (sem ELO) | Contexto de escritório informal; complexidade de ELO não agrega valor | — Pending |
 | Reativar `/api/scoreboard` para times dinâmicos | Endpoint correto já existe; precisa ser reimplementado para a nova estrutura | — Pending |
 
@@ -91,4 +92,4 @@ Este documento evolui a cada transição de fase e milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-03-23 after initialization*
+*Last updated: 2026-03-24 — Phase 01 (dynamic-team-management) complete*
