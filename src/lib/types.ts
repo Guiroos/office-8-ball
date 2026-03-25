@@ -81,3 +81,22 @@ export type ProfileResponse = {
   bio: string | null;
   createdAt: string;
 };
+
+// Scoreboard domain
+
+export type ScoreboardTeamEntry = {
+  id: string;
+  wins: number;
+  losses: number;
+};
+
+export type ScoreboardData = {
+  teams: ScoreboardTeamEntry[];
+  leaderTeamId: string | null;
+  leadBy: number;
+  totalMatches: number;
+};
+
+export type ScoreboardResponse = {
+  scoreboard: ScoreboardData;
+};
