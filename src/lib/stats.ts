@@ -47,39 +47,42 @@ function detectStreaks(
     };
   }
 
-  let currentType: "win" | "loss" | "none" = "none";
-  let currentCount = 0;
+  let runType: "win" | "loss" | "none" = "none";
+  let runCount = 0;
   let longestType: "win" | "loss" | "none" = "none";
   let longestCount = 0;
 
-  for (const match of teamMatches) {
+  // Iterate oldest → newest (reverse of descending input) so that the final
+  // value of runType/runCount reflects the MOST RECENT continuous run.
+  for (let i = teamMatches.length - 1; i >= 0; i--) {
+    const match = teamMatches[i];
     const matchType: "win" | "loss" =
       match.winnerTeamId === teamId ? "win" : "loss";
 
-    if (currentType === "none") {
-      currentType = matchType;
-      currentCount = 1;
-    } else if (currentType === matchType) {
-      currentCount++;
+    if (runType === "none") {
+      runType = matchType;
+      runCount = 1;
+    } else if (runType === matchType) {
+      runCount++;
     } else {
       // Streak broke — check against longest before resetting
-      if (currentCount > longestCount) {
-        longestType = currentType;
-        longestCount = currentCount;
+      if (runCount > longestCount) {
+        longestType = runType;
+        longestCount = runCount;
       }
-      currentType = matchType;
-      currentCount = 1;
+      runType = matchType;
+      runCount = 1;
     }
   }
 
-  // Always compare final streak (loop ends without a break for last streak)
-  if (currentCount > longestCount) {
-    longestType = currentType;
-    longestCount = currentCount;
+  // Always compare final streak (loop ends without a break for last/most-recent streak)
+  if (runCount > longestCount) {
+    longestType = runType;
+    longestCount = runCount;
   }
 
   return {
-    currentStreak: { type: currentType, count: currentCount },
+    currentStreak: { type: runType, count: runCount },
     longestStreak: { type: longestType, count: longestCount },
   };
 }
