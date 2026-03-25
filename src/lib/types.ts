@@ -100,3 +100,7 @@ export type ScoreboardData = {
 export type ScoreboardResponse = {
   scoreboard: ScoreboardData;
 };
+
+// Stats domain — derived from Zod schemas in src/lib/stats.ts
+
+export type { TeamStats, HeadToHeadStats } from "@/lib/stats";
