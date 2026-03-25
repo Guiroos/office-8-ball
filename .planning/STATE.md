@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 01 — dynamic-team-management
+**Current Focus:** Phase 02 — scoreboard-reactivation-&-match-recording
 
 **Scope Boundaries:**
 
@@ -46,7 +46,7 @@ Plan: Not started
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 1 | Dynamic Team CRUD + dual-mode verification | TEAM-01 | Not started |
+| 1 | Dynamic Team CRUD + dual-mode verification | TEAM-01 | ✓ Complete |
 | 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | Not started |
 | 3 | Stats computation module (W/L, streaks, H2H) | — | Not started |
 | 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | Not started |

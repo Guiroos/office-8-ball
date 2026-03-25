@@ -37,6 +37,7 @@
 
 **Plans:**
 2/2 plans complete
+- [x] 01-PLAN-1 — Add TeamType enum and type field to schema, domain layer, and POST /api/teams
 - [x] 01-PLAN-2 — Implement POST/DELETE member management endpoints with constraints
 
 ---
@@ -143,7 +144,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 1 | Planning complete — 2 plans created |
+| TEAM-01 | Phase 1 | Complete |
 | TEAM-02 | Phase 4 | Pending |
 | DASH-01 | Phase 2 | Pending |
 | DASH-02 | Phase 2 | Pending |
@@ -161,4 +162,4 @@
 ---
 
 *Roadmap created: 2026-03-23*
-*Phase 1 planning completed: 2026-03-24*
+*Phase 1 executed: 2026-03-25*
