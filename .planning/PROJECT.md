@@ -32,6 +32,7 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 
 - ✓ Dashboard exibe times buscados dinamicamente de `/api/teams` (remover hardcode) — Validated in Phase 02: scoreboard-reactivation-match-recording
 - ✓ API `/api/scoreboard` retorna W/L agregado por time (reimplementar para times dinâmicos) — Validated in Phase 02: scoreboard-reactivation-match-recording
+- ✓ Módulo de stats puro (`computeTeamStats`, `computeHeadToHead`) com Zod e 21 testes — Validated in Phase 03: stats-computation-module
 - [ ] Página de ranking exibe todos os times ordenados por vitórias
 - [ ] Ranking mostra: W/L, win rate %, streak atual, total de partidas por time
 - [ ] Página de times exibe os times do usuário com suas stats
@@ -71,7 +72,8 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Times como entidade única (solo e duo) com `type` field | Mantém schema uniforme; evita duplicar lógica de partidas e stats por tipo | ✓ Validated Phase 01 |
-| Ranking baseado em W/L simples (sem ELO) | Contexto de escritório informal; complexidade de ELO não agrega valor | — Pending |
+| Ranking baseado em W/L simples (sem ELO) | Contexto de escritório informal; complexidade de ELO não agrega valor | ✓ Validated Phase 03 |
+| Stats como módulo puro (stats.ts) separado da camada de API | Facilita testes unitários sem DB; reutilizável por qualquer rota futura | ✓ Validated Phase 03 |
 | Reativar `/api/scoreboard` para times dinâmicos | Endpoint correto já existe; precisa ser reimplementado para a nova estrutura | ✓ Validated Phase 02 |
 
 ## Evolution
@@ -92,4 +94,4 @@ Este documento evolui a cada transição de fase e milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-03-24 — Phase 02 (scoreboard-reactivation-match-recording) complete*
+*Last updated: 2026-03-25 — Phase 03 (stats-computation-module) complete*
