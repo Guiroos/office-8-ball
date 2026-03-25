@@ -9,7 +9,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Dynamic Team Management** — Users can create teams (solo/duo types) and manage rosters; verifies dual-mode persistence
+- [x] **Phase 1: Dynamic Team Management** — Users can create teams (solo/duo types) and manage rosters; verifies dual-mode persistence (completed 2026-03-25)
 - [ ] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection
 - [ ] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics
 - [ ] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster
@@ -35,7 +35,9 @@
 5. Dual-mode persistence verified: same teams exist in in-memory constants and PostgreSQL database
 6. All team CRUD operations work without DATABASE_URL (in-memory mode)
 
-**Plans:** TBD
+**Plans:**
+2/2 plans complete
+- [x] 01-PLAN-2 — Implement POST/DELETE member management endpoints with constraints
 
 ---
 
@@ -129,7 +131,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Dynamic Team Management | 0/? | Not started | - |
+| 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
 | 2. Scoreboard Reactivation & Match Recording | 0/? | Not started | - |
 | 3. Stats Computation Module | 0/? | Not started | - |
 | 4. Ranking & Team Details | 0/? | Not started | - |
@@ -141,7 +143,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 1 | Pending |
+| TEAM-01 | Phase 1 | Planning complete — 2 plans created |
 | TEAM-02 | Phase 4 | Pending |
 | DASH-01 | Phase 2 | Pending |
 | DASH-02 | Phase 2 | Pending |
@@ -159,3 +161,4 @@
 ---
 
 *Roadmap created: 2026-03-23*
+*Phase 1 planning completed: 2026-03-24*
