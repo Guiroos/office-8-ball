@@ -5,18 +5,11 @@ import type {
   CreateMatchResponse,
   MatchesResponse,
   MatchRecord,
+  ScoreboardData,
+  ScoreboardResponse,
+  TeamRecord,
+  TeamsResponse,
 } from "@/lib/types";
-
-// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
-type ScoreboardData = {
-  teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
-  leaderTeamId: string | null;
-  leadBy: number;
-  totalMatches: number;
-  currentStreak: { teamId: string; teamName: string; count: number } | null;
-};
-
-type ScoreboardResponse = { scoreboard: ScoreboardData };
 
 type DashboardState = {
   scoreboard: ScoreboardData | null;
@@ -24,7 +17,9 @@ type DashboardState = {
 };
 
 type RegisterWinInput = {
-  teamId: string;
+  teamId: string;       // the winning team ID (winnerTeamId)
+  teamAId: string;      // first team in the pair
+  teamBId: string;      // second team in the pair
   note: string;
 };
 
@@ -45,6 +40,30 @@ async function fetchDashboardData() {
     scoreboard: scoreboardJson.scoreboard,
     matches: matchesJson.matches,
   };
+}
+
+export function useTeamsData() {
+  const [teams, setTeams] = useState<TeamRecord[]>([]);
+  const [teamsLoading, setTeamsLoading] = useState(true);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const response = await fetch("/api/teams", { cache: "no-store" });
+        if (!response.ok) throw new Error("Não foi possível carregar os times.");
+        const json = (await response.json()) as TeamsResponse;
+        setTeams(json.teams);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Não foi possível carregar os times.",
+        );
+      } finally {
+        setTeamsLoading(false);
+      }
+    })();
+  }, []);
+
+  return { teams, teamsLoading };
 }
 
 export function useDashboardData() {
@@ -72,14 +91,14 @@ export function useDashboardData() {
     })();
   }, []);
 
-  async function registerWin({ teamId, note }: RegisterWinInput) {
+  async function registerWin({ teamId, teamAId, teamBId, note }: RegisterWinInput) {
     setSubmittingTeamId(teamId);
 
     const execute = async () => {
       const response = await fetch("/api/matches", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ winnerTeamId: teamId, note }),
+        body: JSON.stringify({ teamAId, teamBId, winnerTeamId: teamId, note }),
       });
 
       if (!response.ok) {
