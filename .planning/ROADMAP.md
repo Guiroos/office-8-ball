@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Dynamic Team Management** — Users can create teams (solo/duo types) and manage rosters; verifies dual-mode persistence (completed 2026-03-25)
-- [ ] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection
+- [x] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection (completed 2026-03-25)
 - [ ] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics
 - [ ] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster
 - [ ] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters
@@ -58,9 +58,9 @@
 5. Scoreboard query has no limits (fetches ALL matches; prevents silent data corruption)
 6. API performance < 500ms for office scale (100+ matches per team)
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 - [x] 02-01-PLAN.md — Reactivate GET /api/scoreboard: add ScoreboardResponse types, implement getScoreboard() in data layer (no query limits), rewrite route handler, full test coverage
-- [ ] 02-02-PLAN.md — Refactor dashboard to use dynamic teams: remove TEAMS constant, add useTeamsData() hook, fix registerWin payload to send teamAId+teamBId+winnerTeamId
+- [x] 02-02-PLAN.md — Refactor dashboard to use dynamic teams: remove TEAMS constant, add useTeamsData() hook, fix registerWin payload to send teamAId+teamBId+winnerTeamId
 
 **UI hint:** yes
 
@@ -135,7 +135,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
-| 2. Scoreboard Reactivation & Match Recording | 0/2 | Planning   | - |
+| 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 0/? | Not started | - |
 | 4. Ranking & Team Details | 0/? | Not started | - |
 | 5. User Profiles & Advanced Features | 0/? | Not started | - |

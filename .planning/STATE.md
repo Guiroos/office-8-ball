@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-03-25T01:20:35.888Z"
+status: verifying
+last_updated: "2026-03-25T01:33:05.909Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Executing Phase 02
+**Status:** Phase complete — ready for verification
 **Last updated:** 2026-03-25
 
 ---
@@ -35,8 +35,8 @@ progress:
 
 ## Current Position
 
-Phase: 02 (scoreboard-reactivation-match-recording) — EXECUTING
-Plan: 2 of 2
+Phase: 02 (scoreboard-reactivation-match-recording) — COMPLETE
+Plan: 2 of 2 (all plans done)
 
 ## Roadmap Summary
 
@@ -47,7 +47,7 @@ Plan: 2 of 2
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | 1 | Dynamic Team CRUD + dual-mode verification | TEAM-01 | ✓ Complete |
-| 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | Not started |
+| 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | ✓ Complete |
 | 3 | Stats computation module (W/L, streaks, H2H) | — | Not started |
 | 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | Not started |
 | 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Not started |
@@ -125,6 +125,14 @@ Plan: 2 of 2
     - Rationale: Simplest correct behavior; tiebreakers add complexity without office-scale value
     - Implication: UI must handle null leaderTeamId (show "Tied" state)
 
+12. **Team color variant is positional (index), not identity-based** (Plan 02-02)
+    - Rationale: Decouples UI color scheme from database team IDs; first team = alpha, second = beta
+    - Implication: Dashboard renders any two teams with consistent alpha/beta visual distinction
+
+13. **useTeamsData() follows same error-toast pattern as useDashboardData()** (Plan 02-02)
+    - Rationale: Consistent UX for loading errors; sonner toast.error used throughout the hook layer
+    - Implication: All data hook errors surface as toasts — no silent failures
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -163,4 +171,4 @@ Plan: 2 of 2
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 02-01-PLAN.md (scoreboard API reactivation)*
+*Last session: 2026-03-25 — Completed 02-02-PLAN.md (dynamic dashboard refactor + registerWin payload fix)*
