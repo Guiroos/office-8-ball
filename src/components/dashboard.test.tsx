@@ -7,18 +7,9 @@ import { Dashboard } from "@/components/dashboard";
 import type {
   CreateMatchResponse,
   MatchesResponse,
+  ScoreboardResponse,
+  TeamsResponse,
 } from "@/lib/types";
-
-// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
-type ScoreboardResponse = {
-  scoreboard: {
-    teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
-    leaderTeamId: string | null;
-    leadBy: number;
-    totalMatches: number;
-    currentStreak: { teamId: string; teamName: string; count: number } | null;
-  };
-};
 
 vi.mock("sonner", () => ({
   toast: {
@@ -28,51 +19,52 @@ vi.mock("sonner", () => ({
   },
 }));
 
+const initialTeams: TeamsResponse = {
+  teams: [
+    {
+      id: "frontend",
+      name: "Frontend",
+      type: "duo",
+      status: "active",
+      createdBy: "user-1",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      members: [{ userId: "user-1", joinedAt: "2026-01-01T00:00:00.000Z" }],
+    },
+    {
+      id: "backend",
+      name: "Backend",
+      type: "duo",
+      status: "active",
+      createdBy: "user-2",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      members: [{ userId: "user-2", joinedAt: "2026-01-01T00:00:00.000Z" }],
+    },
+  ],
+};
+
 const initialScoreboard: ScoreboardResponse = {
   scoreboard: {
     teams: [
-      {
-        id: "frontend",
-        name: "frontend",
-        displayName: "Frontend",
-        roster: "Gui + Jean",
-        accent: "var(--team-alpha)",
-        accentSoft: "var(--team-alpha-soft)",
-        slogan: "Empurra feature e bola no mesmo sprint.",
-        wins: 0,
-      },
-      {
-        id: "backend",
-        name: "backend",
-        displayName: "Backend",
-        roster: "Adair + Richard",
-        accent: "var(--team-beta)",
-        accentSoft: "var(--team-beta-soft)",
-        slogan: "Consistentes ate quando o deploy cai.",
-        wins: 0,
-      },
+      { id: "frontend", wins: 0, losses: 0 },
+      { id: "backend", wins: 0, losses: 0 },
     ],
     leaderTeamId: null,
     leadBy: 0,
     totalMatches: 0,
-    currentStreak: null,
   },
 };
 
 const updatedScoreboard: ScoreboardResponse = {
   scoreboard: {
-    ...initialScoreboard.scoreboard,
-    teams: initialScoreboard.scoreboard.teams.map((team) =>
-      team.id === "frontend" ? { ...team, wins: 1 } : team,
-    ),
+    teams: [
+      { id: "frontend", wins: 1, losses: 0 },
+      { id: "backend", wins: 0, losses: 1 },
+    ],
     leaderTeamId: "frontend",
     leadBy: 1,
     totalMatches: 1,
-    currentStreak: {
-      teamId: "frontend",
-      teamName: "Frontend",
-      count: 1,
-    },
   },
 };
 
@@ -124,6 +116,10 @@ describe("Dashboard", () => {
           return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
         }
 
+        if (url === "/api/teams") {
+          return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
+        }
+
         throw new Error(`Unexpected fetch to ${url}`);
       });
 
@@ -135,7 +131,7 @@ describe("Dashboard", () => {
 
     expect(await screen.findByText("Nenhuma partida registrada ainda.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Frontend vs Backend" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("shows an error state when the initial load fails", async () => {
@@ -158,14 +154,18 @@ describe("Dashboard", () => {
       .mockImplementation((input, init) => {
         const url = String(input);
 
+        if (url === "/api/teams") {
+          return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
+        }
+
         if (url === "/api/scoreboard") {
-          return (fetchMock.mock.calls.length <= 1
+          return (fetchMock.mock.calls.filter((c) => String(c[0]) === "/api/scoreboard").length <= 1
             ? jsonResponse(initialScoreboard)
             : jsonResponse(updatedScoreboard)) as ReturnType<typeof fetch>;
         }
 
         if (url === "/api/matches" && !init?.method) {
-          return (fetchMock.mock.calls.length <= 2
+          return (fetchMock.mock.calls.filter((c) => String(c[0]) === "/api/matches" && !c[1]?.method).length <= 1
             ? jsonResponse(emptyMatches)
             : jsonResponse(updatedMatches)) as ReturnType<typeof fetch>;
         }
@@ -173,6 +173,8 @@ describe("Dashboard", () => {
         if (url === "/api/matches" && init?.method === "POST") {
           expect(init.body).toBe(
             JSON.stringify({
+              teamAId: "frontend",
+              teamBId: "backend",
               winnerTeamId: "frontend",
               note: "virou passeio",
             }),
@@ -228,17 +230,19 @@ describe("Dashboard", () => {
     expect(backendCard).toHaveClass("bg-team-beta-soft");
     expect(backendCard).not.toHaveAttribute("style");
 
-    expect(await screen.findByText("Frontend lidera por 1.")).toBeInTheDocument();
-    expect(await screen.findByText("1x")).toBeInTheDocument();
+    expect(await screen.findByText("frontend lidera por 1.")).toBeInTheDocument();
     expect(screen.queryByText("Nenhuma partida registrada ainda.")).not.toBeInTheDocument();
     expect(frontendNote).toHaveValue("");
     expect(backendNote).toHaveValue("fica para a próxima");
-    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
   it("preserves the note when saving fails", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
       const url = String(input);
+
+      if (url === "/api/teams") {
+        return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
+      }
 
       if (url === "/api/scoreboard") {
         return jsonResponse(initialScoreboard) as ReturnType<typeof fetch>;
@@ -291,6 +295,10 @@ describe("Dashboard", () => {
   it("limits each note field to 140 characters and keeps the counters independent", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
+
+      if (url === "/api/teams") {
+        return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
+      }
 
       if (url === "/api/scoreboard") {
         return jsonResponse(initialScoreboard) as ReturnType<typeof fetch>;

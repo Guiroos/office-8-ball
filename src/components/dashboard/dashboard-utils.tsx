@@ -1,11 +1,4 @@
-// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
-type ScoreboardData = {
-  teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
-  leaderTeamId: string | null;
-  leadBy: number;
-  totalMatches: number;
-  currentStreak: { teamId: string; teamName: string; count: number } | null;
-};
+import type { ScoreboardData } from "@/lib/types";
 
 export function formatMatchDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -20,7 +13,7 @@ export function getLeadLabel(scoreboard: ScoreboardData) {
   }
 
   const leader = scoreboard.teams.find((team) => team.id === scoreboard.leaderTeamId);
-  return `${leader?.displayName ?? "Alguém"} lidera por ${scoreboard.leadBy}.`;
+  return `${leader?.id ?? "Alguém"} lidera por ${scoreboard.leadBy}.`;
 }
 
 export function getLeaderName(scoreboard: ScoreboardData | null) {
@@ -29,7 +22,7 @@ export function getLeaderName(scoreboard: ScoreboardData | null) {
   }
 
   return (
-    scoreboard.teams.find((team) => team.id === scoreboard.leaderTeamId)?.displayName ??
+    scoreboard.teams.find((team) => team.id === scoreboard.leaderTeamId)?.id ??
     "Alguém"
   );
 }

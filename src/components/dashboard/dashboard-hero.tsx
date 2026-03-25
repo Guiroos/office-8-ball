@@ -4,14 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { Separator } from "@/components/ui/separator";
 import { StatTile } from "@/components/primitives/stat-tile";
-// TODO(Task 3/4): replace with new scoreboard types once scoreboard route is updated
-type ScoreboardData = {
-  teams: Array<{ id: string; displayName: string; wins: number; [key: string]: unknown }>;
-  leaderTeamId: string | null;
-  leadBy: number;
-  totalMatches: number;
-  currentStreak: { teamId: string; teamName: string; count: number } | null;
-};
+import type { ScoreboardData } from "@/lib/types";
 
 import { getLeadLabel } from "./dashboard-utils";
 
@@ -80,15 +73,13 @@ export function DashboardHero({
             />
 
             <StatTile
-              label="Streak"
+              label="Partidas"
               value={
                 <strong className="block title">
-                  {scoreboard?.currentStreak ? `${scoreboard.currentStreak.count}x` : "0x"}
+                  {scoreboard?.totalMatches ?? 0}
                 </strong>
               }
-              description={
-                scoreboard?.currentStreak ? scoreboard.currentStreak.teamName : "sem dominante"
-              }
+              description="no placar geral"
               className="rounded-md"
             />
           </div>

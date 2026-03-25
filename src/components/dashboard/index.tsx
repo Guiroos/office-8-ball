@@ -9,46 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
-// TODO(Task 5+): replace with dynamic teams fetched from /api/teams
-const TEAMS = [
-  {
-    id: "frontend",
-    name: "frontend",
-    displayName: "Frontend",
-    roster: "Gui + Jean",
-    accent: "var(--team-alpha)",
-    accentSoft: "var(--team-alpha-soft)",
-    slogan: "Empurra feature e bola no mesmo sprint.",
-  },
-  {
-    id: "backend",
-    name: "backend",
-    displayName: "Backend",
-    roster: "Adair + Richard",
-    accent: "var(--team-beta)",
-    accentSoft: "var(--team-beta-soft)",
-    slogan: "Consistentes ate quando o deploy cai.",
-  },
-] as const;
+import type { TeamRecord } from "@/lib/types";
 
 import { DashboardHero } from "./dashboard-hero";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { getEnvironmentLabel, getLeaderName } from "./dashboard-utils";
 import { RecentMatchesCard } from "./recent-matches-card";
-import { useDashboardData } from "./use-dashboard-data";
-
-const TEAM_BUTTON_VARIANT = {
-  frontend: "team-alpha",
-  backend: "team-beta",
-} as const;
+import { useDashboardData, useTeamsData } from "./use-dashboard-data";
 
 const teamScoreCardVariants = cva(
   "overflow-hidden border shadow-sm backdrop-blur-sm text-foreground",
   {
     variants: {
       team: {
-        frontend: "bg-team-alpha-soft",
-        backend: "bg-team-beta-soft",
+        alpha: "bg-team-alpha-soft",
+        beta: "bg-team-beta-soft",
       },
       leader: {
         true: "border-gold ring-2 ring-gold",
@@ -63,15 +38,24 @@ const teamScoreBadgeVariants = cva(
   {
     variants: {
       team: {
-        frontend: "bg-team-alpha",
-        backend: "bg-team-beta",
+        alpha: "bg-team-alpha",
+        beta: "bg-team-beta",
       },
     },
   },
 );
 
+function getTeamVariant(index: number): "alpha" | "beta" {
+  return index === 0 ? "alpha" : "beta";
+}
+
+function getButtonVariant(index: number): "team-alpha" | "team-beta" {
+  return index === 0 ? "team-alpha" : "team-beta";
+}
+
 function TeamScoreCard({
-  teamId,
+  team,
+  teamVariant,
   wins,
   isLeader,
   isSubmitting,
@@ -79,25 +63,21 @@ function TeamScoreCard({
   onNoteChange,
   onRegisterWin,
 }: {
-  teamId: (typeof TEAMS)[number]["id"];
+  team: TeamRecord;
+  teamVariant: "alpha" | "beta";
   wins: number;
   isLeader: boolean;
   isSubmitting: boolean;
   note: string;
-  onNoteChange: (teamId: (typeof TEAMS)[number]["id"], value: string) => void;
-  onRegisterWin: (teamId: (typeof TEAMS)[number]["id"]) => Promise<void>;
+  onNoteChange: (teamId: string, value: string) => void;
+  onRegisterWin: (teamId: string) => Promise<void>;
 }) {
-  const team = TEAMS.find((entry) => entry.id === teamId);
   const noteId = useId();
-
-  if (!team) {
-    return null;
-  }
 
   return (
     <Card
       className={teamScoreCardVariants({
-        team: team.id,
+        team: teamVariant,
         leader: isLeader,
       })}
       data-leader={isLeader}
@@ -107,13 +87,12 @@ function TeamScoreCard({
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="label text-foreground-soft">
-              {team.displayName}
+              {team.name}
             </p>
             <div>
-              <h3 className="title">{team.roster}</h3>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-foreground-soft">
-                {team.slogan}
-              </p>
+              <h3 className="title">
+                {team.members.length} membro{team.members.length !== 1 ? "s" : ""}
+              </h3>
             </div>
           </div>
 
@@ -134,7 +113,7 @@ function TeamScoreCard({
             </p>
           </div>
 
-          <div className={teamScoreBadgeVariants({ team: team.id })}>
+          <div className={teamScoreBadgeVariants({ team: teamVariant })}>
             <Swords className="size-5 text-foreground-inverse" />
           </div>
         </div>
@@ -168,7 +147,7 @@ function TeamScoreCard({
         </div>
 
         <Button
-          variant={TEAM_BUTTON_VARIANT[team.id as keyof typeof TEAM_BUTTON_VARIANT]}
+          variant={getButtonVariant(teamVariant === "alpha" ? 0 : 1)}
           size="lg"
           className="w-full"
           data-testid={`register-win-${team.id}`}
@@ -179,7 +158,7 @@ function TeamScoreCard({
           }}
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Registrando..." : `Vitória ${team.displayName}`}
+          {isSubmitting ? "Registrando..." : `Vitória ${team.name}`}
         </Button>
       </CardContent>
     </Card>
@@ -194,43 +173,41 @@ export function Dashboard() {
     submittingTeamId,
     registerWin,
   } = useDashboardData();
-  const [notesByTeam, setNotesByTeam] = useState<Record<(typeof TEAMS)[number]["id"], string>>({
-    frontend: "",
-    backend: "",
-  });
+  const { teams: dynamicTeams, teamsLoading } = useTeamsData();
+  const [notesByTeam, setNotesByTeam] = useState<Record<string, string>>({});
 
-  const teams = TEAMS.map((team) => ({
-    id: team.id,
-    wins: scoreboard?.teams.find((entry) => entry.id === team.id)?.wins ?? 0,
-  }));
-
-  function handleNoteChange(teamId: (typeof TEAMS)[number]["id"], value: string) {
+  function handleNoteChange(teamId: string, value: string) {
     setNotesByTeam((current) => ({
       ...current,
       [teamId]: value,
     }));
   }
 
-  async function handleRegisterWin(teamId: (typeof TEAMS)[number]["id"]) {
+  async function handleRegisterWin(winnerTeamId: string) {
+    // Find the other team (first team that is not the winner)
+    // For Phase 2 MVP, assume matches are between all pairs; use first two teams in list
+    const otherTeam = dynamicTeams.find((t) => t.id !== winnerTeamId);
+    if (!otherTeam) return;
+
     const didSave = await registerWin({
-      teamId,
-      note: notesByTeam[teamId],
+      teamId: winnerTeamId,
+      teamAId: winnerTeamId,
+      teamBId: otherTeam.id,
+      note: notesByTeam[winnerTeamId] ?? "",
     });
 
-    if (!didSave) {
-      return;
-    }
+    if (!didSave) return;
 
     setNotesByTeam((current) => ({
       ...current,
-      [teamId]: "",
+      [winnerTeamId]: "",
     }));
   }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6">
       <DashboardHero
-        loading={loading}
+        loading={loading || teamsLoading}
         scoreboard={scoreboard}
         environmentLabel={getEnvironmentLabel()}
       />
@@ -254,7 +231,7 @@ export function Dashboard() {
                 />
                 <StatTile
                   label="Ritmo"
-                  value={loading ? "Carregando..." : "Mesa pronta"}
+                  value={loading || teamsLoading ? "Carregando..." : "Mesa pronta"}
                   description={
                     submittingTeamId ? "gravando partida" : "aguardando a próxima treta"
                   }
@@ -271,14 +248,15 @@ export function Dashboard() {
           />
 
           <div className="grid gap-4 lg:grid-cols-2">
-            {teams.map((team) => (
+            {dynamicTeams.map((team, index) => (
               <TeamScoreCard
                 key={team.id}
-                teamId={team.id}
-                wins={team.wins}
+                team={team}
+                teamVariant={getTeamVariant(index)}
+                wins={scoreboard?.teams.find((entry) => entry.id === team.id)?.wins ?? 0}
                 isLeader={scoreboard?.leaderTeamId === team.id}
                 isSubmitting={submittingTeamId === team.id}
-                note={notesByTeam[team.id]}
+                note={notesByTeam[team.id] ?? ""}
                 onNoteChange={handleNoteChange}
                 onRegisterWin={handleRegisterWin}
               />
