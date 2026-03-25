@@ -30,8 +30,8 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 
 <!-- Scope atual. Construindo em direção a estes. -->
 
-- [ ] Dashboard exibe times buscados dinamicamente de `/api/teams` (remover hardcode)
-- [ ] API `/api/scoreboard` retorna W/L agregado por time (reimplementar para times dinâmicos)
+- ✓ Dashboard exibe times buscados dinamicamente de `/api/teams` (remover hardcode) — Validated in Phase 02: scoreboard-reactivation-match-recording
+- ✓ API `/api/scoreboard` retorna W/L agregado por time (reimplementar para times dinâmicos) — Validated in Phase 02: scoreboard-reactivation-match-recording
 - [ ] Página de ranking exibe todos os times ordenados por vitórias
 - [ ] Ranking mostra: W/L, win rate %, streak atual, total de partidas por time
 - [ ] Página de times exibe os times do usuário com suas stats
@@ -52,8 +52,8 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 ## Context
 
 - **Codebase existente:** Next.js 16 App Router, React 19, TypeScript, Prisma + PostgreSQL, Auth.js v4, Tailwind CSS 4, shadcn/ui
-- **Times dinâmicos parcialmente implementados:** API `/api/teams` (GET/POST/PATCH) já existe; dashboard ainda usa hardcode de `frontend`/`backend`
-- **Scoreboard API desativada:** `/api/scoreboard` retorna 503 — foi suspensa durante o refactor de times dinâmicos e precisa ser reimplementada
+- **Times dinâmicos completos:** API `/api/teams` (GET/POST/PATCH), dashboard usa `useTeamsData()` hook para buscar times dinamicamente
+- **Scoreboard API ativa:** `/api/scoreboard` retorna W/L agregado para todos os times do usuário via `getScoreboard()` (sem limite de query)
 - **Schema do banco:** Modelos `User`, `Team`, `TeamMember`, `Match`, `AuthRateLimit` — teams tem `type` field disponível para distinguir `solo` vs `duo`
 - **Tema visual:** Sistema de cores e tema já criado com Tailwind + shadcn/ui; tem margem para refinamento no look & feel
 - **Escala:** Uso interno de escritório — performance não é preocupação crítica; confiabilidade e clareza visual são prioridade
@@ -72,7 +72,7 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 |----------|-----------|---------|
 | Times como entidade única (solo e duo) com `type` field | Mantém schema uniforme; evita duplicar lógica de partidas e stats por tipo | ✓ Validated Phase 01 |
 | Ranking baseado em W/L simples (sem ELO) | Contexto de escritório informal; complexidade de ELO não agrega valor | — Pending |
-| Reativar `/api/scoreboard` para times dinâmicos | Endpoint correto já existe; precisa ser reimplementado para a nova estrutura | — Pending |
+| Reativar `/api/scoreboard` para times dinâmicos | Endpoint correto já existe; precisa ser reimplementado para a nova estrutura | ✓ Validated Phase 02 |
 
 ## Evolution
 
@@ -92,4 +92,4 @@ Este documento evolui a cada transição de fase e milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-03-24 — Phase 01 (dynamic-team-management) complete*
+*Last updated: 2026-03-24 — Phase 02 (scoreboard-reactivation-match-recording) complete*
