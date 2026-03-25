@@ -4,6 +4,7 @@ import type { TeamRecord } from "@/lib/types";
 function normalizeTeam(team: {
   id: string;
   name: string;
+  type: 'solo' | 'duo';
   status: string;
   createdBy: string;
   createdAt: Date;
@@ -13,6 +14,7 @@ function normalizeTeam(team: {
   return {
     id: team.id,
     name: team.name,
+    type: team.type,
     status: team.status as "active" | "archived",
     createdBy: team.createdBy,
     createdAt: team.createdAt.toISOString(),
@@ -37,17 +39,21 @@ export async function isTeamMember(
 export async function createTeam(input: {
   name: string;
   createdBy: string;
-  secondMemberUserId: string;
+  type: 'solo' | 'duo';
+  secondMemberUserId?: string;
 }): Promise<TeamRecord> {
   const team = await prisma.team.create({
     data: {
       name: input.name.trim().toLowerCase(),
+      type: input.type,
       createdBy: input.createdBy,
       members: {
-        create: [
-          { userId: input.createdBy },
-          { userId: input.secondMemberUserId },
-        ],
+        create: input.type === 'solo'
+          ? [{ userId: input.createdBy }]
+          : [
+              { userId: input.createdBy },
+              { userId: input.secondMemberUserId! },
+            ],
       },
     },
     include: { members: true },
@@ -109,4 +115,76 @@ export async function findUserById(
     where: { id: userId },
     select: { id: true },
   });
+}
+
+export async function addTeamMember(
+  teamId: string,
+  userId: string,
+): Promise<TeamRecord> {
+  // Check if user is already a member
+  const existingMember = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId, userId } },
+  });
+
+  if (existingMember) {
+    throw new Error("Usuário já é membro deste time.");
+  }
+
+  // Add user as team member
+  await prisma.teamMember.create({
+    data: { teamId, userId },
+  });
+
+  // Return updated team
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    include: { members: true },
+  });
+
+  if (!team) throw new Error("Time não encontrado.");
+  return normalizeTeam(team);
+}
+
+export async function removeTeamMember(
+  teamId: string,
+  userIdToRemove: string,
+): Promise<TeamRecord> {
+  // Get team to check type and member count
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    include: { members: true },
+  });
+
+  if (!team) throw new Error("Time não encontrado.");
+
+  // Prevent removing creator
+  if (team.createdBy === userIdToRemove) {
+    throw new Error("Não é possível remover o criador do time.");
+  }
+
+  // Check minimum member count based on type
+  const memberCount = team.members.length;
+  const minMembers = team.type === "solo" ? 1 : 2;
+
+  if (memberCount <= minMembers) {
+    throw new Error(
+      team.type === "solo"
+        ? "Solo team precisa ter pelo menos 1 membro."
+        : "Time duo precisa ter pelo menos 2 membros.",
+    );
+  }
+
+  // Remove user from team
+  await prisma.teamMember.delete({
+    where: { teamId_userId: { teamId, userId: userIdToRemove } },
+  });
+
+  // Return updated team
+  const updatedTeam = await prisma.team.findUnique({
+    where: { id: teamId },
+    include: { members: true },
+  });
+
+  if (!updatedTeam) throw new Error("Time não encontrado após remoção.");
+  return normalizeTeam(updatedTeam);
 }
