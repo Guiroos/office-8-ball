@@ -16,7 +16,10 @@ const createTeamSchema = z.object({
     .min(1, "Nome é obrigatório.")
     .max(50, "Nome pode ter no máximo 50 caracteres.")
     .transform((v) => v.trim().toLowerCase()),
-  secondMemberUserId: z.string().min(1, "secondMemberUserId é obrigatório."),
+  type: z.enum(['solo', 'duo'], {
+    error: "Tipo deve ser 'solo' ou 'duo'.",
+  }),
+  secondMemberUserId: z.string().min(1, "Membro adicional é obrigatório para times duo.").optional(),
 });
 
 export async function GET(request: Request) {
@@ -49,29 +52,42 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, secondMemberUserId } = result.data;
+  const { name, type, secondMemberUserId } = result.data;
 
-  if (secondMemberUserId === user.id) {
+  // Validate secondMemberUserId is required for duo teams
+  if (type === 'duo' && !secondMemberUserId) {
+    return NextResponse.json<ApiErrorResponse>(
+      { error: "secondMemberUserId é obrigatório para times do tipo duo." },
+      { status: 400 },
+    );
+  }
+
+  // Validate secondMemberUserId is not same as creator for duo teams
+  if (type === 'duo' && secondMemberUserId === user.id) {
     return NextResponse.json<ApiErrorResponse>(
       { error: "Você não pode criar um time com você mesmo." },
       { status: 400 },
     );
   }
 
-  const secondMember = await findUserById(secondMemberUserId);
+  // Look up second member only for duo teams
+  if (type === 'duo' && secondMemberUserId) {
+    const secondMember = await findUserById(secondMemberUserId);
 
-  if (!secondMember) {
-    return NextResponse.json<ApiErrorResponse>(
-      { error: "Usuário não encontrado." },
-      { status: 404 },
-    );
+    if (!secondMember) {
+      return NextResponse.json<ApiErrorResponse>(
+        { error: "Usuário não encontrado." },
+        { status: 404 },
+      );
+    }
   }
 
   try {
     const team = await createTeam({
       name,
       createdBy: user.id,
-      secondMemberUserId,
+      type,
+      secondMemberUserId: type === 'duo' ? secondMemberUserId : undefined,
     });
 
     return NextResponse.json<TeamResponse>({ team }, { status: 201 });
