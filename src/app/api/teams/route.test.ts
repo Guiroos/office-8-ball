@@ -80,11 +80,12 @@ describe("/api/teams", () => {
   });
 
   describe("POST", () => {
-    it("creates a team and returns 201", async () => {
+    it("creates a duo team and returns 201", async () => {
       mockFindUserById.mockResolvedValue({ id: "user-xyz" });
       const fakeTeam = {
         id: "team-1",
         name: "encacapados",
+        type: "duo",
         status: "active",
         createdBy: "user-abc",
         createdAt: "2026-03-22T00:00:00.000Z",
@@ -101,13 +102,67 @@ describe("/api/teams", () => {
         new Request("http://localhost/api/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "Encaçapados", secondMemberUserId: "user-xyz" }),
+          body: JSON.stringify({ name: "Encaçapados", type: "duo", secondMemberUserId: "user-xyz" }),
         }),
       );
 
       expect(response.status).toBe(201);
       const body = await response.json();
       expect(body.team.name).toBe("encacapados");
+    });
+
+    it("creates a solo team and returns 201", async () => {
+      const fakeTeam = {
+        id: "team-2",
+        name: "solo squad",
+        type: "solo",
+        status: "active",
+        createdBy: "user-abc",
+        createdAt: "2026-03-22T00:00:00.000Z",
+        updatedAt: "2026-03-22T00:00:00.000Z",
+        members: [{ userId: "user-abc", joinedAt: "2026-03-22T00:00:00.000Z" }],
+      };
+      mockCreateTeam.mockResolvedValue(fakeTeam);
+
+      const { POST } = await import("@/app/api/teams/route");
+      const response = await POST(
+        new Request("http://localhost/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Solo Squad", type: "solo" }),
+        }),
+      );
+
+      expect(response.status).toBe(201);
+      const body = await response.json();
+      expect(body.team.type).toBe("solo");
+      expect(mockFindUserById).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when type is missing", async () => {
+      const { POST } = await import("@/app/api/teams/route");
+      const response = await POST(
+        new Request("http://localhost/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Test", secondMemberUserId: "user-xyz" }),
+        }),
+      );
+
+      expect(response.status).toBe(400);
+    });
+
+    it("returns 400 when duo team is missing secondMemberUserId", async () => {
+      const { POST } = await import("@/app/api/teams/route");
+      const response = await POST(
+        new Request("http://localhost/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Test", type: "duo" }),
+        }),
+      );
+
+      expect(response.status).toBe(400);
     });
 
     it("returns 404 when secondMemberUserId does not exist", async () => {
@@ -118,20 +173,20 @@ describe("/api/teams", () => {
         new Request("http://localhost/api/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "Test", secondMemberUserId: "user-ghost" }),
+          body: JSON.stringify({ name: "Test", type: "duo", secondMemberUserId: "user-ghost" }),
         }),
       );
 
       expect(response.status).toBe(404);
     });
 
-    it("returns 400 when user tries to create a team with themselves", async () => {
+    it("returns 400 when user tries to create a duo team with themselves", async () => {
       const { POST } = await import("@/app/api/teams/route");
       const response = await POST(
         new Request("http://localhost/api/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "Solo", secondMemberUserId: "user-abc" }),
+          body: JSON.stringify({ name: "Dupla", type: "duo", secondMemberUserId: "user-abc" }),
         }),
       );
 
@@ -144,7 +199,7 @@ describe("/api/teams", () => {
         new Request("http://localhost/api/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ secondMemberUserId: "user-xyz" }),
+          body: JSON.stringify({ type: "duo", secondMemberUserId: "user-xyz" }),
         }),
       );
 
@@ -158,7 +213,7 @@ describe("/api/teams", () => {
         new Request("http://localhost/api/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "Test", secondMemberUserId: "user-xyz" }),
+          body: JSON.stringify({ name: "Test", type: "duo", secondMemberUserId: "user-xyz" }),
         }),
       );
       expect(response.status).toBe(401);
