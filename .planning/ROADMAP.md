@@ -59,7 +59,7 @@
 6. API performance < 500ms for office scale (100+ matches per team)
 
 **Plans:** 2 plans
-- [ ] 02-01-PLAN.md — Reactivate GET /api/scoreboard: add ScoreboardResponse types, implement getScoreboard() in data layer (no query limits), rewrite route handler, full test coverage
+- [x] 02-01-PLAN.md — Reactivate GET /api/scoreboard: add ScoreboardResponse types, implement getScoreboard() in data layer (no query limits), rewrite route handler, full test coverage
 - [ ] 02-02-PLAN.md — Refactor dashboard to use dynamic teams: remove TEAMS constant, add useTeamsData() hook, fix registerWin payload to send teamAId+teamBId+winnerTeamId
 
 **UI hint:** yes

@@ -13,7 +13,7 @@
 ### Dashboard
 
 - [ ] **DASH-01**: Dashboard exibe times buscados dinamicamente de `/api/teams` (sem hardcode de `frontend`/`backend`)
-- [ ] **DASH-02**: API `/api/scoreboard` retorna W/L agregado por time (reimplementada para times dinâmicos)
+- [x] **DASH-02**: API `/api/scoreboard` retorna W/L agregado por time (reimplementada para times dinâmicos)
 
 ### Ranking
 
@@ -63,7 +63,7 @@
 | TEAM-01 | Phase 1 | Complete |
 | TEAM-02 | Phase 4 | Pending |
 | DASH-01 | Phase 2 | Pending |
-| DASH-02 | Phase 2 | Pending |
+| DASH-02 | Phase 2 | Complete |
 | RANK-01 | Phase 4 | Pending |
 | RANK-02 | Phase 4 | Pending |
 | RANK-03 | Phase 4 | Pending |

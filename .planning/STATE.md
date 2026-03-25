@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-25T00:26:55.895Z"
+status: executing
+last_updated: "2026-03-25T01:20:35.888Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 0
   total_plans: 2
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to plan
+**Status:** Executing Phase 02
 **Last updated:** 2026-03-25
 
 ---
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 02 — scoreboard-reactivation-&-match-recording
+**Current Focus:** Phase 02 — scoreboard-reactivation-match-recording
 
 **Scope Boundaries:**
 
@@ -35,8 +35,8 @@ progress:
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (scoreboard-reactivation-match-recording) — EXECUTING
+Plan: 2 of 2
 
 ## Roadmap Summary
 
@@ -113,6 +113,18 @@ Plan: Not started
    - Rationale: Next.js 15+ requires params as Promise; existing codebase uses this pattern
    - Implication: All `[id]/route.ts` files use `{ params }: { params: Promise<{...}> }` with `await params`
 
+9. **getScoreboard() returns raw ScoreboardData; route wraps in { scoreboard }** (Plan 02-01)
+   - Rationale: Keeps data layer clean and testable independently of API shape
+   - Implication: Route layer is responsible for wrapping domain data in API response envelope
+
+10. **No .take() on scoreboard query — enforced by test** (Plan 02-01)
+    - Rationale: Any query limit silently produces wrong wins/losses/streak counts at scale
+    - Implication: Test inspects mock call args to verify no take() is present
+
+11. **leaderTeamId is null on exact tie — no tiebreakers in v1** (Plan 02-01)
+    - Rationale: Simplest correct behavior; tiebreakers add complexity without office-scale value
+    - Implication: UI must handle null leaderTeamId (show "Tied" state)
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -151,4 +163,4 @@ Plan: Not started
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 01-02-PLAN.md (team member management API)*
+*Last session: 2026-03-25 — Completed 02-01-PLAN.md (scoreboard API reactivation)*
