@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // GSD tooling — not part of the app bundle
+    ".claude/**",
+    ".planning/**",
   ]),
 ]);
 
