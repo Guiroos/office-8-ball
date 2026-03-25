@@ -30,7 +30,12 @@ const TEAM_BASE = {
 };
 
 const makeTeam = (
-  overrides: Partial<typeof TEAM_BASE & { members: { userId: string; joinedAt: Date }[] }> = {},
+  overrides: Partial<
+    Omit<typeof TEAM_BASE, "type"> & {
+      type: "solo" | "duo";
+      members: { userId: string; joinedAt: Date }[];
+    }
+  > = {},
 ) => ({
   ...TEAM_BASE,
   members: [{ userId: "user-creator", joinedAt: new Date("2026-01-01T00:00:00.000Z") }],
