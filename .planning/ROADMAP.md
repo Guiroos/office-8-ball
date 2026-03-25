@@ -11,7 +11,7 @@
 
 - [x] **Phase 1: Dynamic Team Management** — Users can create teams (solo/duo types) and manage rosters; verifies dual-mode persistence (completed 2026-03-25)
 - [x] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection (completed 2026-03-25)
-- [ ] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics
+- [x] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics (completed 2026-03-25)
 - [ ] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster
 - [ ] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters
 
@@ -82,8 +82,8 @@
 5. All stats functions are pure (no side effects); fully testable without database
 6. All output types validate against Zod schemas (winRate in [0,100], streak >= 0, etc.)
 
-**Plans:** 1 plan
-- [ ] 03-01-PLAN.md — Implement stats.ts (computeTeamStats, computeHeadToHead, Zod schemas) and stats.test.ts (15+ edge case tests covering SC-1..SC-6)
+**Plans:** 1/1 plans complete
+- [x] 03-01-PLAN.md — Implement stats.ts (computeTeamStats, computeHeadToHead, Zod schemas) and stats.test.ts (15+ edge case tests covering SC-1..SC-6)
 
 ---
 
@@ -137,7 +137,7 @@
 |-------|----------------|--------|-----------|
 | 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
-| 3. Stats Computation Module | 0/1 | Not started | - |
+| 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 0/? | Not started | - |
 | 5. User Profiles & Advanced Features | 0/? | Not started | - |
 

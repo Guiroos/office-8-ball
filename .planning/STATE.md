@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-25T01:37:00.522Z"
+status: verifying
+last_updated: "2026-03-25T22:50:00.386Z"
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 4
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 5
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to plan
+**Status:** Phase complete — ready for verification
 **Last updated:** 2026-03-25
 
 ---
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 02 — scoreboard-reactivation-match-recording
+**Current Focus:** Phase 03 — stats-computation-module
 
 **Scope Boundaries:**
 
@@ -35,8 +35,8 @@ progress:
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
+Phase: 03 (stats-computation-module) — COMPLETE
+Plan: 1 of 1 (all plans done)
 
 ## Roadmap Summary
 
@@ -48,7 +48,7 @@ Plan: Not started
 |-------|------|--------------|--------|
 | 1 | Dynamic Team CRUD + dual-mode verification | TEAM-01 | ✓ Complete |
 | 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | ✓ Complete |
-| 3 | Stats computation module (W/L, streaks, H2H) | — | Not started |
+| 3 | Stats computation module (W/L, streaks, H2H) | — | ✓ Complete |
 | 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | Not started |
 | 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Not started |
 
@@ -133,6 +133,14 @@ Plan: Not started
     - Rationale: Consistent UX for loading errors; sonner toast.error used throughout the hook layer
     - Implication: All data hook errors surface as toasts — no silent failures
 
+14. **Iterate match array oldest-to-newest for streak detection** (Plan 03-01)
+    - Rationale: Forward iteration (most-recent-first) would track the oldest streak as "current"; reversed ensures currentStreak reflects the most recent continuous run
+    - Implication: detectStreaks processes teamMatches in reverse; currentStreak is the final runType/runCount at loop end
+
+15. **Stats types co-located with Zod schemas in stats.ts; re-exported from types.ts** (Plan 03-01)
+    - Rationale: Type safety via z.infer keeps types and validation schemas in sync automatically; types.ts provides single import path for consumers
+    - Implication: Phase 4 can import TeamStats from either @/lib/stats or @/lib/types
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -171,4 +179,4 @@ Plan: Not started
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 02-02-PLAN.md (dynamic dashboard refactor + registerWin payload fix)*
+*Last session: 2026-03-25 — Completed 03-01-PLAN.md (stats computation module: computeTeamStats, computeHeadToHead, 21 unit tests)*
