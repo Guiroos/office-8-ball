@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 
-import type { ApiErrorResponse } from "@/lib/types";
+import {
+  getAuthenticatedUser,
+  getAuthRequiredResponse,
+  hasDatabaseUrl,
+  getAuthUnavailableResponse,
+} from "@/lib/auth";
+import { getScoreboard } from "@/lib/data";
+import type { ApiErrorResponse, ScoreboardResponse } from "@/lib/types";
 
 export async function GET() {
-  return NextResponse.json<ApiErrorResponse>(
-    {
-      error:
-        "O placar está temporariamente indisponível enquanto o sistema de times é atualizado.",
-    },
-    { status: 503 },
-  );
+  if (!hasDatabaseUrl()) return getAuthUnavailableResponse();
+
+  const user = await getAuthenticatedUser();
+  if (!user) return getAuthRequiredResponse();
+
+  const scoreboard = await getScoreboard(user.id);
+
+  return NextResponse.json<ScoreboardResponse>({ scoreboard });
 }
