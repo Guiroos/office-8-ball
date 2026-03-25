@@ -50,22 +50,19 @@ Declared values (all multiples of 4):
 
 ## Typography
 
-| Role | Size | Weight | Line Height | Tailwind Class |
-|------|------|--------|-------------|-----------------|
-| Display (page hero) | clamp(4rem, 12vw, 6rem) | 900 | 1.2 | `display` |
-| Headline (section) | clamp(3.5rem, 10vw, 7.5rem) | 900 | 1.2 | `headline` |
-| Title (card heading) | clamp(3rem, 4vw, 4.8rem) | 900 | 1.2 | `title` |
-| Subtitle (section title) | clamp(1.9rem, 4vw, 2.7rem) | 600 | 1.2 | `subtitle` |
-| Body (default text) | 1rem (16px) | 400 | 1.5 | `body` |
-| Body Small | 0.875rem (14px) | 400 | 1.5 | `body-sm` |
-| Label (field labels, badges) | 0.72rem (11.5px) | 600 | 1.0 | `label` or `label-sm` or `label-wide` |
-| Caption (fine print) | 0.68rem (10.9px) | 600 | 1.0 | `caption` |
+| Role | Size | Weight | Line Height | Usage |
+|------|------|--------|-------------|-------|
+| Display | clamp(4rem, 12vw, 6rem) | 700 | 1.2 | Hero headings, 1st place podium card title |
+| Heading | clamp(1.5rem, 4vw, 2.5rem) | 700 | 1.2 | Section headers (Ranking, Team Detail, Membros, Últimas Partidas, Confrontos Diretos) |
+| Body | 1rem (16px) | 400 | 1.5 | Default text, team names in standings, match details, stat values |
+| Label | 0.875rem (14px) | 400 | 1.0 | Field labels, badges, metadata, captions, stat tile labels, rank indicators |
 
 **Notes:**
-- All font sizes use clamp() for fluid scaling except body and body-sm (fixed).
-- Subtitle, Title, Headline, Display are used in `SectionHeader` and hero cards.
-- Label variants available: `label` (default tracking: 0.22em), `label-sm` (compact: 0.12em), `label-wide` (emphasis: 0.28em).
-- All heading roles apply 900 weight and letter-spacing adjustments automatically via @utility rules.
+- Display and Heading use weight 700 (bold); Body and Label use weight 400 (regular).
+- Font sizes use clamp() for fluid scaling (Display, Heading) or fixed values (Body, Label).
+- Heading role merges previous Subtitle, Title, and Headline variants — all section-level headings use this single role.
+- Label role merges previous Label, Body Small, and Caption variants — all small/metadata text uses this single role.
+- All heading roles apply letter-spacing adjustments automatically via @utility rules in globals.css.
 
 **Source:** `src/app/globals.css` @utility declarations and `src/app/tokens.css` font-size vars.
 
@@ -155,7 +152,7 @@ Declared values (all multiples of 4):
 
 **Header Section:**
 - Team avatar (initials or colored badge) on left
-- Team name (large title or subtitle)
+- Team name (large title or colored badge) on left
 - "Invite Member" CTA button on right
 - Background: optional surface-emphasis or gradient
 
@@ -399,5 +396,6 @@ Shadows composed via class pairs: `shadow-{size} shadow-{color}/{opacity}`
 
 ---
 
-*UI-SPEC created: 2026-03-25*
+*UI-SPEC revised: 2026-03-25*
 *Phase: 04 — Ranking & Team Details*
+*Issues fixed: Typography consolidation (8→4 font sizes, 3→2 weights)*
