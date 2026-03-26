@@ -192,4 +192,120 @@ describe("listAllTeamsWithStats", () => {
       rank: 1,
     });
   });
+
+  // ── Period filter tests (D-09..D-11) ──────────────────────────────────────
+
+  it("period=all passes no playedAt constraint to match query", async () => {
+    process.env.DATABASE_URL = "postgresql://test";
+    mockTeamFindMany.mockResolvedValueOnce([]);
+
+    const { listAllTeamsWithStats } = await import("@/lib/ranking");
+    await listAllTeamsWithStats(undefined, "all");
+
+    // teams query returned [] so match query was never called — that is fine;
+    // what we assert is that the team query has no playedAt
+    expect(mockTeamFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { status: "active" },
+      }),
+    );
+    expect(mockMatchFindMany).not.toHaveBeenCalled();
+  });
+
+  it("period=week applies gte/lt window derived from resolvePeriodWindow to match query", async () => {
+    process.env.DATABASE_URL = "postgresql://test";
+
+    // Fix "now" to a known Wednesday in BRT: 2026-03-25 (Wednesday) 12:00 BRT = 15:00 UTC
+    // ISO week: Mon 2026-03-23 03:00 UTC → Sun 2026-03-29 02:59:59.999 UTC
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-25T15:00:00.000Z")); // Wednesday noon BRT
+
+    mockTeamFindMany.mockResolvedValueOnce([
+      {
+        id: "team-a",
+        name: "Alpha",
+        type: "duo",
+        status: "active",
+        createdBy: "u1",
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        members: [],
+      },
+    ]);
+    mockMatchFindMany.mockResolvedValueOnce([]);
+
+    const { listAllTeamsWithStats } = await import("@/lib/ranking");
+    await listAllTeamsWithStats(undefined, "week");
+
+    vi.useRealTimers();
+
+    expect(mockMatchFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          playedAt: expect.objectContaining({
+            gte: expect.any(Date),
+            lt: expect.any(Date),
+          }),
+        }),
+      }),
+    );
+
+    const callArgs = mockMatchFindMany.mock.calls[0]?.[0] as {
+      where: { playedAt: { gte: Date; lt: Date } };
+    };
+    const { gte, lt } = callArgs.where.playedAt;
+
+    // Monday 2026-03-23 00:00:00 BRT = 03:00:00 UTC
+    expect(gte.toISOString()).toBe("2026-03-23T03:00:00.000Z");
+    // Sunday 2026-03-29 23:59:59.999 BRT = 2026-03-30 02:59:59.999 UTC
+    expect(lt.toISOString()).toBe("2026-03-30T02:59:59.999Z");
+  });
+
+  it("period=month applies gte/lt window for calendar month in BRT", async () => {
+    process.env.DATABASE_URL = "postgresql://test";
+
+    // Fix "now" to 2026-03-15 12:00 BRT = 15:00 UTC (mid-March)
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-15T15:00:00.000Z"));
+
+    mockTeamFindMany.mockResolvedValueOnce([
+      {
+        id: "team-a",
+        name: "Alpha",
+        type: "duo",
+        status: "active",
+        createdBy: "u1",
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        members: [],
+      },
+    ]);
+    mockMatchFindMany.mockResolvedValueOnce([]);
+
+    const { listAllTeamsWithStats } = await import("@/lib/ranking");
+    await listAllTeamsWithStats(undefined, "month");
+
+    vi.useRealTimers();
+
+    expect(mockMatchFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          playedAt: expect.objectContaining({
+            gte: expect.any(Date),
+            lt: expect.any(Date),
+          }),
+        }),
+      }),
+    );
+
+    const callArgs = mockMatchFindMany.mock.calls[0]?.[0] as {
+      where: { playedAt: { gte: Date; lt: Date } };
+    };
+    const { gte, lt } = callArgs.where.playedAt;
+
+    // 2026-03-01 00:00:00 BRT = 2026-03-01 03:00:00 UTC
+    expect(gte.toISOString()).toBe("2026-03-01T03:00:00.000Z");
+    // 2026-03-31 23:59:59.999 BRT = 2026-04-01 02:59:59.999 UTC
+    expect(lt.toISOString()).toBe("2026-04-01T02:59:59.999Z");
+  });
 });
