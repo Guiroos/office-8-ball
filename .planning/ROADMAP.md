@@ -105,7 +105,7 @@
 
 **Plans:** 3 plans
 - [x] 04-01-PLAN.md — Data foundation: stable ranking sort + in-memory fallback tests + match POST revalidation for /ranking and /times subtree
-- [ ] 04-02-PLAN.md — Ranking UI: PodiumCard/StandingsRow/TypeTabs/RankingView + /ranking RSC + behavior tests (podium order, states, links)
+- [x] 04-02-PLAN.md — Ranking UI: PodiumCard/StandingsRow/TypeTabs/RankingView + /ranking RSC + behavior tests (podium order, states, links)
 - [ ] 04-03-PLAN.md — Team details foundation: getTeamDetailData() server assembler + /times tabs/CTA + /times/[id] with server-side H2H summaries
 
 **UI hint:** yes
