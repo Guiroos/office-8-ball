@@ -7,10 +7,12 @@ import type { RankedTeam } from "@/lib/ranking";
 export function RankingView({
   teams,
   activeType,
+  activePeriod: _activePeriod,
   mode,
 }: {
   teams: RankedTeam[];
   activeType: "all" | "solo" | "duo";
+  activePeriod?: "all" | "month" | "week";
   mode: "available" | "unavailable";
 }) {
   if (mode === "unavailable") {
