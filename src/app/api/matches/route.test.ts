@@ -38,6 +38,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+const mockRevalidatePath = vi.fn();
+
+vi.mock("next/cache", () => ({
+  revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
+}));
+
 const fakeMatch = {
   id: "match-1",
   teamAId: "team-a",
@@ -56,6 +62,7 @@ describe("/api/matches", () => {
     mockCreateMatch.mockReset();
     mockIsTeamMember.mockReset();
     mockTeamFindMany.mockReset();
+    mockRevalidatePath.mockReset();
     currentUser = { id: "user-abc", username: "gui.dev" };
   });
 
@@ -112,6 +119,33 @@ describe("/api/matches", () => {
       expect(response.status).toBe(201);
       const body = await response.json();
       expect(body.match.winnerTeamId).toBe("team-a");
+    });
+
+    it("revalidates ranking and times subtree after successful match creation", async () => {
+      mockTeamFindMany.mockResolvedValue([
+        { id: "team-a", status: "active" },
+        { id: "team-b", status: "active" },
+      ]);
+      mockIsTeamMember.mockResolvedValue(true);
+      mockCreateMatch.mockResolvedValue({ match: fakeMatch });
+
+      const { POST } = await import("@/app/api/matches/route");
+      const response = await POST(
+        new Request("http://localhost/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamAId: "team-a",
+            teamBId: "team-b",
+            winnerTeamId: "team-a",
+          }),
+        }),
+      );
+
+      expect(response.status).toBe(201);
+      expect(mockRevalidatePath).toHaveBeenCalledTimes(2);
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/ranking");
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/times", "layout");
     });
 
     it("returns 400 when teamAId equals teamBId", async () => {
