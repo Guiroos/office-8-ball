@@ -33,11 +33,13 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 - ✓ Dashboard exibe times buscados dinamicamente de `/api/teams` (remover hardcode) — Validated in Phase 02: scoreboard-reactivation-match-recording
 - ✓ API `/api/scoreboard` retorna W/L agregado por time (reimplementar para times dinâmicos) — Validated in Phase 02: scoreboard-reactivation-match-recording
 - ✓ Módulo de stats puro (`computeTeamStats`, `computeHeadToHead`) com Zod e 21 testes — Validated in Phase 03: stats-computation-module
-- [ ] Página de ranking exibe todos os times ordenados por vitórias
-- [ ] Ranking mostra: W/L, win rate %, streak atual, total de partidas por time
+- ✓ Página de ranking exibe todos os times ordenados por vitórias — Validated in Phase 05: user-profiles-advanced-features
+- ✓ Ranking mostra: W/L, win rate %, streak atual, total de partidas por time — Validated in Phase 05: user-profiles-advanced-features
+- ✓ Ranking com filtros de período (all/month/week) com tabs e preservação de query params — Validated in Phase 05: user-profiles-advanced-features
+- ✓ Página de perfil exibe stats agregadas reais (wins, losses, win rate, total) por time — Validated in Phase 05: user-profiles-advanced-features
+- ✓ Head-to-head: rota dedicada `/head-to-head` com URL compartilhável e fallback robusto — Validated in Phase 05: user-profiles-advanced-features
 - [ ] Página de times exibe os times do usuário com suas stats
 - [ ] Registro de partida conectado aos times dinâmicos (não mais hardcoded)
-- [ ] Head-to-head: histórico de confrontos diretos entre dois times
 - [ ] Melhorias visuais: aparência descontraída e profissional, margem sobre o tema atual
 
 ### Out of Scope
@@ -94,4 +96,4 @@ Este documento evolui a cada transição de fase e milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-03-25 — Phase 03 (stats-computation-module) complete*
+*Last updated: 2026-03-26 — Phase 05 (user-profiles-advanced-features) complete*
