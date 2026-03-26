@@ -128,7 +128,14 @@
 5. Head-to-head history accessible from team detail pages or via `/head-to-head?teamA=x&teamB=y` route
 6. All stats derivable without schema changes (filters applied in application layer)
 
-**Plans:** TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Domain contracts and aggregators for profile stats + time-period windows
+- [ ] 05-02-PLAN.md — Server-first `/profile` wiring and UI migration to aggregated payload
+- [ ] 05-03-PLAN.md — Ranking backend/route support for `period=all|month|week`
+- [ ] 05-04-PLAN.md — Ranking UI period filters with query-param preservation and tests
+- [ ] 05-05-PLAN.md — Dedicated `/head-to-head` route with fallback validation and URL sync
 
 **UI hint:** yes
 
