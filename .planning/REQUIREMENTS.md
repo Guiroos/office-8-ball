@@ -17,10 +17,10 @@
 
 ### Ranking
 
-- [ ] **RANK-01**: Página de ranking exibe todos os times ordenados por vitórias
-- [ ] **RANK-02**: Ranking mostra W/L e win rate % por time
-- [ ] **RANK-03**: Ranking mostra streak atual (sequência de vitórias/derrotas) por time
-- [ ] **RANK-04**: Ranking mostra total de partidas por time
+- [x] **RANK-01**: Página de ranking exibe todos os times ordenados por vitórias
+- [x] **RANK-02**: Ranking mostra W/L e win rate % por time
+- [x] **RANK-03**: Ranking mostra streak atual (sequência de vitórias/derrotas) por time
+- [x] **RANK-04**: Ranking mostra total de partidas por time
 - [ ] **RANK-05**: Ranking suporta filtros por período (semana / mês / geral)
 
 ### Perfil
@@ -64,10 +64,10 @@
 | TEAM-02 | Phase 4 | Pending |
 | DASH-01 | Phase 2 | Complete |
 | DASH-02 | Phase 2 | Complete |
-| RANK-01 | Phase 4 | Pending |
-| RANK-02 | Phase 4 | Pending |
-| RANK-03 | Phase 4 | Pending |
-| RANK-04 | Phase 4 | Pending |
+| RANK-01 | Phase 4 | Complete |
+| RANK-02 | Phase 4 | Complete |
+| RANK-03 | Phase 4 | Complete |
+| RANK-04 | Phase 4 | Complete |
 | RANK-05 | Phase 5 | Pending |
 | PROF-01 | Phase 5 | Pending |
 | PROF-02 | Phase 5 | Pending |
