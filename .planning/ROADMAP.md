@@ -99,11 +99,14 @@
 1. Ranking page displays all teams sorted by wins (descending); includes W/L, win rate %, current streak, total matches
 2. Ranking updates within 1 second of match creation (cache revalidation works)
 3. Team detail page shows: team name, roster, W/L stats, current streak, total matches, recent matches list
-4. Team detail page accessible via `/team/:id` or equivalent route
-5. Users can compare two teams' records (visual comparison on team detail page or H2H metrics visible)
+4. Team detail page accessible via `/times/:id` route
+5. Users can compare two teams' records (H2H section on team detail page)
 6. No hardcoded team constants in ranking or team detail components; all data from dynamic APIs
 
-**Plans:** TBD
+**Plans:** 3 plans
+- [ ] 04-01-PLAN.md — Data foundation: stable ranking sort + in-memory fallback tests + match POST revalidation for /ranking and /times subtree
+- [ ] 04-02-PLAN.md — Ranking UI: PodiumCard/StandingsRow/TypeTabs/RankingView + /ranking RSC + behavior tests (podium order, states, links)
+- [ ] 04-03-PLAN.md — Team details foundation: getTeamDetailData() server assembler + /times tabs/CTA + /times/[id] with server-side H2H summaries
 
 **UI hint:** yes
 
@@ -138,7 +141,7 @@
 | 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
-| 4. Ranking & Team Details | 0/? | Not started | - |
+| 4. Ranking & Team Details | 0/3 | Not started | - |
 | 5. User Profiles & Advanced Features | 0/? | Not started | - |
 
 ---
@@ -168,3 +171,4 @@
 *Phase 1 executed: 2026-03-25*
 *Phase 2 planned: 2026-03-25*
 *Phase 3 planned: 2026-03-25*
+*Phase 4 planned: 2026-03-25*
