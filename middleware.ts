@@ -24,5 +24,5 @@ export default authRequired
     };
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/scoreboard", "/times/:path*", "/ranking/:path*", "/profile/:path*", "/settings/:path*"],
+  matcher: ["/dashboard/:path*", "/scoreboard", "/times/:path*", "/ranking/:path*", "/profile/:path*", "/settings/:path*", "/head-to-head/:path*"],
 };
