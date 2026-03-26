@@ -1,7 +1,7 @@
 # Roadmap: Office Sinuca Tracker v1
 
 **Created:** 2026-03-23
-**Phases:** 5
+**Phases:** 8
 **Granularity:** Standard
 **Coverage:** 12/12 v1 requirements mapped
 
@@ -14,6 +14,9 @@
 - [x] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics (completed 2026-03-25)
 - [x] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster (completed 2026-03-25)
 - [x] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26) (completed 2026-03-26)
+- [ ] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26)
+- [ ] **Phase 7: Team Details Access & Member Actions** — Enforce member-only team detail access and wire invite/remove UI actions to member endpoints (planned 2026-03-26)
+- [ ] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `TEAM-02` and `RANK-01..04` (planned 2026-03-26)
 
 ---
 
@@ -141,6 +144,65 @@ Plans:
 
 ---
 
+### Phase 6: Team Creation Flow Wiring
+
+**Goal:** `/times?tab=create` performs real team creation for solo teams with consistent API/UI behavior
+
+**Depends on:** Phase 1, Phase 2
+
+**Requirements:** TEAM-01
+
+**Success Criteria** (what must be TRUE):
+1. Create tab submit triggers `POST /api/teams` with validated payload for solo team creation
+2. Successful creation refreshes team lists/views and gives clear user feedback
+3. API and client error paths are handled (including auth and validation failures) without placeholder dead-ends
+4. Flow "Create solo team" passes end-to-end in authenticated runtime
+
+**Plans:** 0 plans
+
+**UI hint:** yes
+
+---
+
+### Phase 7: Team Details Access & Member Actions
+
+**Goal:** Team detail data is member-protected and team management actions are wired to runtime API calls
+
+**Depends on:** Phase 1, Phase 4, Phase 6
+
+**Requirements:** TEAM-02
+
+**Success Criteria** (what must be TRUE):
+1. Team detail loader enforces viewer membership/ownership checks before returning team payload
+2. Non-member direct URL access to `/times/[id]` is denied safely and predictably
+3. Team detail invite/remove actions call `POST/DELETE /api/teams/:id/members` and update UI state
+4. Flow "Manage team members" passes end-to-end in authenticated runtime
+5. Flow "Team details authorization" passes with explicit non-member access test coverage
+
+**Plans:** 0 plans
+
+**UI hint:** yes
+
+---
+
+### Phase 8: Ranking/Team Verification Recovery
+
+**Goal:** Close orphaned requirement evidence by re-verifying Phase 4 outcomes and restoring requirements traceability integrity
+
+**Depends on:** Phase 4, Phase 7
+
+**Requirements:** RANK-01, RANK-02, RANK-03, RANK-04
+
+**Success Criteria** (what must be TRUE):
+1. Missing verification artifact for Phase 4 is recreated with requirement-level evidence for `TEAM-02` and `RANK-01..04`
+2. Ranking requirements (`RANK-01..04`) are revalidated against current runtime behavior and tests
+3. Requirement traceability reflects verified, non-orphaned status after phase execution
+4. Milestone audit no longer reports orphaned requirement gaps tied to Phase 4
+
+**Plans:** 0 plans
+
+---
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -150,6 +212,9 @@ Plans:
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
 | 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
+| 6. Team Creation Flow Wiring | 0/0 | Planned   | - |
+| 7. Team Details Access & Member Actions | 0/0 | Planned   | - |
+| 8. Ranking/Team Verification Recovery | 0/0 | Planned   | - |
 
 ---
 
@@ -157,14 +222,14 @@ Plans:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 1 | Complete |
-| TEAM-02 | Phase 4 | Complete |
+| TEAM-01 | Phase 6 | Pending |
+| TEAM-02 | Phase 7 | Pending |
 | DASH-01 | Phase 2 | Complete |
 | DASH-02 | Phase 2 | Complete |
-| RANK-01 | Phase 4 | Complete |
-| RANK-02 | Phase 4 | Complete |
-| RANK-03 | Phase 4 | Complete |
-| RANK-04 | Phase 4 | Complete |
+| RANK-01 | Phase 8 | Pending |
+| RANK-02 | Phase 8 | Pending |
+| RANK-03 | Phase 8 | Pending |
+| RANK-04 | Phase 8 | Pending |
 | RANK-05 | Phase 5 | Pending |
 | PROF-01 | Phase 5 | Pending |
 | PROF-02 | Phase 5 | Pending |
@@ -181,3 +246,4 @@ Plans:
 *Phase 4 planned: 2026-03-25*
 *Phase 4 executed: 2026-03-25*
 *Phase 5 planned: 2026-03-26*
+*Gap closure phases added: 2026-03-26 (Phases 6-8)*
