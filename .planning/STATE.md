@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-26T23:01:03.128Z"
+last_updated: "2026-03-26T23:01:06.939Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -15,7 +15,7 @@ progress:
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
 **Status:** Ready to execute
-**Last updated:** 2026-03-26
+**Last updated:** 2026-03-26 — 05-05 complete
 
 ---
 
@@ -157,6 +157,10 @@ Plan: 5 of 5
     - Rationale: Type safety via z.infer keeps types and validation schemas in sync automatically; types.ts provides single import path for consumers
     - Implication: Phase 4 can import TeamStats from either @/lib/stats or @/lib/types
 
+20. **resolveHeadToHeadData is a pure function; page assembler fetches data and passes arrays** (Plan 05-05)
+    - Rationale: Keeps domain logic testable without DB; consistent with stats.ts and profile-stats.ts patterns
+    - Implication: Page handles listUserTeams + listMatches, then passes arrays to resolveHeadToHeadData
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -197,3 +201,4 @@ Plan: 5 of 5
 *STATE.md created: 2026-03-23*
 *Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
 *Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
+*Last session: 2026-03-26 — Completed 05-05-PLAN.md (head-to-head route: resolveHeadToHeadData assembler D-15..D-17, /head-to-head page, HeadToHeadView URL-synced selectors, 11 tests)*

@@ -128,7 +128,7 @@
 5. Head-to-head history accessible from team detail pages or via `/head-to-head?teamA=x&teamB=y` route
 6. All stats derivable without schema changes (filters applied in application layer)
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [x] 05-01-PLAN.md — Domain contracts and aggregators for profile stats + time-period windows
@@ -149,7 +149,7 @@ Plans:
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
-| 5. User Profiles & Advanced Features | 3/5 | In Progress|  |
+| 5. User Profiles & Advanced Features | 4/5 | In Progress|  |
 
 ---
 
