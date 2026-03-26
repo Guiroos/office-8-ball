@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 
-import { PlaceholderPage } from "@/components/authenticated/placeholder-page";
+import { RankingView } from "@/components/ranking/ranking-view";
+import { hasDatabaseUrl } from "@/lib/auth";
+import { listAllTeamsWithStats } from "@/lib/ranking";
 
 export const metadata: Metadata = {
   title: "Ranking | Office 8 Ball",
-  description: "Area reservada para a futura leitura de ranking do Office 8 Ball.",
+  description: "Ranking geral com podium, standings e filtros por tipo de time.",
 };
 
-export default function RankingPage() {
-  return (
-    <PlaceholderPage
-      eyebrow="Ranking"
-      title="O ranking entra sem inventar dominio novo."
-      description="A rota ja existe para sustentar a sidebar compartilhada, mas ainda sem criar calculos paralelos ao scoreboard derivado de matches."
-      nextStep="A proxima etapa pode decidir que leitura competitiva cabe aqui sem quebrar os invariantes atuais do placar."
-    />
-  );
+type RankingPageProps = {
+  searchParams?: Promise<{ type?: string }>;
+};
+
+export default async function RankingPage({ searchParams }: RankingPageProps) {
+  const resolved = (await searchParams) ?? {};
+  const rawType = resolved.type;
+  const parsedType = rawType === "solo" || rawType === "duo" ? rawType : undefined;
+  const activeType = parsedType ?? "all";
+
+  const teams = await listAllTeamsWithStats(parsedType);
+  const mode = hasDatabaseUrl() ? "available" : "unavailable";
+
+  return <RankingView teams={teams} activeType={activeType} mode={mode} />;
 }

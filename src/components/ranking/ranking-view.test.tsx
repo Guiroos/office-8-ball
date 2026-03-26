@@ -102,8 +102,12 @@ describe("RankingView", () => {
   it("renders podium in 2 | 1 | 3 order", () => {
     render(<RankingView teams={teams} activeType="all" mode="available" />);
 
-    const titles = screen.getAllByRole("heading", { level: 3 }).map((node) => node.textContent);
-    expect(titles.slice(0, 3)).toEqual(["Time Dois", "Time Um", "Time Três"]);
+    const first = screen.getByRole("link", { name: /2º Lugar/ });
+    const second = screen.getByRole("link", { name: /1º Lugar/ });
+    const third = screen.getByRole("link", { name: /3º Lugar/ });
+
+    expect(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(second.compareDocumentPosition(third) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("renders list rows from rank 4 onward", () => {
