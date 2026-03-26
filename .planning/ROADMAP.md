@@ -13,7 +13,7 @@
 - [x] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection (completed 2026-03-25)
 - [x] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics (completed 2026-03-25)
 - [x] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster (completed 2026-03-25)
-- [ ] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters
+- [ ] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26)
 
 ---
 
@@ -128,14 +128,14 @@
 5. Head-to-head history accessible from team detail pages or via `/head-to-head?teamA=x&teamB=y` route
 6. All stats derivable without schema changes (filters applied in application layer)
 
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 
 Plans:
-- [ ] 05-01-PLAN.md — Domain contracts and aggregators for profile stats + time-period windows
-- [ ] 05-02-PLAN.md — Server-first `/profile` wiring and UI migration to aggregated payload
-- [ ] 05-03-PLAN.md — Ranking backend/route support for `period=all|month|week`
-- [ ] 05-04-PLAN.md — Ranking UI period filters with query-param preservation and tests
-- [ ] 05-05-PLAN.md — Dedicated `/head-to-head` route with fallback validation and URL sync
+- [x] 05-01-PLAN.md — Domain contracts and aggregators for profile stats + time-period windows
+- [x] 05-02-PLAN.md — Server-first `/profile` wiring and UI migration to aggregated payload
+- [x] 05-03-PLAN.md — Ranking backend/route support for `period=all|month|week`
+- [x] 05-04-PLAN.md — Ranking UI period filters with query-param preservation and tests
+- [x] 05-05-PLAN.md — Dedicated `/head-to-head` route with fallback validation and URL sync
 
 **UI hint:** yes
 
@@ -149,7 +149,7 @@ Plans:
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
-| 5. User Profiles & Advanced Features | 0/? | Not started | - |
+| 5. User Profiles & Advanced Features | 1/5 | In Progress|  |
 
 ---
 
@@ -180,3 +180,4 @@ Plans:
 *Phase 3 planned: 2026-03-25*
 *Phase 4 planned: 2026-03-25*
 *Phase 4 executed: 2026-03-25*
+*Phase 5 planned: 2026-03-26*

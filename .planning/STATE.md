@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-26T03:35:00Z"
+status: executing
+last_updated: "2026-03-26T22:54:27.836Z"
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 9
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to plan
+**Status:** Ready to execute
 **Last updated:** 2026-03-26
 
 ---
@@ -35,8 +35,8 @@ progress:
 
 ## Current Position
 
-Phase: 05
-Plan: Context gathered (05-CONTEXT.md)
+Phase: 05 (user-profiles-advanced-features) — EXECUTING
+Plan: 2 of 5
 
 ## Roadmap Summary
 
@@ -50,7 +50,7 @@ Plan: Context gathered (05-CONTEXT.md)
 | 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | ✓ Complete |
 | 3 | Stats computation module (W/L, streaks, H2H) | — | ✓ Complete |
 | 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | ✓ Complete |
-| 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Not started |
+| 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Planned |
 
 ---
 
@@ -138,6 +138,14 @@ Plan: Context gathered (05-CONTEXT.md)
     - Implication: detectStreaks processes teamMatches in reverse; currentStreak is the final runType/runCount at loop end
 
 15. **Stats types co-located with Zod schemas in stats.ts; re-exported from types.ts** (Plan 03-01)
+
+16. **BRT window uses fixed UTC-3 offset (no DST) in time-period.ts** (Plan 05-01)
+    - Rationale: America/Sao_Paulo observes no DST in 2026; fixed offset avoids Intl dependency and keeps function pure and deterministic
+    - Implication: If DST rules change, update BRT_OFFSET_MS; injectable `now` param makes this testable
+
+17. **computeProfilePageData returns placeholder identity fields; page assembler overrides** (Plan 05-01)
+    - Rationale: Keeps domain function pure and testable without user DB lookup; server assembler (D-01) merges user record
+    - Implication: Callers must override username/displayName/avatarUrl/bio/createdAt from the user record
     - Rationale: Type safety via z.infer keeps types and validation schemas in sync automatically; types.ts provides single import path for consumers
     - Implication: Phase 4 can import TeamStats from either @/lib/stats or @/lib/types
 
@@ -179,4 +187,4 @@ Plan: Context gathered (05-CONTEXT.md)
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 04-03-PLAN.md (team detail server assembler, /times tabs + /times/[id], H2H section wiring)*
+*Last session: 2026-03-26 — Completed 05-01-PLAN.md (profile/period domain contracts: RankingPeriod, ProfilePageData, resolvePeriodWindow, computeProfilePageData, 11 tests)*

@@ -21,13 +21,13 @@
 - [x] **RANK-02**: Ranking mostra W/L e win rate % por time
 - [x] **RANK-03**: Ranking mostra streak atual (sequência de vitórias/derrotas) por time
 - [x] **RANK-04**: Ranking mostra total de partidas por time
-- [ ] **RANK-05**: Ranking suporta filtros por período (semana / mês / geral)
+- [x] **RANK-05**: Ranking suporta filtros por período (semana / mês / geral)
 
 ### Perfil
 
-- [ ] **PROF-01**: Perfil do usuário mostra seus times com stats agregados
-- [ ] **PROF-02**: Perfil mostra win rate geral do jogador (across all teams)
-- [ ] **PROF-03**: Perfil mostra total de partidas jogadas pelo usuário
+- [x] **PROF-01**: Perfil do usuário mostra seus times com stats agregados
+- [x] **PROF-02**: Perfil mostra win rate geral do jogador (across all teams)
+- [x] **PROF-03**: Perfil mostra total de partidas jogadas pelo usuário
 
 ## v2 Requirements
 
@@ -68,10 +68,10 @@
 | RANK-02 | Phase 4 | Complete |
 | RANK-03 | Phase 4 | Complete |
 | RANK-04 | Phase 4 | Complete |
-| RANK-05 | Phase 5 | Pending |
-| PROF-01 | Phase 5 | Pending |
-| PROF-02 | Phase 5 | Pending |
-| PROF-03 | Phase 5 | Pending |
+| RANK-05 | Phase 5 | Complete |
+| PROF-01 | Phase 5 | Complete |
+| PROF-02 | Phase 5 | Complete |
+| PROF-03 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total
