@@ -1,7 +1,7 @@
 # Phase 5: User Profiles & Advanced Features - Research
 
 **Researched:** 2026-03-26
-**Domain:** Profile aggregation, period-filtered ranking, and dedicated head-to-head routing in Next.js App Router + Prisma
+**Domain:** Profile aggregation, time-filtered ranking, and dedicated head-to-head routing
 **Confidence:** HIGH
 
 <user_constraints>
@@ -53,72 +53,77 @@
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| PROF-01 | Perfil do usuário mostra seus times com stats agregados | Profile assembler server-side + `profile-stats` domain module + per-team stats composition |
-| PROF-02 | Perfil mostra win rate geral do jogador (across all teams) | Aggregation semantics + de-dup de partidas + reusable win-rate derivation |
-| PROF-03 | Perfil mostra total de partidas jogadas pelo usuário | Membership-based match inclusion and unique match counting rule (D-05..D-08) |
-| RANK-05 | Ranking suporta filtros por período (semana / mês / geral) | `period` query contract, Sao Paulo boundary helper, date-window Prisma filtering |
+| PROF-01 | Perfil do usuário mostra seus times com stats agregados | `profile-stats` assembler + per-team derivação reutilizando `computeTeamStats` |
+| PROF-02 | Perfil mostra win rate geral do jogador (across all teams) | Agregação por partidas únicas (sem dupla contagem) e fórmula única de winRate |
+| PROF-03 | Perfil mostra total de partidas jogadas pelo usuário | Regra D-05..D-08 implementada em módulo de domínio dedicado |
+| RANK-05 | Ranking suporta filtros por período (semana / mês / geral) | `period` query contract + helper de janela temporal + filtro em query de partidas |
 </phase_requirements>
 
 ## Summary
 
-Phase 5 should be implemented as three domain additions, not route-local logic: a profile aggregation module, a ranking period-window module, and a dedicated head-to-head assembler for URL-driven comparisons. This matches existing architecture (`stats.ts`, `ranking.ts`, `team-details.ts`) and keeps `/profile`, `/ranking`, and `/head-to-head` pages thin server components.
+Phase 5 should be planned as incremental extensions over existing domain modules, not as isolated page logic. The current code already has reusable primitives (`computeTeamStats`, `computeHeadToHead`, `listAllTeamsWithStats`, `getTeamDetailData`) and a query-param-driven ranking route. The missing work is composition: profile aggregation, period windows, and dedicated H2H routing with resilient URL handling.
 
-The current profile UI (`src/components/profile/profile-page.tsx`) is still client-fetch based and hardcoded around legacy teams. Replace it with server-first rendering from a domain payload and keep `/api/profile` unchanged for editable identity fields only. Ranking period filters should extend existing type filtering (`/ranking?type=...`) with `period` while preserving both params and explicit empty states.
+`/profile` currently depends on client fetches and hardcoded teams (`frontend/backend`) in `src/components/profile/profile-page.tsx`; this is the highest-risk gap versus requirements PROF-01..03. The correct path is server-first rendering via a new domain assembler module, while keeping `GET/PUT /api/profile` scoped to editable identity data (D-02).
 
-For time windows, enforce the locked business rule (America/Sao_Paulo / UTC-3) through a single helper used by ranking queries. Do not change Prisma schema and do not persist aggregates. Everything remains derived from match history on read.
+For RANK-05 and dedicated H2H UX, the current architecture already supports query-param parsing and server rendering. Extend that contract with `period=all|month|week`, preserve `type` and `period` together, keep explicit empty states, and add `/head-to-head` with strict param validation + fallback without throwing.
 
-**Primary recommendation:** Implement `src/lib/profile-stats.ts` and `src/lib/time-period.ts` first, then wire `/profile`, `/ranking`, and `/head-to-head` to these modules with query-param-preserving UI.
+**Primary recommendation:** Build `src/lib/profile-stats.ts` and `src/lib/time-period.ts` first, then wire `/profile`, `/ranking`, and `/head-to-head` around those tested domain helpers.
 
 ## Project Constraints (from project instructions)
 
-- Do not edit `prisma/schema.prisma` without explicit approval; this phase must remain schema-neutral.
+- Do not edit `prisma/schema.prisma` without explicit approval.
 - Do not install new packages without approval.
-- Keep dual-mode behavior (DB-backed and in-memory without `DATABASE_URL`) working.
-- Keep protected API statuses (`401`, `409`, `429`, `500`, `503`) unchanged unless client handling/tests are updated.
-- Keep `/dashboard` functional; `/scoreboard` remains legacy redirect.
-- Keep stats derived from match history; do not persist aggregate counters.
-- Use `@/` imports, named exports (except Next page/layout defaults), and server components by default.
-- Route tests must mock `@/lib/auth`; data-layer in-memory tests must reset modules and dynamically import.
-- Unit/route tests should not import Prisma directly.
+- Keep DB-backed mode and in-memory mode behavior intact.
+- Do not change protected API statuses `401`, `409`, `429`, `500`, `503` without coordinated client/test updates.
+- Keep `/dashboard` as the functional authenticated route (`/scoreboard` remains redirect).
+- Keep stats derived from match history; do not add persisted aggregate counters.
+- Use `@/` imports; use named exports except Next page/layout defaults.
+- Prefer server components; add `"use client"` only when required.
+- Route tests must mock `@/lib/auth`; tests should not import Prisma directly.
+- Data-layer tests requiring in-memory behavior must use `delete process.env.DATABASE_URL`, `vi.resetModules()`, and dynamic imports.
 
 ## Standard Stack
 
 ### Core
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| `next` | `16.1.6` (repo), `16.2.1` latest | App Router pages, server components, query-param routing | Already the app framework; phase requires RSC + URL state |
-| `react` | `19.2.3` (repo), `19.2.4` latest | UI composition for profile/ranking/H2H components | Existing rendering model and hooks |
-| `prisma` + `@prisma/client` | `6.19.2` (repo), `7.5.0` latest | Match/team/user queries and date-window filtering | Existing DB abstraction and typed models |
-| `next-auth` (Auth.js v4) | `4.24.13` | Authenticated user resolution for protected pages/routes | Existing auth contract in middleware/lib/auth |
-| `zod` | `4.3.6` | Validation for query params and view-model contracts | Already used in routes and domain |
+| `next` | repo `16.1.6` / latest `16.2.1` | App Router routes + RSC data fetching | Existing framework and route model |
+| `react` | repo `19.2.3` / latest `19.2.4` | UI composition for profile/ranking/H2H | Existing rendering layer |
+| `prisma` + `@prisma/client` | repo `6.19.2` / latest `7.5.0` | Team/match/user read model queries | Existing DB access contract |
+| `next-auth` | `4.24.13` | User identity for protected pages | Existing auth/session integration |
+| `zod` | `4.3.6` | Query and payload validation | Existing validation standard in routes |
 
 ### Supporting
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| `vitest` | `4.1.0` (repo), `4.1.2` latest | Unit and route tests for domain/filter behavior | For profile aggregation and period-window edge cases |
-| `@playwright/test` | `1.58.2` | End-to-end deep-link and filter persistence checks | Optional final gate for `/head-to-head` URL behavior |
+| `vitest` | repo `4.1.0` / latest `4.1.2` | Unit/route tests for new domain modules | Required for PROF and RANK behavior coverage |
+| `@playwright/test` | `1.58.2` | Deep-link/URL behavior verification | Optional higher-confidence check for H2H URL sync |
+| `@testing-library/react` | `16.3.2` | Component-level query-param and empty-state tests | For ranking/profile client components |
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| App-layer UTC window helper | Raw SQL with `AT TIME ZONE` in `$queryRaw` | More SQL complexity and weaker type safety for this phase |
-| Dedicated `profile-stats.ts` | Inline logic inside `/profile` page | Harder to test and reuse; violates D-04 |
-| Keep H2H only in `/times/[id]` | Dedicated `/head-to-head` route | Existing section is not shareable/deep-linkable; D-14 requires route |
+| App-layer time-window helper | Raw SQL timezone expressions | Harder to test and maintain in this codebase |
+| Dedicated profile domain module | Inline logic in page component | Violates D-04 and reduces testability |
+| Reusing only `/times/[id]` H2H | Dedicated `/head-to-head` route | Does not satisfy D-14 deep-link requirement |
 
 **Installation:**
 ```bash
-# No new packages required for Phase 5.
+# No new dependencies required for this phase.
 ```
 
-**Version verification (npm registry, checked 2026-03-26):**
-- `next@16.2.1` published `2026-03-20T23:31:11.148Z`
-- `react@19.2.4` published `2026-01-26T18:23:10.244Z`
-- `next-auth@4.24.13` published `2025-10-29T20:52:19.822Z`
-- `prisma@7.5.0` published `2026-03-11T14:45:10.779Z`
-- `@prisma/client@7.5.0` published `2026-03-11T14:44:35.031Z`
-- `zod@4.3.6` published `2026-01-22T19:14:35.382Z`
-- `vitest@4.1.2` published `2026-03-26T14:36:51.447Z`
-- `@playwright/test@1.58.2` published `2026-02-06T16:42:52.725Z`
+**Version verification:** Before finalizing the plan, verify versions with:
+```bash
+npm view next version
+npm view react version
+npm view prisma version
+npm view @prisma/client version
+npm view next-auth version
+npm view zod version
+npm view vitest version
+npm view @playwright/test version
+```
+Registry check performed on 2026-03-26 (`npm view ... version time.modified --json`) confirmed the "latest" versions listed above.
 
 ## Architecture Patterns
 
@@ -126,146 +131,144 @@ For time windows, enforce the locked business rule (America/Sao_Paulo / UTC-3) t
 ```text
 src/
 ├── app/(authenticated)/
-│   ├── profile/page.tsx              # RSC profile route consuming server assembler
-│   ├── ranking/page.tsx              # Extends query parsing with period
-│   └── head-to-head/page.tsx         # New dedicated authenticated route
+│   ├── profile/page.tsx            # server-first profile route
+│   ├── ranking/page.tsx            # supports type + period query params
+│   └── head-to-head/page.tsx       # dedicated authenticated H2H route
 ├── components/
-│   ├── profile/                      # Server-friendly profile view components
-│   ├── ranking/                      # Type + period filter controls
-│   └── head-to-head/                 # URL-synced selector UI
+│   ├── profile/                    # profile view components
+│   ├── ranking/                    # type + period filter controls
+│   └── head-to-head/               # selector + state messaging
 └── lib/
-    ├── profile-stats.ts              # D-04 aggregation module
-    ├── time-period.ts                # week/month/all period boundaries (UTC-3)
-    ├── ranking.ts                    # accepts type + period and applies date window
-    └── head-to-head.ts               # dedicated route assembler + validation/fallback
+    ├── profile-stats.ts            # user aggregate and per-team stats (D-04)
+    ├── time-period.ts              # all/week/month window resolution (D-10/D-11)
+    ├── ranking.ts                  # extend listing with period filtering
+    └── head-to-head.ts             # shared validation/fallback assembler
 ```
 
-### Pattern 1: Server Assembler for Profile (D-01, D-03, D-04)
-**What:** Build one domain payload combining identity + aggregate stats + per-team stats; page renders it directly.
-**When to use:** Any authenticated route where all core data is available server-side.
+### Pattern 1: Domain Assembler for `/profile`
+**What:** Fetch identity + memberships + matches once on server, then derive all profile metrics in one module.
+**When to use:** Any route where all required data is available server-side and should render without client bootstrap.
 **Example:**
 ```typescript
-// Source: local code pattern from src/lib/team-details.ts + D-01..D-04
+// Source: local pattern from src/lib/team-details.ts and locked D-01..D-04
 export async function getProfilePageData(userId: string) {
-  const teams = await listUserTeams(userId, true); // include archived for D-07
-  const teamIds = teams.map((t) => t.id);
-  const matches = await listMatchesForTeams(teamIds); // ordered desc
-  return buildProfileStats({ userId, teams, matches });
+  const teams = await listUserTeams(userId, true); // includes archived per D-07
+  const teamIds = new Set(teams.map((team) => team.id));
+  const matches = await listMatchesForTeams([...teamIds]);
+  return buildProfileStats({ teams, teamIds, matches });
 }
 ```
 
-### Pattern 2: Period Window Helper + Ranking Query Composition
-**What:** Parse `period` query once, compute date boundaries once, apply in Prisma `where`.
-**When to use:** Any route/service that filters match-derived stats by time.
+### Pattern 2: Single Time-Window Resolver
+**What:** Parse `period` and compute one canonical `{startUtc, endUtc}` used by ranking queries.
+**When to use:** Any period-filtered stat query (`all`, `week`, `month`).
 **Example:**
 ```typescript
-// Source: Prisma filtering style in docs + existing src/lib/ranking.ts query style
-const { startUtc, endUtc } = resolvePeriodWindow(period, new Date());
-const where = startUtc && endUtc ? { playedAt: { gte: startUtc, lt: endUtc } } : {};
-
+// Source: existing Prisma query style in src/lib/ranking.ts
+const window = resolvePeriodWindow(period, "America/Sao_Paulo");
 const matchRows = await prisma.match.findMany({
   where: {
     OR: [{ teamAId: { in: teamIds } }, { teamBId: { in: teamIds } }],
-    ...where,
+    ...(window ? { playedAt: { gte: window.startUtc, lt: window.endUtc } } : {}),
   },
   orderBy: { playedAt: "desc" },
 });
 ```
 
-### Pattern 3: URL-Driven H2H Route With Validation + Fallback
-**What:** Parse `teamA/teamB` from URL, validate ownership and distinct IDs, render fallback pair and message when invalid.
-**When to use:** Deep-linkable comparisons where state must survive refresh/share.
+### Pattern 3: URL-Validated H2H Selection
+**What:** Parse `teamA/teamB`, validate against accessible teams, reject same-team pair, and fallback to first valid pair with warning.
+**When to use:** `/head-to-head` initial load and on param mutation.
 **Example:**
 ```typescript
-// Source: query-param style from src/app/(authenticated)/ranking/page.tsx + D-14..D-18
-const requested = parseHeadToHeadParams(searchParams);
-const resolved = resolveValidPair(requested, viewerTeams); // never throws
+// Source: query-param handling style from src/app/(authenticated)/ranking/page.tsx
+const parsed = parseH2HSearchParams(searchParams);
+const resolved = resolveValidPair(parsed, viewerTeams); // never throws
 return { pair: resolved.pair, warning: resolved.warning };
 ```
 
 ### Anti-Patterns to Avoid
-- **Client-first profile fetch loop:** Re-implementing `/profile` with `useEffect(fetch)` keeps hardcoded/partial state and violates D-01/D-03.
-- **Date logic duplicated in components and data layer:** Causes inconsistent week/month boundaries and hard-to-reproduce bugs.
-- **Auto-fallback from empty filtered ranking to all-time:** Violates D-13.
-- **Adding profile/ranking aggregate columns in DB:** Violates phase constraints and D-06/D-07 principles.
+- **Client-side profile bootstrap as primary data flow:** keeps hardcoded state and violates D-03.
+- **Copying stats formulas into UI components:** creates drift from `stats.ts`.
+- **Dropping existing query params when changing one filter:** breaks D-12 shareable URLs.
+- **Silent fallback to all-time when filtered result is empty:** violates D-13.
 
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Team/per-team stat formulas | New ad-hoc W/L and H2H math | `computeTeamStats` and `computeHeadToHead` from `src/lib/stats.ts` | Existing, tested formulas reduce regression risk |
-| Profile aggregate engine in UI | Local state math inside React component | `src/lib/profile-stats.ts` pure domain module | Testable, reusable, server-friendly |
-| Auth/session checks in each component | Custom cookie/session parsing | `getAuthenticatedUser`, `hasDatabaseUrl`, existing middleware pattern | Consistent protected-route behavior |
-| Query param mutation | Manual string concatenation for URLs | `URLSearchParams` + Next Router/Link | Prevents dropping `type`/`period` params accidentally |
+| Win/loss/winRate/streak math | New custom stat formulas | `computeTeamStats` in `src/lib/stats.ts` | Existing tested contract |
+| H2H pair aggregation | New ad-hoc H2H algorithm | `computeHeadToHead` in `src/lib/stats.ts` | Existing tested edge-case behavior |
+| Profile aggregation in component state | `useEffect` + local reduction logic | `src/lib/profile-stats.ts` domain module | Deterministic and unit-testable |
+| URL query string manipulation | Manual string concatenation | `URLSearchParams` and Next `Link`/router updates | Preserves `type` + `period` reliably |
 
-**Key insight:** This phase is mainly composition work over existing domain primitives; custom reimplementation creates drift from already-tested stats behavior.
+**Key insight:** Phase 5 is primarily orchestration of existing domain primitives; hand-rolled replacements increase regression risk without adding capability.
 
 ## Common Pitfalls
 
-### Pitfall 1: Double-counting user matches
-**What goes wrong:** Same match counted twice when user belongs to both teams.
-**Why it happens:** Naive loops add per-team totals without unique match ID set.
-**How to avoid:** Aggregate by unique match IDs, then derive wins/losses once per match.
-**Warning signs:** `wins + losses` greater than deduplicated `totalMatches`.
+### Pitfall 1: Double counting matches in profile totals
+**What goes wrong:** User total matches is inflated.
+**Why it happens:** Summing per-team totals instead of deduping match IDs (D-08).
+**How to avoid:** Build a unique match set first; derive wins/losses from that set.
+**Warning signs:** `wins + losses` exceeds count of unique matches.
 
-### Pitfall 2: Wrong week/month boundaries
-**What goes wrong:** Filters include/exclude wrong matches near midnight.
-**Why it happens:** Boundary calculations in server local timezone or UTC without UTC-3 normalization.
-**How to avoid:** Central `time-period` helper with explicit Sao Paulo/UTC-3 boundaries.
-**Warning signs:** Tests fail for Sunday/Monday and month rollover timestamps.
+### Pitfall 2: Wrong week/month boundaries at day rollover
+**What goes wrong:** Matches near midnight appear in wrong period filter.
+**Why it happens:** Multiple ad-hoc timezone conversions across files.
+**How to avoid:** Centralize period boundaries in one helper anchored to `America/Sao_Paulo` per D-10/D-11.
+**Warning signs:** Flaky tests around Monday 00:00 and month transitions.
 
-### Pitfall 3: Broken deep links for H2H
-**What goes wrong:** Invalid `teamA/teamB` throws or blanks page.
-**Why it happens:** Route assumes params are always valid.
-**How to avoid:** Validate params against accessible teams, show warning, and fallback to first valid pair.
-**Warning signs:** 500/404 on malformed URLs.
+### Pitfall 3: Invalid H2H URL breaks route
+**What goes wrong:** `/head-to-head` errors or shows blank UI on bad params.
+**Why it happens:** Assumption that URL params are always valid and authorized.
+**How to avoid:** Validate IDs against viewer teams and fallback with explicit message (D-16).
+**Warning signs:** 404/500 on malformed `teamA/teamB`.
 
-### Pitfall 4: Middleware mismatch for new protected route
-**What goes wrong:** `/head-to-head` is accessible unauthenticated or redirects inconsistently.
-**Why it happens:** `middleware.ts` matcher not updated when route is added.
-**How to avoid:** Add `/head-to-head/:path*` to matcher in same task as route creation.
-**Warning signs:** Auth tests pass on existing routes but fail on new route.
+### Pitfall 4: Missing middleware protection for new route
+**What goes wrong:** `/head-to-head` bypasses auth unexpectedly.
+**Why it happens:** `middleware.ts` matcher not updated.
+**How to avoid:** Add `/head-to-head/:path*` in the same task as route creation.
+**Warning signs:** Auth behavior differs from `/ranking` and `/times`.
 
 ## Code Examples
 
-Verified patterns from existing codebase and official docs:
+Verified patterns from existing code:
 
-### Profile aggregation with de-dup
+### Unique-match profile aggregation
 ```typescript
-// Source: src/lib/stats.ts + Phase 5 decisions D-05..D-08
-const uniqueMatches = new Map(matches.map((m) => [m.id, m]));
+// Source: src/lib/stats.ts usage style + D-05..D-08
+const matchById = new Map(matches.map((match) => [match.id, match]));
 let wins = 0;
 let losses = 0;
 
-for (const match of uniqueMatches.values()) {
-  const userInMatch = teamIds.has(match.teamAId) || teamIds.has(match.teamBId);
-  if (!userInMatch) continue;
-  if (teamIds.has(match.winnerTeamId)) wins++;
-  else losses++;
+for (const match of matchById.values()) {
+  const involved = teamIds.has(match.teamAId) || teamIds.has(match.teamBId);
+  if (!involved) continue;
+  if (teamIds.has(match.winnerTeamId)) wins += 1;
+  else losses += 1;
 }
-
-const totalMatches = wins + losses;
-const winRate = totalMatches === 0 ? 0 : (wins / totalMatches) * 100;
 ```
 
-### Preserve `type` + `period` filters in ranking links
+### Preserve `type` and `period` query params
 ```tsx
-// Source: src/components/ranking/type-tabs.tsx pattern, extended for D-12
-const params = new URLSearchParams(searchParams);
+// Source: src/components/ranking/type-tabs.tsx pattern
+const params = new URLSearchParams(currentParams);
 params.set("period", nextPeriod);
-return `/ranking?${params.toString()}`;
+const href = `/ranking?${params.toString()}`;
 ```
 
-### Robust head-to-head fallback resolution
+### Fallback-safe H2H pair resolver
 ```typescript
-// Source: src/lib/team-details.ts rival-selection style + D-15/D-16
-function resolveValidPair(input: { teamA?: string; teamB?: string }, teams: TeamRecord[]) {
-  const ids = new Set(teams.map((t) => t.id));
-  const validA = input.teamA && ids.has(input.teamA) ? input.teamA : null;
-  const validB = input.teamB && ids.has(input.teamB) ? input.teamB : null;
-  if (validA && validB && validA !== validB) return { pair: [validA, validB], warning: null };
-  const fallback = teams.length >= 2 ? [teams[0]!.id, teams[1]!.id] : [null, null];
-  return { pair: fallback, warning: "Seleção inválida; exibindo confronto disponível." };
+// Source: fallback selection pattern inspired by src/lib/team-details.ts
+function resolvePair(teamA: string | null, teamB: string | null, teams: string[]) {
+  const valid = new Set(teams);
+  if (teamA && teamB && teamA !== teamB && valid.has(teamA) && valid.has(teamB)) {
+    return { teamA, teamB, warning: null };
+  }
+  return {
+    teamA: teams[0] ?? null,
+    teamB: teams[1] ?? null,
+    warning: "Seleção inválida; exibindo confronto disponível.",
+  };
 }
 ```
 
@@ -273,36 +276,35 @@ function resolveValidPair(input: { teamA?: string; teamB?: string }, teams: Team
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| Client-side profile fetching with hardcoded team placeholders | Server-side profile assembler + reusable domain module | Phase 5 target (2026-03) | Deterministic SSR payload, no stale client boot state |
-| Ranking filtered only by team type | Combined type + period query contract | Phase 5 target (2026-03) | Time-scoped standings with shareable URLs |
-| H2H only inside `/times/[id]` selector | Dedicated `/head-to-head` deep-linkable route plus team detail section | Phase 5 target (2026-03) | Better navigation/shareability without losing existing section |
+| Client-fetched profile data with placeholders | Server-side profile assembler with derived metrics | Phase 5 target (2026-03) | Removes hardcoded drift and improves determinism |
+| Ranking filtered only by team type | Ranking filtered by team type + period | Phase 5 target (2026-03) | Enables requirement RANK-05 |
+| H2H only within team detail page | Dedicated `/head-to-head` route + existing embedded H2H | Phase 5 target (2026-03) | Deep-linkable comparisons and better discoverability |
 
 **Deprecated/outdated:**
-- Hardcoded profile team constants (`frontend/backend`) in `src/components/profile/profile-page.tsx`.
-- Profile main content driven by `/api/matches` client fetch rather than server assembler payload.
+- Hardcoded `TEAMS` constant in `src/components/profile/profile-page.tsx`.
+- Primary profile loading via client-side `/api/profile` and `/api/matches` effects.
 
 ## Open Questions
 
-1. **Exact timezone implementation strategy for `America/Sao_Paulo` boundary math**
-   - What we know: Locked decisions require Sao Paulo semantics and label UTC-3.
-   - What's unclear: Whether to treat this strictly as fixed UTC-3 offset or as named timezone conversion behavior across historical dates.
-   - Recommendation: Implement fixed UTC-3 in `time-period.ts` for Phase 5 consistency; document as explicit product rule and revisit only if user-level timezone becomes in-scope.
+1. **UTC-3 fixed offset vs named timezone behavior**
+   - What we know: Decisions lock behavior to `America/Sao_Paulo` and specify UTC-3.
+   - What's unclear: Whether historical DST edge dates matter for this product.
+   - Recommendation: Implement explicit current product rule (UTC-3 calendar boundaries), document it, and revisit only if per-user timezone becomes scope.
 
 ## Environment Availability
 
 | Dependency | Required By | Available | Version | Fallback |
 |------------|------------|-----------|---------|----------|
-| Node.js | Build/tests/runtime tooling | ✓ | `v24.14.0` | — |
-| npm/npx | Scripts, test execution | ✓ | `11.9.0` | — |
-| Local Playwright via npx | E2E deep-link verification | ✓ | `1.58.2` | Vitest integration coverage only |
-| PostgreSQL CLI (`psql`) | Manual DB inspection/debug | ✗ | — | Use Prisma queries/tests instead |
-| Docker | Optional local DB provisioning | ✓ | `29.2.1` | Existing DB instance/in-memory mode |
+| Node.js | Next/Vitest/Playwright scripts | ✓ | `v24.14.0` | — |
+| npm/npx | package scripts + test commands | ✓ | `11.9.0` | — |
+| PostgreSQL CLI (`psql`) | manual DB inspection only | ✗ | — | Use Prisma client queries/tests |
+| Docker | optional local DB provisioning | ✓ | `29.2.1` (client) | Existing DB or in-memory mode |
 
 **Missing dependencies with no fallback:**
-- None for planning and implementation.
+- None identified for planning or implementation.
 
 **Missing dependencies with fallback:**
-- `psql` missing; use Prisma Client and route/data-layer tests for verification.
+- `psql` is unavailable; use Prisma-backed integration tests for DB verification.
 
 ## Validation Architecture
 
@@ -311,16 +313,16 @@ function resolveValidPair(input: { teamA?: string; teamB?: string }, teams: Team
 |----------|-------|
 | Framework | Vitest `4.1.0` (repo), Playwright `1.58.2` |
 | Config file | `vitest.config.ts`, `playwright.config.ts` |
-| Quick run command | `npm run test -- src/lib/profile-stats.test.ts src/lib/ranking.test.ts src/components/ranking/ranking-view.test.tsx` |
+| Quick run command | `npm run test -- src/lib/ranking.test.ts src/components/ranking/ranking-view.test.tsx src/app/api/profile/route.test.ts` |
 | Full suite command | `npm run typecheck && npm run test && npm run e2e` |
 
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| PROF-01 | Profile lists user teams with per-team stats | unit/integration | `npm run test -- src/lib/profile-stats.test.ts src/app/(authenticated)/profile/page.test.tsx` | ❌ Wave 0 |
-| PROF-02 | Profile computes overall win rate across teams | unit | `npm run test -- src/lib/profile-stats.test.ts -t "overall win rate"` | ❌ Wave 0 |
-| PROF-03 | Profile total matches uses de-duplicated membership semantics | unit | `npm run test -- src/lib/profile-stats.test.ts -t "counts unique matches"` | ❌ Wave 0 |
-| RANK-05 | Ranking supports all/week/month with query persistence and empty states | unit/component | `npm run test -- src/lib/ranking.test.ts src/components/ranking/ranking-view.test.tsx` | ⚠️ Partial |
+| PROF-01 | Profile lists user teams with per-team stats | unit + route/component | `npm run test -- src/lib/profile-stats.test.ts src/app/(authenticated)/profile/page.test.tsx` | ❌ Wave 0 |
+| PROF-02 | Profile computes overall user win rate | unit | `npm run test -- src/lib/profile-stats.test.ts -t "win rate"` | ❌ Wave 0 |
+| PROF-03 | Profile computes total played matches with dedupe | unit | `npm run test -- src/lib/profile-stats.test.ts -t "total matches"` | ❌ Wave 0 |
+| RANK-05 | Ranking supports `period=all|month|week` and empty states | unit + component | `npm run test -- src/lib/ranking.test.ts src/components/ranking/ranking-view.test.tsx` | ⚠️ Partial (period cases missing) |
 
 ### Sampling Rate
 - **Per task commit:** `npm run test -- src/lib/profile-stats.test.ts src/lib/ranking.test.ts`
@@ -328,46 +330,56 @@ function resolveValidPair(input: { teamA?: string; teamB?: string }, teams: Team
 - **Phase gate:** Full suite green before `/gsd:verify-work`
 
 ### Wave 0 Gaps
-- [ ] `src/lib/profile-stats.test.ts` — covers PROF-01/02/03 aggregation semantics
-- [ ] `src/lib/time-period.test.ts` — week/month boundary edge cases (Sunday/Monday and month rollover)
-- [ ] `src/app/(authenticated)/profile/page.test.tsx` — server-rendered profile payload wiring
-- [ ] `src/app/(authenticated)/head-to-head/page.test.tsx` — invalid query fallback and default pair behavior
-- [ ] Extend `src/lib/ranking.test.ts` for `period` date-window filtering
-- [ ] Extend `src/components/ranking/ranking-view.test.tsx` for period empty-state copy with filters visible
+- [ ] `src/lib/profile-stats.test.ts` — PROF-01/02/03 core semantics
+- [ ] `src/lib/time-period.test.ts` — week/month boundary edge cases
+- [ ] `src/app/(authenticated)/profile/page.test.tsx` — RSC payload wiring and empty states
+- [ ] `src/app/(authenticated)/head-to-head/page.test.tsx` — fallback + invalid query behavior
+- [ ] Extend `src/lib/ranking.test.ts` for `period` filter query behavior
+- [ ] Extend `src/components/ranking/ranking-view.test.tsx` for period filter empty-state visibility
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Local codebase:
-  - `src/lib/stats.ts`, `src/lib/ranking.ts`, `src/lib/team-details.ts`, `src/lib/teams.ts`, `src/app/(authenticated)/ranking/page.tsx`, `src/components/profile/profile-page.tsx`, `middleware.ts`
+- Local phase decisions and constraints:
   - `.planning/phases/05-user-profiles-advanced-features/05-CONTEXT.md`
-  - `AGENTS.md`, `.planning/REQUIREMENTS.md`, `.planning/ROADMAP.md`, `.planning/STATE.md`
-- npm registry metadata:
+  - `AGENTS.md`
+  - `.planning/REQUIREMENTS.md`
+  - `.planning/ROADMAP.md`
+  - `.planning/STATE.md`
+- Local implementation contracts:
+  - `src/lib/stats.ts`
+  - `src/lib/ranking.ts`
+  - `src/lib/team-details.ts`
+  - `src/components/profile/profile-page.tsx`
+  - `src/app/(authenticated)/ranking/page.tsx`
+  - `src/components/ranking/type-tabs.tsx`
+  - `src/components/ranking/ranking-view.tsx`
+  - `middleware.ts`
+- npm registry checks (2026-03-26):
   - https://www.npmjs.com/package/next
   - https://www.npmjs.com/package/react
-  - https://www.npmjs.com/package/next-auth
   - https://www.npmjs.com/package/prisma
   - https://www.npmjs.com/package/@prisma/client
+  - https://www.npmjs.com/package/next-auth
   - https://www.npmjs.com/package/zod
   - https://www.npmjs.com/package/vitest
   - https://www.npmjs.com/package/@playwright/test
-- PostgreSQL docs:
-  - https://www.postgresql.org/docs/current/functions-datetime.html
 
 ### Secondary (MEDIUM confidence)
-- Prisma docs page structure and filtering examples:
-  - https://www.prisma.io/docs/orm/prisma-client/queries/crud
+- Next.js App Router page/search params reference:
+  - https://nextjs.org/docs/app/api-reference/file-conventions/page
+- Prisma query filtering docs:
+  - https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting
 
 ### Tertiary (LOW confidence)
-- Next.js search params historical doc snapshot (older version docs):
-  - https://nextjs.org/docs/14/app/api-reference/file-conventions/page
+- None.
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH - validated by current repository and npm registry version checks.
-- Architecture: HIGH - anchored in locked decisions plus existing project patterns and contracts.
-- Pitfalls: HIGH - derived from existing code behavior, middleware coverage, and locked semantics.
+- Standard stack: HIGH - verified from local `package.json` and npm registry metadata on 2026-03-26.
+- Architecture: HIGH - anchored in locked decisions and existing Phase 4 patterns in code.
+- Pitfalls: HIGH - derived from currently implemented code paths and known guardrails.
 
 **Research date:** 2026-03-26
 **Valid until:** 2026-04-25
