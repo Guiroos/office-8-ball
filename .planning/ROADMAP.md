@@ -13,7 +13,7 @@
 - [x] **Phase 2: Scoreboard Reactivation & Match Recording** — Reactivate scoreboard API for dynamic teams; connect match recording to dynamic team selection (completed 2026-03-25)
 - [x] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics (completed 2026-03-25)
 - [x] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster (completed 2026-03-25)
-- [ ] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26)
+- [x] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26) (completed 2026-03-26)
 
 ---
 
@@ -128,7 +128,7 @@
 5. Head-to-head history accessible from team detail pages or via `/head-to-head?teamA=x&teamB=y` route
 6. All stats derivable without schema changes (filters applied in application layer)
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md — Domain contracts and aggregators for profile stats + time-period windows
@@ -149,7 +149,7 @@ Plans:
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
-| 5. User Profiles & Advanced Features | 4/5 | In Progress|  |
+| 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
 
 ---
 
