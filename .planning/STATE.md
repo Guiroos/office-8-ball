@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-26T22:54:27.836Z"
+last_updated: "2026-03-26T22:59:23.752Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
@@ -36,7 +36,7 @@ progress:
 ## Current Position
 
 Phase: 05 (user-profiles-advanced-features) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Roadmap Summary
 
@@ -144,6 +144,14 @@ Plan: 2 of 5
     - Implication: If DST rules change, update BRT_OFFSET_MS; injectable `now` param makes this testable
 
 17. **computeProfilePageData returns placeholder identity fields; page assembler overrides** (Plan 05-01)
+
+18. **Period filter in listAllTeamsWithStats uses playedAt: { gte, lt } spread; period=all produces empty spread for backward compatibility** (Plan 05-03)
+    - Rationale: Keeps match query unchanged for all-time view; no conditional query path needed
+    - Implication: RankingView receives activePeriod as optional prop, prefixed _ until period tabs UI is wired
+
+19. **RankingView accepts optional activePeriod prop but does not render it yet** (Plan 05-03)
+    - Rationale: Data pipeline complete; UI wiring deferred to a later plan targeting period tabs
+    - Implication: activePeriod prop uses _activePeriod destructuring to satisfy no-unused-vars until consumed
     - Rationale: Keeps domain function pure and testable without user DB lookup; server assembler (D-01) merges user record
     - Implication: Callers must override username/displayName/avatarUrl/bio/createdAt from the user record
     - Rationale: Type safety via z.infer keeps types and validation schemas in sync automatically; types.ts provides single import path for consumers
@@ -187,4 +195,4 @@ Plan: 2 of 5
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-26 — Completed 05-01-PLAN.md (profile/period domain contracts: RankingPeriod, ProfilePageData, resolvePeriodWindow, computeProfilePageData, 11 tests)*
+*Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
