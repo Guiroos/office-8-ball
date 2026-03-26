@@ -1,13 +1,20 @@
 import { SectionHeader } from "@/components/primitives/section-header";
+import { PeriodTabs } from "@/components/ranking/period-tabs";
 import { PodiumCard } from "@/components/ranking/podium-card";
 import { StandingsRow } from "@/components/ranking/standings-row";
 import { TypeTabs } from "@/components/ranking/type-tabs";
 import type { RankedTeam } from "@/lib/ranking";
 
+const PERIOD_LABELS: Record<"all" | "month" | "week", string> = {
+  all: "nesta categoria",
+  month: "neste mês",
+  week: "nesta semana",
+};
+
 export function RankingView({
   teams,
   activeType,
-  activePeriod: _activePeriod,
+  activePeriod = "all",
   mode,
 }: {
   teams: RankedTeam[];
@@ -30,10 +37,19 @@ export function RankingView({
   if (teams.length === 0) {
     return (
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* per D-02 */}
-        <TypeTabs activeType={activeType} />
-        <div className="mt-6 rounded-lg border border-border bg-surface p-6">
-          <p className="text-muted-foreground">Nenhum time encontrado nesta categoria</p>
+        {/* per D-02, D-12: both filter groups remain visible in empty state */}
+        <TypeTabs activeType={activeType} activePeriod={activePeriod} />
+        <div className="mt-4">
+          <PeriodTabs activePeriod={activePeriod} activeType={activeType} />
+        </div>
+        {/* per D-13: explicit empty state without automatic fallback to all-time */}
+        <div
+          data-testid="empty-state"
+          className="mt-6 rounded-lg border border-border bg-surface p-6"
+        >
+          <p className="text-muted-foreground">
+            Nenhum time encontrado {PERIOD_LABELS[activePeriod]}
+          </p>
         </div>
       </main>
     );
@@ -55,9 +71,12 @@ export function RankingView({
         title="Placar de times"
         description="Classificação ao vivo baseada no histórico de partidas."
       />
-      {/* per D-02 */}
+      {/* per D-02, D-12: type and period filters coexist */}
       <div className="mt-6">
-        <TypeTabs activeType={activeType} />
+        <TypeTabs activeType={activeType} activePeriod={activePeriod} />
+      </div>
+      <div className="mt-4">
+        <PeriodTabs activePeriod={activePeriod} activeType={activeType} />
       </div>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-3">
