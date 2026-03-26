@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-last_updated: "2026-03-25T22:53:30.561Z"
+last_updated: "2026-03-26T02:06:04Z"
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 5
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 03 — stats-computation-module
+**Current Focus:** Phase 05 — user-profiles-advanced-features
 
 **Scope Boundaries:**
 
@@ -35,7 +35,7 @@ progress:
 
 ## Current Position
 
-Phase: 4
+Phase: 05
 Plan: Not started
 
 ## Roadmap Summary
@@ -49,7 +49,7 @@ Plan: Not started
 | 1 | Dynamic Team CRUD + dual-mode verification | TEAM-01 | ✓ Complete |
 | 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | ✓ Complete |
 | 3 | Stats computation module (W/L, streaks, H2H) | — | ✓ Complete |
-| 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | Not started |
+| 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | ✓ Complete |
 | 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Not started |
 
 ---
@@ -179,4 +179,4 @@ Plan: Not started
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 03-01-PLAN.md (stats computation module: computeTeamStats, computeHeadToHead, 21 unit tests)*
+*Last session: 2026-03-25 — Completed 04-03-PLAN.md (team detail server assembler, /times tabs + /times/[id], H2H section wiring)*

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import {
@@ -103,6 +104,8 @@ export async function POST(request: Request) {
   }
 
   const response = await createMatch({ teamAId, teamBId, winnerTeamId, note });
+  revalidatePath("/ranking");
+  revalidatePath("/times", "layout");
 
   return NextResponse.json<CreateMatchResponse>(response, { status: 201 });
 }
