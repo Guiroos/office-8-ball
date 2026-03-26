@@ -103,12 +103,10 @@
 5. Users can compare two teams' records (H2H section on team detail page)
 6. No hardcoded team constants in ranking or team detail components; all data from dynamic APIs
 
-**Plans:** 5 plans (3 base + 2 gap-closure)
+**Plans:** 3 plans
 - [x] 04-01-PLAN.md — Data foundation: stable ranking sort + in-memory fallback tests + match POST revalidation for /ranking and /times subtree
 - [x] 04-02-PLAN.md — Ranking UI: PodiumCard/StandingsRow/TypeTabs/RankingView + /ranking RSC + behavior tests (podium order, states, links)
-- [x] 04-03-PLAN.md — Team details foundation: getTeamDetailData() server assembler + /times tabs/CTA + /times/[id] with server-side H2H summaries
-- [ ] 04-04-PLAN.md — Gap closure: connect `/times?tab=create` to real POST `/api/teams` flow + revalidation
-- [ ] 04-05-PLAN.md — Gap closure: add reproducible UAT bootstrap data profile (seed fixtures + preflight)
+- [ ] 04-03-PLAN.md — Team details foundation: getTeamDetailData() server assembler + /times tabs/CTA + /times/[id] with server-side H2H summaries
 
 **UI hint:** yes
 
@@ -143,7 +141,7 @@
 | 1. Dynamic Team Management | 2/2 | Complete   | 2026-03-25 |
 | 2. Scoreboard Reactivation & Match Recording | 2/2 | Complete   | 2026-03-25 |
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
-| 4. Ranking & Team Details | 3/5 | In progress | - |
+| 4. Ranking & Team Details | 0/3 | Not started | - |
 | 5. User Profiles & Advanced Features | 0/? | Not started | - |
 
 ---
