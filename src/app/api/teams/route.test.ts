@@ -139,6 +139,38 @@ describe("/api/teams", () => {
       expect(mockFindUserById).not.toHaveBeenCalled();
     });
 
+    it("creates a duo team without secondMemberUserId and returns 201", async () => {
+      const fakeTeam = {
+        id: "team-3",
+        name: "duo pending",
+        type: "duo",
+        status: "active",
+        createdBy: "user-abc",
+        createdAt: "2026-03-22T00:00:00.000Z",
+        updatedAt: "2026-03-22T00:00:00.000Z",
+        members: [{ userId: "user-abc", joinedAt: "2026-03-22T00:00:00.000Z" }],
+      };
+      mockCreateTeam.mockResolvedValue(fakeTeam);
+
+      const { POST } = await import("@/app/api/teams/route");
+      const response = await POST(
+        new Request("http://localhost/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "Duo Pending", type: "duo" }),
+        }),
+      );
+
+      expect(response.status).toBe(201);
+      expect(mockFindUserById).not.toHaveBeenCalled();
+      expect(mockCreateTeam).toHaveBeenCalledWith({
+        name: "duo pending",
+        createdBy: "user-abc",
+        type: "duo",
+        secondMemberUserId: undefined,
+      });
+    });
+
     it("returns 400 when type is missing", async () => {
       const { POST } = await import("@/app/api/teams/route");
       const response = await POST(
@@ -146,19 +178,6 @@ describe("/api/teams", () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: "Test", secondMemberUserId: "user-xyz" }),
-        }),
-      );
-
-      expect(response.status).toBe(400);
-    });
-
-    it("returns 400 when duo team is missing secondMemberUserId", async () => {
-      const { POST } = await import("@/app/api/teams/route");
-      const response = await POST(
-        new Request("http://localhost/api/teams", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "Test", type: "duo" }),
         }),
       );
 

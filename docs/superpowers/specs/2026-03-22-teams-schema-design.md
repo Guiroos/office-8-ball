@@ -148,13 +148,14 @@ Rules marked **[DB]** are enforced by DB constraints (FK, unique, CHECK). Rules 
 - **[DB]** `name` is globally unique (`@unique`); DB rejects duplicates with Prisma error `P2002` → route maps this to `400 Bad Request` (name taken)
 - **[API]** `name` is normalized before insert: trimmed + lowercased — "Alpha" and "alpha" resolve to the same name; the unique constraint handles any race condition via `P2002`
 - **[API]** `name` max 50 characters — `400 Bad Request` if exceeded
-- **[API]** Exactly 2 members: creator (auto-inserted) + `secondMemberUserId`
-- **[API]** `secondMemberUserId` must refer to an existing user — API pre-validates existence and returns `404 Not Found` before insert; do not rely on FK violation for this error
-- **[API]** A user cannot create a team with themselves (`createdBy !== secondMemberUserId`) — `400 Bad Request`
+- **[API]** Team creation always auto-inserts the creator as the first member
+- **[API]** `duo` teams may be created with only the creator and completed later via the invite-member flow
+- **[API]** If `secondMemberUserId` is provided for a `duo`, it must refer to an existing user — API pre-validates existence and returns `404 Not Found` before insert; do not rely on FK violation for this error
+- **[API]** If `secondMemberUserId` is provided for a `duo`, it cannot point to the creator (`createdBy !== secondMemberUserId`) — `400 Bad Request`
 - **[API]** No limit on how many teams a user can belong to
 - **[API]** `createdBy` is attribution only — confers no extra permissions; both members have equal rights
 - Default status: `active`; IDs generated via `cuid()`
-- **[API]** The 2-member cap is enforced only at creation; the schema itself does not prevent additional `TeamMember` rows
+- **[API]** The schema itself does not prevent additional `TeamMember` rows
 
 ### Team archiving
 
@@ -223,9 +224,9 @@ The existing in-memory fallback in `src/lib/data.ts` is built around `TEAMS` and
 
 #### `POST /api/teams`
 Create a team.
-- **Body:** `{ name: string, secondMemberUserId: string }`
+- **Body:** `{ name: string, type: "solo" | "duo", secondMemberUserId?: string }`
 - **Success:** `201 Created` — `{ team: { id, name, status, createdBy, createdAt, updatedAt, members: [{ userId, joinedAt }] } }`
-- **Errors:** `400` (validation / self-team / name taken via P2002), `401`, `404` (secondMemberUserId not found)
+- **Errors:** `400` (validation / self-team / name taken via P2002), `401`, `404` (secondMemberUserId not found when provided)
 
 #### `GET /api/teams`
 List teams the authenticated user belongs to.

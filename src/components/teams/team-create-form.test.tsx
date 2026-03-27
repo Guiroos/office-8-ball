@@ -95,6 +95,43 @@ describe("TeamCreateForm", () => {
     });
   });
 
+  it("submits duo creation without second member when modalidade is Duplas", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 201,
+      json: async () => ({
+        team: {
+          id: "team-2",
+          name: "duo wolves",
+          type: "duo",
+          status: "active",
+          createdBy: "user-1",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+          members: [{ userId: "user-1", joinedAt: "2026-01-01T00:00:00.000Z" }],
+        },
+      }),
+    });
+
+    render(<TeamCreateForm />);
+
+    fireEvent.change(screen.getByTestId("team-create-name"), {
+      target: { value: "Duo Wolves" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Duplas" }));
+    fireEvent.click(screen.getByTestId("team-create-submit"));
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        "/api/teams",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ name: "duo wolves", type: "duo" }),
+        }),
+      );
+    });
+  });
+
   it("shows error message from payload on 400 response", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,

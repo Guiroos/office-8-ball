@@ -16,10 +16,10 @@ const createTeamSchema = z.object({
     .min(1, "Nome é obrigatório.")
     .max(50, "Nome pode ter no máximo 50 caracteres.")
     .transform((v) => v.trim().toLowerCase()),
-  type: z.enum(['solo', 'duo'], {
+  type: z.enum(["solo", "duo"], {
     error: "Tipo deve ser 'solo' ou 'duo'.",
   }),
-  secondMemberUserId: z.string().min(1, "Membro adicional é obrigatório para times duo.").optional(),
+  secondMemberUserId: z.string().min(1, "Membro adicional inválido.").optional(),
 });
 
 export async function GET(request: Request) {
@@ -54,24 +54,16 @@ export async function POST(request: Request) {
 
   const { name, type, secondMemberUserId } = result.data;
 
-  // Validate secondMemberUserId is required for duo teams
-  if (type === 'duo' && !secondMemberUserId) {
-    return NextResponse.json<ApiErrorResponse>(
-      { error: "secondMemberUserId é obrigatório para times do tipo duo." },
-      { status: 400 },
-    );
-  }
-
   // Validate secondMemberUserId is not same as creator for duo teams
-  if (type === 'duo' && secondMemberUserId === user.id) {
+  if (type === "duo" && secondMemberUserId === user.id) {
     return NextResponse.json<ApiErrorResponse>(
       { error: "Você não pode criar um time com você mesmo." },
       { status: 400 },
     );
   }
 
-  // Look up second member only for duo teams
-  if (type === 'duo' && secondMemberUserId) {
+  // Look up second member only when the duo is created with an invited member.
+  if (type === "duo" && secondMemberUserId) {
     const secondMember = await findUserById(secondMemberUserId);
 
     if (!secondMember) {
@@ -87,7 +79,7 @@ export async function POST(request: Request) {
       name,
       createdBy: user.id,
       type,
-      secondMemberUserId: type === 'duo' ? secondMemberUserId : undefined,
+      secondMemberUserId: type === "duo" ? secondMemberUserId : undefined,
     });
 
     return NextResponse.json<TeamResponse>({ team }, { status: 201 });
