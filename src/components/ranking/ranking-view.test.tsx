@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { RankingView } from "@/components/ranking/ranking-view";
@@ -112,8 +112,10 @@ describe("RankingView", () => {
 
   it("renders list rows from rank 4 onward", () => {
     render(<RankingView teams={teams} activeType="all" mode="available" />);
-    expect(screen.getByText("Time Quatro")).toBeInTheDocument();
-    expect(screen.queryByText("Time Cinco")).not.toBeInTheDocument();
+    const standings = screen.getByRole("region", { name: "Classificação" });
+
+    expect(within(standings).getAllByText("Time Quatro")).toHaveLength(2);
+    expect(within(standings).queryByText("Time Cinco")).not.toBeInTheDocument();
   });
 
   it("renders available empty-state copy", () => {
@@ -121,9 +123,16 @@ describe("RankingView", () => {
     expect(screen.getByText(/Nenhum time encontrado/)).toBeInTheDocument();
   });
 
-  it("renders unavailable copy", () => {
+  it("renders unavailable header without ranking content", () => {
     render(<RankingView teams={[]} activeType="duo" mode="unavailable" />);
-    expect(screen.getByText("Ranking indisponível em modo de desenvolvimento")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Placar de times" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Filtro de tipo de time" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Filtro de período" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
 
   it("links rows and cards to team detail pages", () => {
