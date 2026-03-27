@@ -202,12 +202,14 @@ Plans:
 **Requirements:** RANK-01, RANK-02, RANK-03, RANK-04
 
 **Success Criteria** (what must be TRUE):
-1. Missing verification artifact for Phase 4 is recreated with requirement-level evidence for `TEAM-02` and `RANK-01..04`
+1. Missing verification artifact for Phase 4 is recreated with requirement-level evidence for `RANK-01..04` plus an explicit `TEAM-02` traceability note pointing to Phase 7 as canonical proof
 2. Ranking requirements (`RANK-01..04`) are revalidated against current runtime behavior and tests
 3. Requirement traceability reflects verified, non-orphaned status after phase execution
 4. Milestone audit no longer reports orphaned requirement gaps tied to Phase 4
 
-**Plans:** 0 plans
+**Plans:** 1/2 plans executed
+- [x] 08-01-PLAN.md — Recover `04-VERIFICATION.md` from current ranking evidence and log the focused reruns in Phase 4 control notes
+- [ ] 08-02-PLAN.md — Repair requirements, roadmap, audit, and state traceability after recovered Phase 4 evidence exists
 
 ---
 
@@ -222,7 +224,7 @@ Plans:
 | 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 2/2 | Complete   | 2026-03-27 |
-| 8. Ranking/Team Verification Recovery | 0/0 | Planned   | - |
+| 8. Ranking/Team Verification Recovery | 1/2 | In Progress|  |
 
 ---
 
@@ -255,3 +257,4 @@ Plans:
 *Phase 4 executed: 2026-03-25*
 *Phase 5 planned: 2026-03-26*
 *Gap closure phases added: 2026-03-26 (Phases 6-8)*
+*Phase 8 planned: 2026-03-26*
