@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-03-27T02:02:26.011Z"
+status: verifying
+last_updated: "2026-03-27T02:12:03.582Z"
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 15
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last updated:** 2026-03-26 — 05-05 complete
 
 ---
@@ -173,6 +173,14 @@ Plan: 2 of 2
     - Rationale: Mirrors existing API route pattern; prevents data leakage to non-members; avoids unnecessary DB work
     - Implication: ranking, matches, users queries only execute when viewer is a confirmed member
 
+24. **Button "destructive" variant absent in design system — ghost + semantic tokens used for Confirmar button** (Plan 07-02)
+    - Rationale: Adding new variant to button requires design review; semantic tokens (border-destructive text-destructive) achieve the same visual intent within existing token system
+    - Implication: MemberList Confirmar button uses ghost variant with className override; no Button component changes needed
+
+25. **viewerId flows page → TeamDetailView → MemberList — keeps client components sessionless** (Plan 07-02)
+    - Rationale: page.tsx is server component and single auth authority; client components receive only what they need
+    - Implication: InviteMemberDialog and MemberList have no session dependency; testable in isolation with mock props
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -218,3 +226,4 @@ Plan: 2 of 2
 *Last session: 2026-03-27 — Completed 06-01-PLAN.md (team creation flow wiring: TeamCreateForm solo component, /times?tab=create wired, 5 tests, TEAM-01 runtime gap closed)*
 *Last session: 2026-03-27 — Completed 06-02-PLAN.md (team-creation-flow-wiring E2E spec: create solo team flow Playwright test passes against real runtime, 2 tasks, 1 file, TEAM-01 gate closed)*
 *Last session: 2026-03-26 — Completed 07-01-PLAN.md (team-detail membership gate: TeamDetailResult discriminated union, isTeamMember gate before heavy queries, TeamDetailAccessDenied component, 11 tests, TEAM-02 access hardening)*
+*Last session: 2026-03-26 — Completed 07-02-PLAN.md (team member actions: InviteMemberDialog username lookup + POST, MemberList inline Confirmar/Cancelar + DELETE, 19 new component+route tests, E2E spec, TEAM-02 fully validated)*
