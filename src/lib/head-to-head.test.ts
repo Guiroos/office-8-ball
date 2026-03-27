@@ -67,8 +67,8 @@ describe("resolveHeadToHeadData", () => {
     );
 
     // Should pick first valid pair: teamA vs teamB
-    expect(result.pair.teamA.id).toBe("team-a");
-    expect(result.pair.teamB.id).toBe("team-b");
+    expect(result.pair.teamA?.id).toBe("team-a");
+    expect(result.pair.teamB?.id).toBe("team-b");
     expect(result.warning).toBeNull();
     expect(result.summary).toBeDefined();
     expect(result.options).toHaveLength(3);
@@ -87,9 +87,9 @@ describe("resolveHeadToHeadData", () => {
     expect(result.warning).not.toBeNull();
     expect(result.warning).toContain("Seleção inválida");
     // Should still provide a valid pair as fallback
-    expect(result.pair.teamA.id).toBeDefined();
-    expect(result.pair.teamB.id).toBeDefined();
-    expect(result.pair.teamA.id).not.toBe(result.pair.teamB.id);
+    expect(result.pair.teamA?.id).toBeDefined();
+    expect(result.pair.teamB?.id).toBeDefined();
+    expect(result.pair.teamA?.id).not.toBe(result.pair.teamB?.id);
   });
 
   it("Teste 2b: D-16 — params não autorizados (time fora da lista) retornam warning + fallback", () => {
@@ -104,7 +104,7 @@ describe("resolveHeadToHeadData", () => {
 
     expect(result.warning).not.toBeNull();
     expect(result.warning).toContain("Seleção inválida");
-    expect(result.pair.teamA.id).not.toBe(result.pair.teamB.id);
+    expect(result.pair.teamA?.id).not.toBe(result.pair.teamB?.id);
   });
 
   // ─── D-17: same team on both sides → rejected with message + fallback ──────
@@ -120,7 +120,7 @@ describe("resolveHeadToHeadData", () => {
     expect(result.warning).not.toBeNull();
     expect(result.warning).toContain("Seleção inválida");
     // Fallback must not be a same-team pair
-    expect(result.pair.teamA.id).not.toBe(result.pair.teamB.id);
+    expect(result.pair.teamA?.id).not.toBe(result.pair.teamB?.id);
   });
 
   it("Teste 1b: D-15 — sem times suficientes retorna pair nulo com warning", () => {
@@ -133,7 +133,7 @@ describe("resolveHeadToHeadData", () => {
     );
 
     expect(result.warning).not.toBeNull();
-    expect(result.pair.teamA.id).toBe("team-a");
+    expect(result.pair.teamA?.id).toBe("team-a");
     expect(result.pair.teamB).toBeNull();
   });
 
