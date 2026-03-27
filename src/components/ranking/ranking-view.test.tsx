@@ -118,7 +118,7 @@ describe("RankingView", () => {
 
   it("renders available empty-state copy", () => {
     render(<RankingView teams={[]} activeType="solo" mode="available" />);
-    expect(screen.getByText("Nenhum time encontrado nesta categoria")).toBeInTheDocument();
+    expect(screen.getByText(/Nenhum time encontrado/)).toBeInTheDocument();
   });
 
   it("renders unavailable copy", () => {
@@ -131,6 +131,41 @@ describe("RankingView", () => {
     const links = screen.getAllByRole("link");
     expect(links.some((link) => link.getAttribute("href") === "/times/team-1")).toBe(true);
     expect(links.some((link) => link.getAttribute("href") === "/times/team-4")).toBe(true);
+  });
+
+  it("empty state in mode=available keeps both type and period tabs visible", () => {
+    render(
+      <RankingView teams={[]} activeType="solo" activePeriod="month" mode="available" />,
+    );
+    // Type tabs nav present
+    expect(screen.getByRole("navigation", { name: "Filtro de tipo de time" })).toBeInTheDocument();
+    // Period tabs nav present
+    expect(screen.getByRole("navigation", { name: "Filtro de período" })).toBeInTheDocument();
+  });
+
+  it("empty state shows period-aware message without falling back to all-time", () => {
+    render(
+      <RankingView teams={[]} activeType="all" activePeriod="week" mode="available" />,
+    );
+    expect(screen.getByTestId("empty-state")).toHaveTextContent("nesta semana");
+    // Should NOT show generic "nesta categoria" copy when period is week
+    expect(screen.queryByText(/nesta categoria/)).not.toBeInTheDocument();
+  });
+
+  it("type tab links preserve active period in href", () => {
+    render(<RankingView teams={teams} activeType="all" activePeriod="month" mode="available" />);
+    const links = screen.getAllByRole("link");
+    // The "Solo" tab should include period=month when switching to solo
+    const soloLink = links.find((l) => l.textContent === "Solo");
+    expect(soloLink?.getAttribute("href")).toBe("/ranking?type=solo&period=month");
+  });
+
+  it("period tab links preserve active type in href", () => {
+    render(<RankingView teams={teams} activeType="solo" activePeriod="all" mode="available" />);
+    const links = screen.getAllByRole("link");
+    // The "Esta semana" tab should include type=solo when switching to week
+    const weekLink = links.find((l) => l.textContent === "Esta semana");
+    expect(weekLink?.getAttribute("href")).toBe("/ranking?type=solo&period=week");
   });
 });
 
@@ -147,6 +182,26 @@ describe("RankingPage", () => {
     const RankingPage = (await import("@/app/(authenticated)/ranking/page")).default;
     await RankingPage({ searchParams: Promise.resolve({ type: "solo" }) });
 
-    expect(mockListAllTeamsWithStats).toHaveBeenCalledWith("solo");
+    expect(mockListAllTeamsWithStats).toHaveBeenCalledWith("solo", "all");
+  });
+
+  it("fetches rankings with validated period param", async () => {
+    mockHasDatabaseUrl.mockReturnValue(true);
+    mockListAllTeamsWithStats.mockResolvedValue([]);
+
+    const RankingPage = (await import("@/app/(authenticated)/ranking/page")).default;
+    await RankingPage({ searchParams: Promise.resolve({ type: "solo", period: "month" }) });
+
+    expect(mockListAllTeamsWithStats).toHaveBeenCalledWith("solo", "month");
+  });
+
+  it("defaults period to 'all' when param is missing", async () => {
+    mockHasDatabaseUrl.mockReturnValue(true);
+    mockListAllTeamsWithStats.mockResolvedValue([]);
+
+    const RankingPage = (await import("@/app/(authenticated)/ranking/page")).default;
+    await RankingPage({ searchParams: Promise.resolve({}) });
+
+    expect(mockListAllTeamsWithStats).toHaveBeenCalledWith(undefined, "all");
   });
 });

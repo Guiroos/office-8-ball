@@ -4,33 +4,33 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-type RankingType = "all" | "solo" | "duo";
+type RankingPeriod = "all" | "month" | "week";
 
-const TYPE_VALUES: Array<{ label: string; value: RankingType }> = [
-  { label: "Todos", value: "all" },
-  { label: "Solo", value: "solo" },
-  { label: "Duplas", value: "duo" },
+const TABS: Array<{ label: string; value: RankingPeriod }> = [
+  { label: "Todos os tempos", value: "all" },
+  { label: "Este mês", value: "month" },
+  { label: "Esta semana", value: "week" },
 ];
 
-export function TypeTabs({
+export function PeriodTabs({
+  activePeriod,
   activeType,
-  activePeriod = "all",
 }: {
-  activeType: RankingType;
-  activePeriod?: "all" | "month" | "week";
+  activePeriod: RankingPeriod;
+  activeType: "all" | "solo" | "duo";
 }) {
-  function buildHref(type: RankingType): string {
+  function buildHref(period: RankingPeriod): string {
     const params = new URLSearchParams();
-    if (type !== "all") params.set("type", type);
-    if (activePeriod !== "all") params.set("period", activePeriod);
+    if (activeType !== "all") params.set("type", activeType);
+    if (period !== "all") params.set("period", period);
     const qs = params.toString();
     return qs ? `/ranking?${qs}` : "/ranking";
   }
 
   return (
-    <nav aria-label="Filtro de tipo de time" className="flex flex-wrap gap-2">
-      {TYPE_VALUES.map((tab) => {
-        const active = tab.value === activeType;
+    <nav aria-label="Filtro de período" className="flex flex-wrap gap-2">
+      {TABS.map((tab) => {
+        const active = tab.value === activePeriod;
         return (
           <Link
             key={tab.value}

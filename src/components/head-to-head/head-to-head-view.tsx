@@ -1,0 +1,160 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import type { HeadToHeadPageData } from "@/lib/head-to-head";
+import type { TeamRecord } from "@/lib/types";
+
+type Props = {
+  data: HeadToHeadPageData;
+};
+
+/**
+ * Head-to-head UI component.
+ *
+ * Renders two explicit team selectors (Team A / Team B) that sync to URL
+ * immediately without full reload (D-17/D-18). Prevents selecting the same
+ * team on both sides (D-17). Displays warning messages in PT-BR for invalid
+ * selections (D-16).
+ */
+export function HeadToHeadView({ data }: Props) {
+  const router = useRouter();
+  const { pair, warning, options, summary } = data;
+
+  function buildUrl(teamAId: string | null, teamBId: string | null) {
+    const params = new URLSearchParams();
+    if (teamAId) params.set("teamA", teamAId);
+    if (teamBId) params.set("teamB", teamBId);
+    return `/head-to-head?${params.toString()}`;
+  }
+
+  function handleTeamAChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const newTeamAId = event.target.value || null;
+    // D-17: prevent selecting same team on both sides
+    const teamBId = pair.teamB?.id === newTeamAId ? null : pair.teamB?.id ?? null;
+    router.push(buildUrl(newTeamAId, teamBId));
+  }
+
+  function handleTeamBChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const newTeamBId = event.target.value || null;
+    // D-17: prevent selecting same team on both sides
+    const teamAId = pair.teamA?.id === newTeamBId ? null : pair.teamA?.id ?? null;
+    router.push(buildUrl(teamAId, newTeamBId));
+  }
+
+  const teamAId = pair.teamA?.id ?? "";
+  const teamBId = pair.teamB?.id ?? "";
+
+  return (
+    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-bold tracking-tight">Confronto Direto</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Compare o histórico de partidas entre dois times.
+          </p>
+        </header>
+
+        {/* Warning banner (D-16) */}
+        {warning && (
+          <div
+            role="alert"
+            className="rounded-md border border-border bg-surface-emphasis px-4 py-3 text-sm text-muted-foreground"
+          >
+            {warning}
+          </div>
+        )}
+
+        {/* Team selectors (D-17/D-18) */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Team A selector */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" htmlFor="selector-team-a">
+              Team A
+            </label>
+            <select
+              id="selector-team-a"
+              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+              value={teamAId}
+              onChange={handleTeamAChange}
+            >
+              <option value="">Selecione um time...</option>
+              {options
+                .filter((team: TeamRecord) => team.id !== teamBId)
+                .map((team: TeamRecord) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Team B selector */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" htmlFor="selector-team-b">
+              Team B
+            </label>
+            <select
+              id="selector-team-b"
+              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+              value={teamBId}
+              onChange={handleTeamBChange}
+            >
+              <option value="">Selecione um time...</option>
+              {options
+                .filter((team: TeamRecord) => team.id !== teamAId)
+                .map((team: TeamRecord) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
+        {/* H2H summary */}
+        {pair.teamA && pair.teamB ? (
+          summary && summary.totalMatches > 0 ? (
+            <div className="rounded-lg border border-border bg-surface p-4">
+              <h2 className="mb-3 text-sm font-semibold">
+                {pair.teamA.name} vs {pair.teamB.name}
+              </h2>
+              <div className="grid gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Vitórias de {pair.teamA.name}</span>
+                  <span className="font-medium">{summary.teamAWins}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Vitórias de {pair.teamB.name}</span>
+                  <span className="font-medium">{summary.teamBWins}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Total de Partidas</span>
+                  <span className="font-medium">{summary.totalMatches}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Taxa de Vitória ({pair.teamA.name})
+                  </span>
+                  <span className="font-medium">
+                    {summary.totalMatches === 0
+                      ? "—"
+                      : `${((summary.teamAWins / summary.totalMatches) * 100).toFixed(1)}%`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhuma partida registrada entre estes times.
+            </p>
+          )
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Selecione dois times para ver o histórico de confrontos.
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}

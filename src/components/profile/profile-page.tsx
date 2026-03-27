@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Calendar,
   Check,
@@ -16,16 +16,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
-// TODO(Task 5+): replace with dynamic teams fetched from /api/teams
-const TEAMS = [
-  { id: "frontend", displayName: "Frontend" },
-  { id: "backend", displayName: "Backend" },
-] as const;
-import type { MatchRecord, MatchesResponse, ProfileResponse } from "@/lib/types";
+import type { ProfilePageData, ProfileResponse } from "@/lib/types";
 
 import Image from "next/image";
 
 import { ProfileEditDialog } from "./profile-edit-dialog";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type ProfilePageProps = {
+  data: ProfilePageData & { email: string | null };
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getInitials(username: string): string {
   return username
@@ -44,52 +47,30 @@ function formatJoinDate(isoDate: string): string {
   });
 }
 
-function formatMatchDate(isoDate: string): string {
-  return new Date(isoDate).toLocaleDateString("pt-BR", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatWinRate(rate: number): string {
+  return `${Math.round(rate)}%`;
 }
 
-export function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileResponse | null>(null);
-  const [profileError, setProfileError] = useState(false);
-  const [matches, setMatches] = useState<MatchRecord[]>([]);
-  const [matchesError, setMatchesError] = useState(false);
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function ProfilePage({ data }: ProfilePageProps) {
+  const { aggregate, teamRows } = data;
+
+  // Editable profile fields — initialized from server-side data
+  const [editableProfile, setEditableProfile] = useState<ProfileResponse>({
+    id: data.userId,
+    username: data.username,
+    email: data.email,
+    displayName: data.displayName,
+    avatarUrl: data.avatarUrl,
+    bio: data.bio,
+    createdAt: data.createdAt,
+  });
+
   const [editOpen, setEditOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [gravatarUrl, setGravatarUrl] = useState<string | null>(null);
   const [avatarLoadError, setAvatarLoadError] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    fetch("/api/profile")
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: ProfileResponse) => setProfile(data))
-      .catch(() => setProfileError(true));
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/matches")
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: MatchesResponse) => setMatches(data.matches.slice(0, 5)))
-      .catch(() => setMatchesError(true));
-  }, []);
-
-  useEffect(() => {
-    if (!profile?.username) return;
-    const encoder = new TextEncoder();
-    crypto.subtle
-      .digest("SHA-256", encoder.encode(profile.username.toLowerCase().trim()))
-      .then((buffer) => {
-        const hash = Array.from(new Uint8Array(buffer))
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
-        setGravatarUrl(`https://www.gravatar.com/avatar/${hash}?d=identicon&s=96`);
-        setAvatarLoadError(false);
-      });
-  }, [profile?.username]);
 
   const handleShare = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -99,21 +80,11 @@ export function ProfilePage() {
   }, []);
 
   const handleSave = useCallback((updated: ProfileResponse) => {
-    setProfile(updated);
+    setEditableProfile(updated);
   }, []);
 
-  if (profileError) {
-    return (
-      <IconCallout
-        icon={<Trophy className="size-5" />}
-        title="Perfil indisponível sem conexão ao banco de dados."
-        description="Tente novamente mais tarde."
-      />
-    );
-  }
-
-  const initials = profile ? getInitials(profile.username) : "";
-  const avatarSrc = profile?.avatarUrl ?? gravatarUrl;
+  const initials = getInitials(editableProfile.username);
+  const avatarSrc = editableProfile.avatarUrl ?? null;
 
   return (
     <div className="flex flex-col gap-8">
@@ -153,7 +124,7 @@ export function ProfilePage() {
             {avatarSrc && !avatarLoadError ? (
               <Image
                 src={avatarSrc}
-                alt={profile?.username || ""}
+                alt={editableProfile.username}
                 width={360}
                 height={360}
                 className="size-full object-cover"
@@ -165,41 +136,61 @@ export function ProfilePage() {
           </div>
           <div className="text-center md:text-left">
             <h2 className="text-xl font-bold">
-              {profile?.displayName ?? profile?.username ?? "—"}
+              {editableProfile.displayName ?? editableProfile.username}
             </h2>
-            <p className="text-muted-foreground">@{profile?.username ?? "—"}</p>
-            {profile?.createdAt ? (
-              <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground md:justify-start">
-                <Calendar className="size-4" />
-                entrou em {formatJoinDate(profile.createdAt)}
-              </p>
-            ) : null}
+            <p className="text-muted-foreground">@{editableProfile.username}</p>
+            <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground md:justify-start">
+              <Calendar className="size-4" />
+              entrou em {formatJoinDate(editableProfile.createdAt)}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — PROF-01: wins, losses, win rate, total matches */}
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatTile label="Vitórias" value="—" />
-        <StatTile label="Win Rate" value="—" />
-        <StatTile label="Partidas" value="—" />
-        <StatTile label="Sequência" value="—" />
+        <StatTile label="Vitórias" value={String(aggregate.wins)} />
+        <StatTile label="Derrotas" value={String(aggregate.losses)} />
+        <StatTile label="Win Rate" value={formatWinRate(aggregate.winRate)} />
+        <StatTile label="Partidas" value={String(aggregate.totalMatches)} />
       </section>
 
       {/* Main Grid */}
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left Column */}
         <div className="flex flex-col gap-6 lg:col-span-1">
+          {/* Teams with per-team stats — PROF-02/03 */}
           <Card>
             <CardContent className="space-y-4 p-6">
               <SectionHeader eyebrow="Meus Times" title="Equipes" hideTitle />
-              <IconCallout
-                icon={<Trophy className="size-5" />}
-                title="Nenhum time ainda"
-                description="Nenhum time ainda — em breve"
-              />
+              {teamRows.length === 0 ? (
+                <IconCallout
+                  icon={<Trophy className="size-5" />}
+                  title="Nenhum time ainda"
+                  description="Crie ou entre em um time para ver suas stats aqui."
+                />
+              ) : (
+                <ul className="space-y-3">
+                  {teamRows.map((row) => (
+                    <li
+                      key={row.teamId}
+                      className="rounded-lg border border-border bg-muted/50 p-3"
+                    >
+                      <p className="text-sm font-semibold">{row.teamName}</p>
+                      <div className="mt-1 flex gap-4 text-xs text-muted-foreground">
+                        <span>{row.wins}V</span>
+                        <span>{row.losses}D</span>
+                        <span>{formatWinRate(row.winRate)}</span>
+                        <span>{row.totalMatches} partidas</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </CardContent>
           </Card>
+
+          {/* Account info */}
           <Card>
             <CardContent className="space-y-4 p-6">
               <SectionHeader eyebrow="Conta" title="Informações da Conta" hideTitle />
@@ -208,31 +199,29 @@ export function ProfilePage() {
                   <User className="size-4 shrink-0 text-muted-foreground" />
                   <span className="text-muted-foreground">Usuário</span>
                   <span className="ml-auto font-medium">
-                    {profile?.username ?? "—"}
+                    {editableProfile.username}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="size-4 shrink-0 text-muted-foreground" />
                   <span className="text-muted-foreground">Email</span>
                   <span className="ml-auto font-medium">
-                    {profile?.email ?? "—"}
+                    {editableProfile.email ?? "—"}
                   </span>
                 </div>
-                {profile?.createdAt ? (
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="size-4 shrink-0 text-muted-foreground" />
-                    <span className="text-muted-foreground">Membro desde</span>
-                    <span className="ml-auto font-medium">
-                      {formatJoinDate(profile.createdAt)}
-                    </span>
-                  </div>
-                ) : null}
+                <div className="flex items-center gap-3 text-sm">
+                  <Calendar className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="text-muted-foreground">Membro desde</span>
+                  <span className="ml-auto font-medium">
+                    {formatJoinDate(editableProfile.createdAt)}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column — placeholder for future match history */}
         <div className="lg:col-span-2">
           <Card>
             <CardContent className="space-y-4 p-6">
@@ -241,59 +230,20 @@ export function ProfilePage() {
                 title="Partidas Recentes"
                 hideTitle
               />
-              <p className="text-xs text-muted-foreground">
-                Últimas partidas registradas no sistema
+              <p className="text-sm text-muted-foreground">
+                Histórico de partidas disponível em breve.
               </p>
-              {matchesError ? (
-                <IconCallout
-                  icon={<Trophy className="size-5" />}
-                  title="Erro ao carregar partidas"
-                  description="Não foi possível carregar as partidas."
-                />
-              ) : matches.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhuma partida registrada ainda.
-                </p>
-              ) : (
-                <ul className="space-y-3">
-                  {matches.map((match) => {
-                    const loser = TEAMS.find(
-                      (t) => t.id !== match.winnerTeamId,
-                    );
-                    return (
-                      <li
-                        key={match.id}
-                        className="flex items-center justify-between rounded-lg border border-border bg-muted/50 p-4"
-                      >
-                        <div className="space-y-0.5">
-                          <p className="text-sm font-semibold">
-                            {match.winnerTeamId}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            vs {loser?.displayName ?? "—"}
-                          </p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {formatMatchDate(match.playedAt)}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {profile ? (
-        <ProfileEditDialog
-          open={editOpen}
-          onOpenChange={setEditOpen}
-          profile={profile}
-          onSave={handleSave}
-        />
-      ) : null}
+      <ProfileEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        profile={editableProfile}
+        onSave={handleSave}
+      />
     </div>
   );
 }

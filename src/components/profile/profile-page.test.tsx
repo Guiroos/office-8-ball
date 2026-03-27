@@ -1,97 +1,79 @@
-import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProfilePage } from "@/components/profile/profile-page";
+import type { ProfilePageData } from "@/lib/types";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// ── Base data fixture ──────────────────────────────────────────────────────────
 
-const MOCK_PROFILE = {
-  id: "user-1",
+const BASE_DATA: ProfilePageData & { email: string | null } = {
+  userId: "user-1",
   username: "gui.dev",
   email: "gui@office8ball.dev",
   displayName: "Guilherme",
+  avatarUrl: null,
+  bio: null,
   createdAt: "2025-01-01T00:00:00.000Z",
-};
-
-const MOCK_MATCHES = {
-  matches: [
+  aggregate: {
+    wins: 7,
+    losses: 3,
+    winRate: 70,
+    totalMatches: 10,
+  },
+  teamRows: [
     {
-      id: "m1",
-      teamAId: "frontend",
-      teamBId: "backend",
-      winnerTeamId: "frontend",
-      loserTeamId: "backend",
-      playedAt: "2026-03-01T10:00:00.000Z",
-      note: null,
+      teamId: "team-1",
+      teamName: "Equipe Alpha",
+      wins: 5,
+      losses: 2,
+      winRate: 71.42857142857143,
+      totalMatches: 7,
     },
   ],
 };
-
-function mockFetchResponses(
-  profileRes: { ok: boolean; status?: number; data?: unknown },
-  matchesRes: { ok: boolean; status?: number; data?: unknown },
-) {
-  mockFetch.mockImplementation((url: string) => {
-    if (url === "/api/profile") {
-      return Promise.resolve({
-        ok: profileRes.ok,
-        status: profileRes.status ?? (profileRes.ok ? 200 : 500),
-        json: async () => profileRes.data,
-      });
-    }
-    if (url === "/api/matches") {
-      return Promise.resolve({
-        ok: matchesRes.ok,
-        status: matchesRes.status ?? (matchesRes.ok ? 200 : 500),
-        json: async () => matchesRes.data,
-      });
-    }
-    return Promise.reject(new Error("Unknown URL"));
-  });
-}
 
 describe("ProfilePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders hero with profile data", async () => {
-    mockFetchResponses(
-      { ok: true, data: MOCK_PROFILE },
-      { ok: true, data: MOCK_MATCHES },
-    );
-    render(<ProfilePage />);
-    await waitFor(() => {
-      expect(screen.getByText("Guilherme")).toBeInTheDocument();
-      expect(screen.getByText("@gui.dev")).toBeInTheDocument();
-    });
+  it("renders hero with username and display name from props", () => {
+    render(<ProfilePage data={BASE_DATA} />);
+    expect(screen.getByText("Guilherme")).toBeInTheDocument();
+    expect(screen.getByText("@gui.dev")).toBeInTheDocument();
   });
 
-  it("shows error callout when profile fetch fails", async () => {
-    mockFetchResponses(
-      { ok: false, status: 503 },
-      { ok: true, data: MOCK_MATCHES },
-    );
-    render(<ProfilePage />);
-    await waitFor(() => {
-      expect(
-        screen.getByText(/perfil indisponível/i),
-      ).toBeInTheDocument();
-    });
+  it("renders aggregate stats from props", () => {
+    render(<ProfilePage data={BASE_DATA} />);
+    expect(screen.getByText("7")).toBeInTheDocument(); // wins
+    expect(screen.getByText("3")).toBeInTheDocument(); // losses
+    expect(screen.getByText("70%")).toBeInTheDocument(); // win rate
+    expect(screen.getByText("10")).toBeInTheDocument(); // total matches
   });
 
-  it("shows match error callout when matches fetch fails", async () => {
-    mockFetchResponses(
-      { ok: true, data: MOCK_PROFILE },
-      { ok: false, status: 401 },
-    );
-    render(<ProfilePage />);
-    await waitFor(() => {
-      expect(
-        screen.getByText(/não foi possível carregar as partidas/i),
-      ).toBeInTheDocument();
-    });
+  it("renders team rows with per-team stats", () => {
+    render(<ProfilePage data={BASE_DATA} />);
+    expect(screen.getByText("Equipe Alpha")).toBeInTheDocument();
+    expect(screen.getByText("5V")).toBeInTheDocument();
+    expect(screen.getByText("2D")).toBeInTheDocument();
+  });
+
+  it("shows empty teams callout when teamRows is empty", () => {
+    const data = { ...BASE_DATA, teamRows: [] };
+    render(<ProfilePage data={data} />);
+    expect(screen.getByText("Nenhum time ainda")).toBeInTheDocument();
+  });
+
+  it("shows account email in account info section", () => {
+    render(<ProfilePage data={BASE_DATA} />);
+    expect(screen.getByText("gui@office8ball.dev")).toBeInTheDocument();
+  });
+
+  it("shows username when displayName is null", () => {
+    const data = { ...BASE_DATA, displayName: null };
+    render(<ProfilePage data={data} />);
+    // The hero h2 should show username when displayName is null
+    expect(screen.getByText("gui.dev", { selector: "h2" })).toBeInTheDocument();
   });
 
   it("renders share button that changes to Copiado! on click", async () => {
@@ -99,12 +81,7 @@ describe("ProfilePage", () => {
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
-    mockFetchResponses(
-      { ok: true, data: MOCK_PROFILE },
-      { ok: true, data: MOCK_MATCHES },
-    );
-    render(<ProfilePage />);
-    await waitFor(() => screen.getByText("Compartilhar"));
+    render(<ProfilePage data={BASE_DATA} />);
 
     fireEvent.click(screen.getByText("Compartilhar"));
     expect(screen.getByText("Copiado!")).toBeInTheDocument();
@@ -115,24 +92,9 @@ describe("ProfilePage", () => {
     vi.useRealTimers();
   });
 
-  it("displays up to 5 recent matches", async () => {
-    const manyMatches = Array.from({ length: 7 }, (_, i) => ({
-      id: `m${i}`,
-      teamAId: "frontend",
-      teamBId: "backend",
-      winnerTeamId: "frontend",
-      loserTeamId: "backend",
-      playedAt: "2026-03-01T10:00:00.000Z",
-      note: null,
-    }));
-    mockFetchResponses(
-      { ok: true, data: MOCK_PROFILE },
-      { ok: true, data: { matches: manyMatches } },
-    );
-    render(<ProfilePage />);
-    await waitFor(() => {
-      const items = screen.getAllByText("frontend");
-      expect(items.length).toBeLessThanOrEqual(5);
-    });
+  it("opens edit dialog when Editar button is clicked", () => {
+    render(<ProfilePage data={BASE_DATA} />);
+    fireEvent.click(screen.getByText("Editar"));
+    expect(screen.getByText("Editar Perfil")).toBeInTheDocument();
   });
 });

@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-26T02:06:04Z"
+status: completed
+last_updated: "2026-03-26T23:09:19.172Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 13
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to plan
-**Last updated:** 2026-03-25
+**Status:** Milestone complete
+**Last updated:** 2026-03-26 — 05-05 complete
 
 ---
 
@@ -50,7 +50,7 @@ Plan: Not started
 | 2 | Scoreboard API reactivation + match recording | DASH-01, DASH-02 | ✓ Complete |
 | 3 | Stats computation module (W/L, streaks, H2H) | — | ✓ Complete |
 | 4 | Ranking page + team detail pages | TEAM-02, RANK-01..04 | ✓ Complete |
-| 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Not started |
+| 5 | User profiles + time filters + H2H views | PROF-01..03, RANK-05 | Planned |
 
 ---
 
@@ -138,8 +138,32 @@ Plan: Not started
     - Implication: detectStreaks processes teamMatches in reverse; currentStreak is the final runType/runCount at loop end
 
 15. **Stats types co-located with Zod schemas in stats.ts; re-exported from types.ts** (Plan 03-01)
+
+16. **BRT window uses fixed UTC-3 offset (no DST) in time-period.ts** (Plan 05-01)
+    - Rationale: America/Sao_Paulo observes no DST in 2026; fixed offset avoids Intl dependency and keeps function pure and deterministic
+    - Implication: If DST rules change, update BRT_OFFSET_MS; injectable `now` param makes this testable
+
+17. **computeProfilePageData returns placeholder identity fields; page assembler overrides** (Plan 05-01)
+
+18. **Period filter in listAllTeamsWithStats uses playedAt: { gte, lt } spread; period=all produces empty spread for backward compatibility** (Plan 05-03)
+    - Rationale: Keeps match query unchanged for all-time view; no conditional query path needed
+    - Implication: RankingView receives activePeriod as optional prop, prefixed _ until period tabs UI is wired
+
+19. **RankingView accepts optional activePeriod prop but does not render it yet** (Plan 05-03) — now fully consumed by PeriodTabs in Plan 05-04
+    - Rationale: Data pipeline complete; UI wiring deferred to a later plan targeting period tabs
+    - Implication: activePeriod prop now consumed; PeriodTabs renders all/month/week tabs with URLSearchParams cross-filter preservation
+    - Rationale: Keeps domain function pure and testable without user DB lookup; server assembler (D-01) merges user record
+    - Implication: Callers must override username/displayName/avatarUrl/bio/createdAt from the user record
     - Rationale: Type safety via z.infer keeps types and validation schemas in sync automatically; types.ts provides single import path for consumers
     - Implication: Phase 4 can import TeamStats from either @/lib/stats or @/lib/types
+
+21. **URLSearchParams used in TypeTabs and PeriodTabs to build cross-preserving filter hrefs** (Plan 05-04)
+    - Rationale: Default values (all/all) omitted from URL to keep links clean and readable
+    - Implication: /ranking with no params = all types, all-time; each tab set receives the other filter's current value
+
+20. **resolveHeadToHeadData is a pure function; page assembler fetches data and passes arrays** (Plan 05-05)
+    - Rationale: Keeps domain logic testable without DB; consistent with stats.ts and profile-stats.ts patterns
+    - Implication: Page handles listUserTeams + listMatches, then passes arrays to resolveHeadToHeadData
 
 **Pitfalls to Avoid:**
 
@@ -179,4 +203,7 @@ Plan: Not started
 ---
 
 *STATE.md created: 2026-03-23*
-*Last session: 2026-03-25 — Completed 04-03-PLAN.md (team detail server assembler, /times tabs + /times/[id], H2H section wiring)*
+*Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
+*Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
+*Last session: 2026-03-26 — Completed 05-05-PLAN.md (head-to-head route: resolveHeadToHeadData assembler D-15..D-17, /head-to-head page, HeadToHeadView URL-synced selectors, 11 tests)*
+*Last session: 2026-03-26 — Completed 05-04-PLAN.md (ranking period tabs: PeriodTabs component, TypeTabs cross-filter preservation, period-aware empty state, 7 new tests, RANK-05 complete)*

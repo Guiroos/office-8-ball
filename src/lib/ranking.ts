@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { computeTeamStats } from "@/lib/stats";
-import type { MatchRecord, TeamRecord } from "@/lib/types";
+import { resolvePeriodWindow } from "@/lib/time-period";
+import type { MatchRecord, RankingPeriod, TeamRecord } from "@/lib/types";
 import type { TeamStats } from "@/lib/stats";
 
 export type RankedTeam = TeamRecord & TeamStats & { rank: number };
@@ -56,6 +57,7 @@ function normalizeMatch(match: {
 
 export async function listAllTeamsWithStats(
   type?: "solo" | "duo",
+  period?: RankingPeriod,
 ): Promise<RankedTeam[]> {
   if (!hasDatabaseUrl()) return [];
 
@@ -68,9 +70,18 @@ export async function listAllTeamsWithStats(
   if (teams.length === 0) return [];
 
   const teamIds = teams.map((team) => team.id);
+
+  const resolvedPeriod = period ?? "all";
+  const { startUtc, endUtc } = resolvePeriodWindow(resolvedPeriod);
+  const playedAtFilter =
+    startUtc !== null && endUtc !== null
+      ? { playedAt: { gte: startUtc, lt: endUtc } }
+      : {};
+
   const matchRows = await prisma.match.findMany({
     where: {
       OR: [{ teamAId: { in: teamIds } }, { teamBId: { in: teamIds } }],
+      ...playedAtFilter,
     },
     orderBy: { playedAt: "desc" },
   });
