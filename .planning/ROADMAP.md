@@ -16,7 +16,7 @@
 - [x] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26) (completed 2026-03-26)
 - [x] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26) (completed 2026-03-27)
 - [x] **Phase 7: Team Details Access & Member Actions** — Enforce member-only team detail access and wire invite/remove UI actions to member endpoints (planned 2026-03-26) (completed 2026-03-27)
-- [ ] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `TEAM-02` and `RANK-01..04` (planned 2026-03-26)
+- [x] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `RANK-01..04`; `TEAM-02` cross-referenced to Phase 7 as canonical proof (planned 2026-03-26) (completed 2026-03-27)
 
 ---
 
@@ -207,9 +207,11 @@ Plans:
 3. Requirement traceability reflects verified, non-orphaned status after phase execution
 4. Milestone audit no longer reports orphaned requirement gaps tied to Phase 4
 
-**Plans:** 1/2 plans executed
+**TEAM-02 traceability note:** `TEAM-02` is not a Phase 8 requirement. Its canonical evidence lives in `.planning/phases/07-team-details-access-member-actions/07-VERIFICATION.md`. Phase 7 is the authoritative proof that TEAM-02 is satisfied. Phase 8 cross-references Phase 7 as canonical proof rather than recreating competing evidence.
+
+**Plans:** 2/2 plans complete
 - [x] 08-01-PLAN.md — Recover `04-VERIFICATION.md` from current ranking evidence and log the focused reruns in Phase 4 control notes
-- [ ] 08-02-PLAN.md — Repair requirements, roadmap, audit, and state traceability after recovered Phase 4 evidence exists
+- [x] 08-02-PLAN.md — Repair requirements, roadmap, audit, and state traceability after recovered Phase 4 evidence exists
 
 ---
 
@@ -224,7 +226,7 @@ Plans:
 | 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 2/2 | Complete   | 2026-03-27 |
-| 8. Ranking/Team Verification Recovery | 1/2 | In Progress|  |
+| 8. Ranking/Team Verification Recovery | 2/2 | Complete   | 2026-03-27 |
 
 ---
 
@@ -232,18 +234,18 @@ Plans:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 6 | Pending |
-| TEAM-02 | Phase 7 | Pending |
+| TEAM-01 | Phase 6 | Complete |
+| TEAM-02 | Phase 7 | Complete |
 | DASH-01 | Phase 2 | Complete |
 | DASH-02 | Phase 2 | Complete |
-| RANK-01 | Phase 8 | Pending |
-| RANK-02 | Phase 8 | Pending |
-| RANK-03 | Phase 8 | Pending |
-| RANK-04 | Phase 8 | Pending |
-| RANK-05 | Phase 5 | Pending |
-| PROF-01 | Phase 5 | Pending |
-| PROF-02 | Phase 5 | Pending |
-| PROF-03 | Phase 5 | Pending |
+| RANK-01 | Phase 8 | Complete |
+| RANK-02 | Phase 8 | Complete |
+| RANK-03 | Phase 8 | Complete |
+| RANK-04 | Phase 8 | Complete |
+| RANK-05 | Phase 5 | Complete |
+| PROF-01 | Phase 5 | Complete |
+| PROF-02 | Phase 5 | Complete |
+| PROF-03 | Phase 5 | Complete |
 
 **Coverage:** 12/12 v1 requirements mapped ✓
 
