@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-last_updated: "2026-03-26T23:09:19.172Z"
+status: "Phase 06 shipped — PR #76"
+last_updated: "2026-03-27T00:37:59.128Z"
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 13
+  total_phases: 8
+  completed_phases: 5
+  total_plans: 13
+  completed_plans: 15
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Milestone complete
+**Status:** Phase 06 shipped — PR #76
 **Last updated:** 2026-03-26 — 05-05 complete
 
 ---
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 05 — user-profiles-advanced-features
+**Current Focus:** Phase 06 — team-creation-flow-wiring
 
 **Scope Boundaries:**
 
@@ -35,7 +35,7 @@ progress:
 
 ## Current Position
 
-Phase: 05
+Phase: 07
 Plan: Not started
 
 ## Roadmap Summary
@@ -207,3 +207,5 @@ Plan: Not started
 *Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
 *Last session: 2026-03-26 — Completed 05-05-PLAN.md (head-to-head route: resolveHeadToHeadData assembler D-15..D-17, /head-to-head page, HeadToHeadView URL-synced selectors, 11 tests)*
 *Last session: 2026-03-26 — Completed 05-04-PLAN.md (ranking period tabs: PeriodTabs component, TypeTabs cross-filter preservation, period-aware empty state, 7 new tests, RANK-05 complete)*
+*Last session: 2026-03-27 — Completed 06-01-PLAN.md (team creation flow wiring: TeamCreateForm solo component, /times?tab=create wired, 5 tests, TEAM-01 runtime gap closed)*
+*Last session: 2026-03-27 — Completed 06-02-PLAN.md (team-creation-flow-wiring E2E spec: create solo team flow Playwright test passes against real runtime, 2 tasks, 1 file, TEAM-01 gate closed)*

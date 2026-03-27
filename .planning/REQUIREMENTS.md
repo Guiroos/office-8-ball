@@ -7,7 +7,7 @@
 
 ### Times
 
-- [ ] **TEAM-01**: Usuário pode criar time do tipo solo (1 jogador, `type: solo`) com nome único
+- [x] **TEAM-01**: Usuário pode criar time do tipo solo (1 jogador, `type: solo`) com nome único
 - [ ] **TEAM-02**: Usuário pode ver página de detalhes do time (membros, stats e histórico de partidas)
 
 ### Dashboard
@@ -60,7 +60,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEAM-01 | Phase 6 | Pending |
+| TEAM-01 | Phase 6 | Complete |
 | TEAM-02 | Phase 7 | Pending |
 | DASH-01 | Phase 2 | Complete |
 | DASH-02 | Phase 2 | Complete |

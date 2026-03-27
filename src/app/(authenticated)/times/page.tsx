@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { TeamCard } from "@/components/teams/team-card";
+import { TeamCreateForm } from "@/components/teams/team-create-form";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
 import { listUserTeams } from "@/lib/teams";
 
@@ -52,9 +53,7 @@ export default async function TeamsPage({ searchParams }: TeamsPageProps) {
               </p>
             )
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Fluxo de criação será conectado ao formulário existente de times nesta fase.
-            </p>
+            <TeamCreateForm />
           )}
         </section>
 

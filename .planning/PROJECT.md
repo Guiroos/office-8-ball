@@ -96,4 +96,4 @@ Este documento evolui a cada transição de fase e milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-03-26 — Phase 05 (user-profiles-advanced-features) complete*
+*Last updated: 2026-03-27 — Phase 06 (team-creation-flow-wiring) complete — TeamCreateForm wired to POST /api/teams with Zod validation, PT-BR error handling, and E2E coverage*
