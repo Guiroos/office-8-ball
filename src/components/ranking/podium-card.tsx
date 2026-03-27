@@ -1,36 +1,114 @@
 import Link from "next/link";
+import { Medal, Trophy } from "lucide-react";
 
 import { StatTile } from "@/components/primitives/stat-tile";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { RankedTeam } from "@/lib/ranking";
 
-const PODIUM_BADGES: Record<number, string> = {
-  1: "🏆 1º Lugar",
-  2: "🥈 2º Lugar",
-  3: "🥉 3º Lugar",
-};
+function getRankConfig(rank: number) {
+  if (rank === 1)
+    return {
+      icon: <Trophy className="size-3.5 shrink-0 text-gold" />,
+      label: "1º Lugar",
+      cardClass: "border-gold/50",
+      hoverClass: "hover:shadow-lg hover:shadow-gold/30",
+      accentStrip: true,
+      rankNumClass: "text-gold/15",
+    };
+  if (rank === 2)
+    return {
+      icon: <Medal className="size-3.5 shrink-0 text-muted-foreground" />,
+      label: "2º Lugar",
+      cardClass: "border-border-strong",
+      hoverClass: "hover:shadow-md hover:shadow-foreground/15",
+      accentStrip: false,
+      rankNumClass: "text-muted-foreground/10",
+    };
+  if (rank === 3)
+    return {
+      icon: <Medal className="size-3.5 shrink-0 text-gold/70" />,
+      label: "3º Lugar",
+      cardClass: "border-border-strong",
+      hoverClass: "hover:shadow-md hover:shadow-foreground/15",
+      accentStrip: false,
+      rankNumClass: "text-muted-foreground/10",
+    };
+  return {
+    icon: null,
+    label: `#${rank}`,
+    cardClass: "border-border",
+    hoverClass: "hover:shadow-sm",
+    accentStrip: false,
+    rankNumClass: "text-muted-foreground/10",
+  };
+}
 
 export function PodiumCard({ team }: { team: RankedTeam }) {
+  const config = getRankConfig(team.rank);
+  const streakLabel =
+    team.currentStreak.type === "win"
+      ? `${team.currentStreak.count}V`
+      : team.currentStreak.type === "loss"
+        ? `${team.currentStreak.count}D`
+        : "-";
+
   return (
     <Link href={`/times/${team.id}`} className="block focus-visible:outline-none">
-      <Card className="h-full border-border-strong bg-surface-emphasis transition hover:-translate-y-1 hover:shadow-md hover:shadow-gold/35">
-        <CardHeader className="space-y-3">
-          <Badge className="w-fit">{PODIUM_BADGES[team.rank] ?? `#${team.rank}`}</Badge>
-          <CardTitle className="title">{team.name}</CardTitle>
+      <Card
+        className={cn(
+          "h-full cursor-pointer overflow-hidden bg-surface-emphasis transition hover:-translate-y-1",
+          config.cardClass,
+          config.hoverClass,
+        )}
+      >
+        {/* Gold accent strip — rank 1 only; overflow-hidden on Card clips corners */}
+        {config.accentStrip && (
+          <div className="h-0.5 bg-gold-gradient" />
+        )}
+
+        {/* Header: rank badge + team name + decorative rank number */}
+        <CardHeader className="flex-row items-start justify-between p-4 pb-3">
+          <div className="flex flex-col gap-1.5">
+            <Badge className="flex w-fit items-center gap-1.5">
+              {config.icon}
+              {config.label}
+            </Badge>
+            <p className="text-base font-bold leading-snug">{team.name}</p>
+          </div>
+          <span
+            className={cn(
+              "select-none font-black leading-none tabular-nums text-5xl",
+              config.rankNumClass,
+            )}
+            aria-hidden
+          >
+            {team.rank}
+          </span>
         </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-2">
-          <StatTile label="Vitórias" value={team.wins} className="rounded-md p-3" />
-          <StatTile label="Derrotas" value={team.losses} className="rounded-md p-3" />
+
+        {/* Stats — divided grid via StatTile with border/bg stripped */}
+        <CardContent className="grid grid-cols-2 divide-x divide-y divide-border border-t border-border">
+          <StatTile
+            label="Vitórias"
+            value={team.wins}
+            className="rounded-none border-0 bg-transparent p-3"
+          />
+          <StatTile
+            label="Derrotas"
+            value={team.losses}
+            className="rounded-none border-0 bg-transparent p-3"
+          />
           <StatTile
             label="Taxa de Vitória"
             value={`${team.winRate.toFixed(1)}%`}
-            className="rounded-md p-3"
+            className="rounded-none border-0 bg-transparent p-3"
           />
           <StatTile
-            label="Sequência Atual"
-            value={`${team.currentStreak.count} ${team.currentStreak.type === "win" ? "W" : team.currentStreak.type === "loss" ? "L" : "-"}`}
-            className="rounded-md p-3"
+            label="Sequência"
+            value={streakLabel}
+            className="rounded-none border-0 bg-transparent p-3"
           />
         </CardContent>
       </Card>
