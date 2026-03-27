@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     // GSD tooling — not part of the app bundle
     ".claude/**",
     ".planning/**",
+    ".codex/**",
   ]),
 ]);
 

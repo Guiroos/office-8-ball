@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createCredentials, login, logout, signUp } from "./helpers/auth";
+import { createCredentials, createTeam, login, logout, signUp } from "./helpers/auth";
 
 test.describe("authenticated scoreboard flow", () => {
   test("signs up, registers a win, and persists the updated scoreboard", async ({ page }) => {
@@ -8,31 +8,29 @@ test.describe("authenticated scoreboard flow", () => {
     const note = `Virou passeio ${Date.now()}`;
 
     await signUp(page, credentials);
+    await createTeam(page, `time-a-${Date.now()}`);
+    await createTeam(page, `time-b-${Date.now()}`);
+
+    await page.goto("/dashboard");
     await expect(page.getByText(credentials.username, { exact: true })).toBeVisible();
-    await expect(page.getByText("Frontend vs Backend")).toBeVisible();
 
-    const initialFrontendWins = Number(
-      await page.getByTestId("team-wins-frontend").textContent(),
-    );
+    const firstTeamWins = page.locator('[data-testid^="team-wins-"]').first();
+    const initialWins = Number(await firstTeamWins.textContent());
 
-    await page.getByTestId("team-note-frontend").fill(note);
-    await page.getByTestId("register-win-frontend").click();
+    await page.locator('[data-testid^="team-note-"]').first().fill(note);
+    await page.locator('[data-testid^="register-win-"]').first().click();
 
-    await expect(
-      page.getByText(
-        /Frontend ganhou\. Backend abriu um ticket para investigar\.|Jean chamou de responsivo\. A mesa concordou\.|Mais uma para o pixel perfect da sinuca\./,
-      ),
-    ).toBeVisible();
+    await expect(page.getByText("Partida registrada com sucesso.")).toBeVisible();
     await expect
-      .poll(async () => Number(await page.getByTestId("team-wins-frontend").textContent()))
-      .toBeGreaterThan(initialFrontendWins);
+      .poll(async () => Number(await firstTeamWins.textContent()))
+      .toBeGreaterThan(initialWins);
     await expect(page.getByRole("list").getByText(note, { exact: true })).toBeVisible();
 
-    const persistedFrontendWins = await page.getByTestId("team-wins-frontend").textContent();
+    const persistedWins = await firstTeamWins.textContent();
 
     await page.reload();
 
-    await expect(page.getByTestId("team-wins-frontend")).toHaveText(persistedFrontendWins ?? "");
+    await expect(firstTeamWins).toHaveText(persistedWins ?? "");
     await expect(page.getByRole("list").getByText(note, { exact: true })).toBeVisible();
   });
 
@@ -92,34 +90,35 @@ test.describe("authenticated scoreboard flow", () => {
     await expect(page.getByText("Este usuário já está em uso.")).toBeVisible();
   });
 
-  test("registers a backend win with note and keeps it visible after reload", async ({
+  test("registers a second team win with note and keeps it visible after reload", async ({
     page,
   }) => {
-    const credentials = createCredentials("backend-note");
-    const note = `Backend anotou ${Date.now()}`;
+    const credentials = createCredentials("team-note");
+    const note = `Time anotou ${Date.now()}`;
 
     await signUp(page, credentials);
+    await createTeam(page, `time-a-${Date.now()}`);
+    await createTeam(page, `time-b-${Date.now()}`);
 
-    const initialBackendWins = Number(await page.getByTestId("team-wins-backend").textContent());
+    await page.goto("/dashboard");
 
-    await page.getByTestId("team-note-backend").fill(note);
-    await page.getByTestId("register-win-backend").click();
+    const secondTeamWins = page.locator('[data-testid^="team-wins-"]').nth(1);
+    const initialWins = Number(await secondTeamWins.textContent());
 
-    await expect(
-      page.getByText(
-        /Backend levou\. Frontend vai culpar a iluminação\.|Richard chamou de regra de negócio e encerrou a discussão\.|Adair versionou a humilhação em produção\./,
-      ),
-    ).toBeVisible();
+    await page.locator('[data-testid^="team-note-"]').nth(1).fill(note);
+    await page.locator('[data-testid^="register-win-"]').nth(1).click();
+
+    await expect(page.getByText("Partida registrada com sucesso.")).toBeVisible();
     await expect
-      .poll(async () => Number(await page.getByTestId("team-wins-backend").textContent()))
-      .toBeGreaterThan(initialBackendWins);
+      .poll(async () => Number(await secondTeamWins.textContent()))
+      .toBeGreaterThan(initialWins);
     await expect(page.getByRole("list").getByText(note, { exact: true })).toBeVisible();
 
-    const persistedBackendWins = await page.getByTestId("team-wins-backend").textContent();
+    const persistedWins = await secondTeamWins.textContent();
 
     await page.reload();
 
-    await expect(page.getByTestId("team-wins-backend")).toHaveText(persistedBackendWins ?? "");
+    await expect(secondTeamWins).toHaveText(persistedWins ?? "");
     await expect(page.getByRole("list").getByText(note, { exact: true })).toBeVisible();
   });
 });
