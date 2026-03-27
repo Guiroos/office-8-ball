@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { TeamRecord } from "@/lib/types";
 
 function getInitials(name: string) {
@@ -16,19 +17,22 @@ function getInitials(name: string) {
 export function TeamCard({ team }: { team: TeamRecord }) {
   return (
     <Link href={`/times/${team.id}`} className="block">
-      <Card className="border-border bg-surface transition hover:shadow-sm hover:shadow-foreground/20">
-        <CardHeader className="flex flex-row items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-full bg-surface-emphasis font-semibold">
+      <Card className="cursor-pointer shadow-sm shadow-foreground/10 transition hover:shadow-md hover:shadow-foreground/20">
+        <div className="flex items-center gap-3 p-4">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-emphasis text-xs font-semibold">
             {getInitials(team.name)}
           </div>
-          <div className="space-y-1">
-            <CardTitle className="text-base">{team.name}</CardTitle>
-            <Badge variant="outline">{team.type === "solo" ? "Solo" : "Duplas"}</Badge>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <p className="truncate text-sm font-semibold leading-none">{team.name}</p>
+            <Badge variant="outline" className="text-xs">
+              {team.type === "solo" ? "Solo" : "Duplas"}
+            </Badge>
           </div>
-        </CardHeader>
-        <CardContent className="pt-0 text-sm text-muted-foreground">
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        </div>
+        <div className="border-t border-border px-4 py-2.5 text-xs text-muted-foreground">
           {team.members.length} membro(s)
-        </CardContent>
+        </div>
       </Card>
     </Link>
   );
