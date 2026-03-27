@@ -18,6 +18,7 @@ import {
 import { type ComponentType, type ReactNode, useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -69,9 +70,11 @@ function UserAvatar({ user }: { user: SessionUser }) {
 
   return (
     <div className="relative">
-      <div className="text-sidebar-foreground flex size-11 shrink-0 items-center justify-center rounded-pill border border-sidebar-border bg-avatar-gradient text-sm font-bold uppercase tracking-label-sm">
-        {initials || "OB"}
-      </div>
+      <Avatar className="size-11 rounded-pill border-sidebar-border bg-avatar-gradient">
+        <AvatarFallback className="bg-transparent text-sidebar-foreground tracking-label-sm">
+          {initials || "OB"}
+        </AvatarFallback>
+      </Avatar>
       <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-avatar-ring bg-status" />
     </div>
   );

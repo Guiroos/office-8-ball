@@ -13,6 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
@@ -120,7 +121,7 @@ export function ProfilePage({ data }: ProfilePageProps) {
       {/* Hero */}
       <section className="relative overflow-hidden rounded-xl border border-primary/20 bg-primary/10 p-6 lg:p-10">
         <div className="flex flex-col items-center gap-6 md:flex-row">
-          <div className="flex size-24 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-2xl font-bold uppercase text-foreground overflow-hidden">
+          <Avatar className="size-24 border-border bg-muted text-2xl">
             {avatarSrc && !avatarLoadError ? (
               <Image
                 src={avatarSrc}
@@ -131,9 +132,11 @@ export function ProfilePage({ data }: ProfilePageProps) {
                 onError={() => setAvatarLoadError(true)}
               />
             ) : (
-              initials || "OB"
+              <AvatarFallback className="bg-muted text-2xl font-bold">
+                {initials || "OB"}
+              </AvatarFallback>
             )}
-          </div>
+          </Avatar>
           <div className="text-center md:text-left">
             <h2 className="text-xl font-bold">
               {editableProfile.displayName ?? editableProfile.username}

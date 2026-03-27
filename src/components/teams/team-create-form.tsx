@@ -5,9 +5,12 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+import { Field, FieldError } from "@/components/primitives/form-field";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
 import type { ApiErrorResponse, TeamRecord, TeamResponse } from "@/lib/types";
 
 const schema = z.object({
@@ -71,10 +74,8 @@ export function TeamCreateForm() {
   return (
     <Card className="max-w-md p-6">
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-2">
-          <label htmlFor="team-name" className="text-sm font-medium text-foreground">
-            Nome do Time
-          </label>
+        <Field>
+          <Label htmlFor="team-name">Nome do Time</Label>
           <Input
             id="team-name"
             name="name"
@@ -89,32 +90,26 @@ export function TeamCreateForm() {
             invalid={!!nameError}
             aria-describedby={nameError ? "team-name-error" : undefined}
           />
-          {nameError && (
-            <p id="team-name-error" className="text-sm text-danger">
-              {nameError}
-            </p>
-          )}
-        </div>
+          <FieldError id="team-name-error">{nameError}</FieldError>
+        </Field>
 
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">Modalidade</p>
-          <div className="flex gap-2">
+        <Field>
+          <Label>Modalidade</Label>
+          <SegmentedControl aria-label="Seleção de modalidade" className="w-full">
             {(["solo", "duo"] as const).map((option) => (
-              <button
+              <SegmentedControlItem
                 key={option}
                 type="button"
                 onClick={() => setType(option)}
-                className={`rounded-pill border px-4 py-2 text-sm transition-colors ${
-                  type === option
-                    ? "border-primary bg-primary text-foreground-inverse"
-                    : "border-border bg-surface text-muted-foreground hover:border-border-strong hover:bg-surface-emphasis hover:text-foreground"
-                }`}
+                active={type === option}
+                className="flex-1"
+                aria-pressed={type === option}
               >
                 {option === "solo" ? "Solo" : "Duplas"}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
-        </div>
+          </SegmentedControl>
+        </Field>
 
         <Button
           type="submit"

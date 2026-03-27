@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import type { MatchRecord } from "@/lib/types";
 
 function formatDate(value: string) {
@@ -31,16 +32,32 @@ export function RecentMatchesList({
           const won = match.winnerTeamId === teamId;
 
           return (
-            <li key={match.id} className="rounded-lg border border-border bg-surface p-3">
-              <p className="text-sm font-medium">
-                {won ? "Vitória" : "Derrota"} vs {opponentName}
-              </p>
-              <p className="text-xs text-muted-foreground">{formatDate(match.playedAt)}</p>
+            <li
+              key={match.id}
+              className="rounded-lg border border-border bg-surface-emphasis p-4 shadow-sm shadow-foreground/5"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+                <div className="space-y-2">
+                  <Badge variant={won ? "default" : "outline"}>
+                    {won ? "Vitória" : "Derrota"}
+                  </Badge>
+                  <div>
+                    <p className="font-semibold">Contra {opponentName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {won
+                        ? "Resultado positivo no confronto mais recente."
+                        : "Esse foi o revés mais recente contra esse adversário."}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="caption text-muted-foreground sm:text-right">{formatDate(match.playedAt)}</p>
+              </div>
             </li>
           );
         })}
       </ul>
-      <p className="text-sm text-muted-foreground">Ver histórico completo</p>
+      <p className="caption text-muted-foreground">Mostrando as 3 partidas mais recentes.</p>
     </div>
   );
 }
