@@ -7,6 +7,7 @@ import { startTransition, useId, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
 import type { TeamRecord } from "@/lib/types";
@@ -131,7 +132,7 @@ function TeamScoreCard({
             </span>
           </div>
 
-          <textarea
+          <Textarea
             id={noteId}
             value={note}
             data-testid={`team-note-${team.id}`}
@@ -139,7 +140,7 @@ function TeamScoreCard({
             rows={3}
             disabled={isSubmitting}
             placeholder="Vale zoeira curta, sem tese de retrospectiva."
-            className="min-h-24 w-full resize-none rounded-md border border-border-strong bg-surface-emphasis px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-foreground-soft focus:border-team-alpha focus:ring-2 focus:ring-team-alpha-soft disabled:cursor-not-allowed disabled:bg-surface-muted"
+            className="resize-none border-border-strong placeholder:text-foreground-soft"
             onChange={(event) => {
               onNoteChange(team.id, event.target.value);
             }}

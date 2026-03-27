@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { cn } from "@/lib/utils";
+import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
 
 type RankingType = "all" | "solo" | "duo";
 
@@ -28,25 +28,21 @@ export function TypeTabs({
   }
 
   return (
-    <nav aria-label="Filtro de tipo de time" className="flex flex-wrap gap-2">
+    <SegmentedControl aria-label="Filtro de tipo de time" role="navigation">
       {TYPE_VALUES.map((tab) => {
         const active = tab.value === activeType;
         return (
-          <Link
+          <SegmentedControlItem
             key={tab.value}
-            href={buildHref(tab.value)}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "rounded-pill border px-4 py-2 text-sm font-medium transition",
-              active
-                ? "border-primary bg-primary text-foreground-inverse"
-                : "border-border bg-surface text-muted-foreground hover:text-foreground",
-            )}
+            asChild
+            active={active}
           >
-            {tab.label}
-          </Link>
+            <Link href={buildHref(tab.value)} aria-current={active ? "page" : undefined}>
+              {tab.label}
+            </Link>
+          </SegmentedControlItem>
         );
       })}
-    </nav>
+    </SegmentedControl>
   );
 }

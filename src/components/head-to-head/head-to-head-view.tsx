@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import type { HeadToHeadPageData } from "@/lib/head-to-head";
 import type { TeamRecord } from "@/lib/types";
 
@@ -69,12 +71,11 @@ export function HeadToHeadView({ data }: Props) {
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Team A selector */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" htmlFor="selector-team-a">
+            <Label htmlFor="selector-team-a">
               Team A
-            </label>
-            <select
+            </Label>
+            <NativeSelect
               id="selector-team-a"
-              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
               value={teamAId}
               onChange={handleTeamAChange}
             >
@@ -86,17 +87,16 @@ export function HeadToHeadView({ data }: Props) {
                     {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
                   </option>
                 ))}
-            </select>
+            </NativeSelect>
           </div>
 
           {/* Team B selector */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" htmlFor="selector-team-b">
+            <Label htmlFor="selector-team-b">
               Team B
-            </label>
-            <select
+            </Label>
+            <NativeSelect
               id="selector-team-b"
-              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
               value={teamBId}
               onChange={handleTeamBChange}
             >
@@ -108,7 +108,7 @@ export function HeadToHeadView({ data }: Props) {
                     {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
                   </option>
                 ))}
-            </select>
+            </NativeSelect>
           </div>
         </div>
 

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError } from "@/components/primitives/form-field";
 import type { ProfileResponse } from "@/lib/types";
 
@@ -150,12 +151,14 @@ export function ProfileEditDialog({
           </Field>
           <Field>
             <Label htmlFor="bio">Bio</Label>
-            <Input
+            <Textarea
               id="bio"
               value={form.bio}
               onChange={(e) => updateField("bio", e.target.value)}
               placeholder="Conta um pouco sobre você"
               disabled={loading}
+              maxLength={200}
+              rows={4}
             />
             <FieldError>{errors.bio}</FieldError>
           </Field>

@@ -2,59 +2,103 @@ import { H2HSection } from "@/components/teams/h2h-section";
 import { InviteMemberDialog } from "@/components/teams/invite-member-dialog";
 import { MemberList } from "@/components/teams/member-list";
 import { RecentMatchesList } from "@/components/teams/recent-matches-list";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
 import type { TeamDetailData } from "@/lib/team-details";
+
+function formatTeamTypeLabel(type: "solo" | "duo") {
+  return type === "solo" ? "Solo" : "Duplas";
+}
+
+function formatCurrentStreakLabel(
+  streak: TeamDetailData["stats"]["currentStreak"],
+) {
+  if (streak.type === "none" || streak.count === 0) {
+    return "-";
+  }
+
+  return `${streak.count}${streak.type === "win" ? "V" : "D"}`;
+}
 
 export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
   const teamNameById = Object.fromEntries([
     [data.team.id, data.team.name],
     ...data.rivals.map((rival) => [rival.id, rival.name]),
   ]);
+  const teamTypeLabel = formatTeamTypeLabel(data.team.type);
+  const summaryText = `${data.stats.wins} vitórias, ${data.stats.losses} derrotas e ${data.stats.winRate.toFixed(1)}% de aproveitamento.`;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <Card className="border-border-strong bg-surface-emphasis">
-        <CardHeader className="flex flex-row items-center justify-between gap-3">
-          <div>
-            <CardTitle className="title">{data.team.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{data.team.type === "solo" ? "Solo" : "Duplas"}</p>
+      <Card className="border-border-strong bg-surface-emphasis shadow-sm shadow-foreground/10">
+        <CardHeader className="gap-5 p-5 sm:p-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <p className="label-wide text-muted-foreground">Área de times</p>
+              <CardTitle className="title">{data.team.name}</CardTitle>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline">{teamTypeLabel}</Badge>
+              <Badge variant="default">
+                {data.members.length} {data.members.length === 1 ? "membro" : "membros"}
+              </Badge>
+              {data.rankingPosition ? (
+                <Badge variant="gold">#{data.rankingPosition} no ranking</Badge>
+              ) : null}
+            </div>
+
+            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+              {summaryText}
+            </p>
           </div>
-          <InviteMemberDialog teamId={data.team.id} />
+
+          <div className="w-full sm:w-auto sm:pt-1">
+            <InviteMemberDialog teamId={data.team.id} />
+          </div>
         </CardHeader>
       </Card>
 
       {/* per D-07 */}
       <section className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        <StatTile label="Total Wins" value={data.stats.wins} />
-        <StatTile label="Total Losses" value={data.stats.losses} />
-        <StatTile label="Total de Partidas" value={data.stats.totalMatches} />
-        <StatTile label="Win Rate %" value={`${data.stats.winRate.toFixed(1)}%`} />
+        <StatTile label="Vitórias" value={data.stats.wins} />
+        <StatTile label="Derrotas" value={data.stats.losses} />
+        <StatTile label="Partidas jogadas" value={data.stats.totalMatches} />
+        <StatTile label="Aproveitamento" value={`${data.stats.winRate.toFixed(1)}%`} />
         <StatTile label="Posição no ranking" value={data.rankingPosition ?? "-"} />
         <StatTile
           label="Sequência Atual"
-          value={`${data.stats.currentStreak.count} ${data.stats.currentStreak.type === "win" ? "W" : data.stats.currentStreak.type === "loss" ? "L" : "-"}`}
+          value={formatCurrentStreakLabel(data.stats.currentStreak)}
         />
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card className="border-border bg-surface">
           <CardContent className="space-y-4 p-6">
-            <SectionHeader eyebrow="Time" title="Membros" />
+            <SectionHeader
+              eyebrow="Time"
+              title="Membros"
+              description="Quem faz parte do time e quem pode ser gerenciado nesta equipe."
+            />
             <MemberList
-                members={data.members}
-                teamId={data.team.id}
-                teamType={data.team.type}
-                createdBy={data.team.createdBy}
-                viewerId={data.viewerId}
-              />
+              members={data.members}
+              teamId={data.team.id}
+              teamType={data.team.type}
+              createdBy={data.team.createdBy}
+              viewerId={data.viewerId}
+            />
           </CardContent>
         </Card>
 
         <Card className="border-border bg-surface">
           <CardContent className="space-y-4 p-6">
-            <SectionHeader eyebrow="Partidas" title="Últimas Partidas" />
+            <SectionHeader
+              eyebrow="Partidas"
+              title="Últimas Partidas"
+              description="Resumo rápido dos confrontos mais recentes desse time."
+            />
             <RecentMatchesList
               matches={data.recentMatches}
               teamId={data.team.id}
@@ -68,7 +112,11 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
       <section className="mt-6">
         <Card className="border-border bg-surface">
           <CardContent className="space-y-4 p-6">
-            <SectionHeader eyebrow="Comparação" title="Confrontos Diretos" />
+            <SectionHeader
+              eyebrow="Comparação"
+              title="Confrontos Diretos"
+              description="Compare o desempenho do time contra cada adversário disponível."
+            />
             {/* addresses review concern: server-side H2H summary */}
             <H2HSection
               rivals={data.rivals}

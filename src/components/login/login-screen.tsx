@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/primitives/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
 import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit";
 import {
   getLoginFieldErrors,
@@ -48,9 +49,6 @@ const INITIAL_TOUCHED_FIELDS = {
   username: false,
   password: false,
 };
-
-const SEGMENT_BUTTON_BASE_CLASS =
-  "rounded-sm px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed";
 
 export function LoginScreen({
   authAvailable,
@@ -292,34 +290,26 @@ export function LoginScreen({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-surface-emphasis p-2">
-                    <button
+                  <SegmentedControl className="grid grid-cols-2">
+                    <SegmentedControlItem
                       type="button"
-                      className={`${SEGMENT_BUTTON_BASE_CLASS} ${
-                        !isRegisterMode
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground"
-                      }`}
+                      active={!isRegisterMode}
                       onClick={() => handleModeChange("login")}
                       disabled={areControlsDisabled}
                       data-testid="login-mode-login"
                     >
                       Entrar
-                    </button>
-                    <button
+                    </SegmentedControlItem>
+                    <SegmentedControlItem
                       type="button"
-                      className={`${SEGMENT_BUTTON_BASE_CLASS} ${
-                        isRegisterMode
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground"
-                      }`}
+                      active={isRegisterMode}
                       onClick={() => handleModeChange("register")}
                       disabled={areControlsDisabled}
                       data-testid="login-mode-register"
                     >
                       Criar conta
-                    </button>
-                  </div>
+                    </SegmentedControlItem>
+                  </SegmentedControl>
 
                   <form className="space-y-4" onSubmit={handleSubmit}>
                     <Field>

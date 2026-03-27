@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { TeamMemberView } from "@/lib/team-details";
@@ -15,6 +16,15 @@ type MemberListProps = {
   createdBy: string;
   viewerId: string;
 };
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 function mapErrorStatus(status: number, fallbackMessage: string): string {
   if (status === 401) return "Faça login novamente para gerenciar membros.";
@@ -70,25 +80,38 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
         const isConfirming = confirmingUserId === member.userId;
         const isRemoving = removingUserId === member.userId;
         const removable = isRemovable(member);
+        const isViewer = member.userId === viewerId;
 
         return (
           <li
             key={member.userId}
-            className="flex items-center justify-between rounded-lg border border-border bg-surface p-3"
+            className="flex flex-col gap-3 rounded-lg border border-border bg-surface-emphasis p-4 shadow-sm shadow-foreground/5 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
-              <p className="font-medium">{member.displayName}</p>
-              <p className="text-sm text-muted-foreground">@{member.username}</p>
+            <div className="flex items-center gap-3">
+              <Avatar className="size-10 border-0 bg-surface">
+                <AvatarFallback className="bg-surface">
+                  {getInitials(member.displayName)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold">{member.displayName}</p>
+                  {isViewer ? <Badge variant="default">Você</Badge> : null}
+                  <Badge variant={member.role === "Criador" ? "gold" : "outline"}>
+                    {member.role}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">@{member.username}</p>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">{member.role}</Badge>
-
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               {removable && !isConfirming && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
+                  className="w-full sm:w-auto"
                   onClick={() => setConfirmingUserId(member.userId)}
                   disabled={isRemoving}
                 >
@@ -102,7 +125,7 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="border-destructive text-destructive hover:bg-destructive/10"
+                    className="w-full border-destructive text-destructive hover:bg-destructive/10 sm:w-auto"
                     onClick={() => handleRemove(member.userId)}
                     disabled={isRemoving}
                   >
@@ -112,6 +135,7 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
                     type="button"
                     variant="ghost"
                     size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => setConfirmingUserId(null)}
                     disabled={isRemoving}
                   >

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import type { TeamRecord } from "@/lib/types";
 
@@ -19,9 +20,11 @@ export function TeamCard({ team }: { team: TeamRecord }) {
     <Link href={`/times/${team.id}`} className="block">
       <Card className="cursor-pointer shadow-sm shadow-foreground/10 transition hover:shadow-md hover:shadow-foreground/20">
         <div className="flex items-center gap-3 p-4">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-emphasis text-xs font-semibold">
-            {getInitials(team.name)}
-          </div>
+          <Avatar className="size-9 border-0 bg-surface-emphasis">
+            <AvatarFallback className="bg-surface-emphasis text-xs">
+              {getInitials(team.name)}
+            </AvatarFallback>
+          </Avatar>
           <div className="min-w-0 flex-1 space-y-1.5">
             <p className="truncate text-sm font-semibold leading-none">{team.name}</p>
             <Badge variant="outline" className="text-xs">

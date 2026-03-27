@@ -95,7 +95,7 @@ export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
 
   return (
     <>
-      <Button type="button" onClick={() => setOpen(true)}>
+      <Button type="button" className="w-full sm:w-auto" onClick={() => setOpen(true)}>
         Convidar Membro
       </Button>
 
