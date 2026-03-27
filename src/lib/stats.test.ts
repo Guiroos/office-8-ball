@@ -61,6 +61,7 @@ describe("computeTeamStats", () => {
       expect(result.currentStreak).toEqual({ type: "none", count: 0 });
       expect(result.longestStreak).toEqual({ type: "none", count: 0 });
       expect(result.totalMatches).toBe(0);
+      expect(result.lastFiveResults).toEqual([]);
     });
   });
 
@@ -74,6 +75,7 @@ describe("computeTeamStats", () => {
       expect(result.losses).toBe(0);
       expect(result.currentStreak).toEqual({ type: "win", count: 1 });
       expect(result.longestStreak).toEqual({ type: "win", count: 1 });
+      expect(result.lastFiveResults).toEqual(["win"]);
     });
 
     it("returns 0% win rate and loss streak of 1 for single loss", () => {
@@ -85,6 +87,7 @@ describe("computeTeamStats", () => {
       expect(result.losses).toBe(1);
       expect(result.currentStreak).toEqual({ type: "loss", count: 1 });
       expect(result.longestStreak).toEqual({ type: "loss", count: 1 });
+      expect(result.lastFiveResults).toEqual(["loss"]);
     });
   });
 
@@ -105,6 +108,7 @@ describe("computeTeamStats", () => {
       expect(result.losses).toBe(30);
       expect(result.winRate).toBeCloseTo(70, 5);
       expect(result.totalMatches).toBe(100);
+      expect(result.lastFiveResults).toEqual(["win", "win", "win", "win", "win"]);
     });
   });
 
@@ -159,6 +163,21 @@ describe("computeTeamStats", () => {
       const result = computeTeamStats("team-a", matches);
       expect(result.currentStreak).toEqual({ type: "win", count: 2 });
       expect(result.longestStreak).toEqual({ type: "win", count: 2 });
+    });
+
+    it("stores up to the 5 most recent results in descending order", () => {
+      const matches: MatchRecord[] = [
+        makeMatch("m6", "team-a", "team-b", "team-a", "2026-03-26T10:00:00Z"),
+        makeMatch("m5", "team-a", "team-b", "team-b", "2026-03-25T10:00:00Z"),
+        makeMatch("m4", "team-a", "team-b", "team-a", "2026-03-24T10:00:00Z"),
+        makeMatch("m3", "team-a", "team-b", "team-b", "2026-03-23T10:00:00Z"),
+        makeMatch("m2", "team-a", "team-b", "team-a", "2026-03-22T10:00:00Z"),
+        makeMatch("m1", "team-a", "team-b", "team-b", "2026-03-21T10:00:00Z"),
+      ];
+
+      const result = computeTeamStats("team-a", matches);
+
+      expect(result.lastFiveResults).toEqual(["win", "loss", "win", "loss", "win"]);
     });
   });
 });
@@ -230,6 +249,7 @@ describe("SC-6: Zod output validation", () => {
         currentStreak: { type: "win", count: 5 },
         longestStreak: { type: "win", count: 5 },
         totalMatches: 5,
+        lastFiveResults: ["win", "win", "win", "win", "win"],
       })
     ).toThrow();
   });
@@ -244,6 +264,7 @@ describe("SC-6: Zod output validation", () => {
         currentStreak: { type: "loss", count: 5 },
         longestStreak: { type: "loss", count: 5 },
         totalMatches: 5,
+        lastFiveResults: ["loss", "loss", "loss", "loss", "loss"],
       })
     ).toThrow();
   });
@@ -258,6 +279,7 @@ describe("SC-6: Zod output validation", () => {
         currentStreak: { type: "win", count: 5 },
         longestStreak: { type: "win", count: 5 },
         totalMatches: 5,
+        lastFiveResults: ["win", "win", "win", "win", "win"],
       })
     ).toThrow();
   });
@@ -272,6 +294,7 @@ describe("SC-6: Zod output validation", () => {
         currentStreak: { type: "none", count: -1 },
         longestStreak: { type: "none", count: 0 },
         totalMatches: 0,
+        lastFiveResults: [],
       })
     ).toThrow();
   });

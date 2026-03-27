@@ -16,6 +16,7 @@ export const TeamStatsSchema = z.object({
   currentStreak: StreakSchema,
   longestStreak: StreakSchema,
   totalMatches: z.number().int().nonnegative(),
+  lastFiveResults: z.array(z.enum(["win", "loss"])).max(5),
 });
 
 export const HeadToHeadStatsSchema = z.object({
@@ -119,6 +120,9 @@ export function computeTeamStats(
   const winRate = total === 0 ? 0 : (wins / total) * 100;
 
   const { currentStreak, longestStreak } = detectStreaks(teamId, teamMatches);
+  const lastFiveResults = teamMatches
+    .slice(0, 5)
+    .map((match) => (match.winnerTeamId === teamId ? "win" : "loss"));
 
   return TeamStatsSchema.parse({
     teamId,
@@ -128,6 +132,7 @@ export function computeTeamStats(
     currentStreak,
     longestStreak,
     totalMatches: total,
+    lastFiveResults,
   });
 }
 
