@@ -183,7 +183,11 @@ Plans:
 4. Flow "Manage team members" passes end-to-end in authenticated runtime
 5. Flow "Team details authorization" passes with explicit non-member access test coverage
 
-**Plans:** 0 plans
+**Plans:** 2 plans
+
+Plans:
+- [x] 07-01-PLAN.md — Replace the legacy public `/times/[id]` contract with member-only detail results and an explicit denied state
+- [ ] 07-02-PLAN.md — Wire invite/remove member actions on the detail page and prove the flow with route, component, and E2E coverage
 
 **UI hint:** yes
 
@@ -217,7 +221,7 @@ Plans:
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
 | 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
-| 7. Team Details Access & Member Actions | 0/0 | Planned   | - |
+| 7. Team Details Access & Member Actions | 0/2 | Planned   | - |
 | 8. Ranking/Team Verification Recovery | 0/0 | Planned   | - |
 
 ---
