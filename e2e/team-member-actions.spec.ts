@@ -29,9 +29,9 @@ test.describe("team member actions", () => {
 
     // Invite the invitee by username (button text: "Convidar Membro")
     await page.getByRole("button", { name: "Convidar Membro" }).click();
-    await expect(page.getByPlaceholderText(/username/i)).toBeVisible();
+    await expect(page.getByPlaceholder(/username/i)).toBeVisible();
 
-    await page.getByPlaceholderText(/username/i).fill(invitee.username);
+    await page.getByPlaceholder(/username/i).fill(invitee.username);
     await page.getByRole("button", { name: /^convidar$/i }).click();
 
     // Wait for success feedback and roster refresh
@@ -40,8 +40,6 @@ test.describe("team member actions", () => {
     // After router.refresh, the new member should appear in the member list
     await expect(page.getByText(`@${invitee.username}`)).toBeVisible();
 
-    // Return team URL for reuse
-    return teamUrl;
   });
 
   test("team details authorization blocks non-members", async ({ page }) => {
