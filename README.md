@@ -1,144 +1,200 @@
 # Office 8 Ball
 
-Internal pool scoreboard for `Frontend (Gui + Jean)` vs `Backend (Adair + Richard)`.
+Aplicacao interna para acompanhar partidas de sinuca no escritorio com autenticacao, criacao de times dinamicos e ranking por historico de partidas.
 
-## Current Status
-- `v1` is implemented as a single Next.js App Router app with a shared authenticated shell.
-- The main dashboard now uses `Tailwind CSS` + local `shadcn/ui`-style components.
-- The theme system is shared across login, dashboard, and the authenticated shell, with global foundation tokens for radius, shadow, and type.
-- `src/app/globals.css` now also carries semantic shell tokens for sidebar, account menu, and content contrast in light and dark themes.
-- The local UI layer now combines base primitives plus small reusable composition components for shared section headers, stat tiles, icon callouts, and themed surfaces.
-- Persistence supports two modes:
-  - `Prisma + Neon/Postgres` when `DATABASE_URL` is configured
-  - in-memory fallback for local development when `DATABASE_URL` is missing
-- Authentication uses `Auth.js` credentials plus Prisma-backed users when `DATABASE_URL` is configured
-- Login and signup now apply Prisma-backed rate limiting by `email + ip`
-- Auth validation is shared between client and server through `zod` schemas
-- Implemented APIs:
-  - `GET /api/scoreboard`
-  - `GET /api/matches`
-  - `POST /api/matches`
-  - `POST /api/auth/register`
-- Current UI supports one-click winner registration and recent history display.
-- `/login` now renders the branded auth entry screen:
-  - desktop keeps a two-column split with image left and form right
-  - mobile hides the image and keeps only the form column
-  - login uses `email + password`
-  - signup uses `username + email + password`
-  - submit actions stay enabled while auth is available, but local validation blocks invalid requests before any auth endpoint call
-  - field errors appear after blur or submit attempt and clear as values become valid
-  - repeated auth failures now trigger a temporary progressive block
-- The API already supports optional `note`.
-- The current UI lets each team card send an optional `note` during winner registration.
-- The current UI already renders persisted notes in recent history.
-- Common local validation commands:
-  - `npm run test`
-  - `npm run lint`
-  - `npm run typecheck`
-  - `npm run build`
-- An automated test suite is now configured with `Vitest` + Testing Library.
+O projeto deixou de ser o `v1` de dois times fixos (`Frontend vs Backend`) e hoje opera em outro escopo: usuarios criam times `solo` ou `duo`, gerenciam membros, registram partidas entre times ativos e acompanham ranking, perfil e confronto direto dentro de uma shell autenticada.
+
+## Escopo Atual
+
+- App unico em `Next.js` com `App Router`
+- Autenticacao por credenciais com `Auth.js`
+- Persistencia principal em `Prisma + PostgreSQL`
+- Times criados em runtime pelos usuarios; o seed nao cria mais times
+- Tipos de time suportados:
+  - `solo`
+  - `duo`
+- Dominio atual inclui:
+  - criacao de time
+  - listagem dos times do usuario
+  - detalhe do time com membros, ultimas partidas e head-to-head por rival
+  - convite/adicao e remocao de membros
+  - arquivamento de time
+  - registro de partidas entre times ativos
+  - ranking geral com filtros por tipo e periodo
+  - perfil do usuario com estatisticas agregadas
+- A area autenticada principal hoje fica em `/dashboard`, `/times`, `/ranking`, `/head-to-head`, `/profile` e `/settings`
 
 ## Stack
-- Next.js App Router
-- Tailwind CSS
-- local shadcn/ui-style components
-- Vercel for hosting
-- Neon Postgres for persistence
-- Prisma ORM for database access
-- Zod for shared auth validation
-- In-memory fallback when `DATABASE_URL` is not configured
-- Vitest + Testing Library for unit and integration tests
 
-## Local Development
-1. Copy `.env.example` to `.env.local`.
-2. Add `DATABASE_URL` when you are ready to connect Neon.
-3. Run `npm run dev`.
-4. Run `npm run test` to verify the local test suite.
-5. Open `http://localhost:3000`.
+- `Next.js 16`
+- `React 19`
+- `TypeScript`
+- `Tailwind CSS 4`
+- componentes locais no estilo `shadcn/ui`
+- `Prisma`
+- `PostgreSQL`
+- `Auth.js` (`next-auth`)
+- `Zod`
+- `Vitest` + Testing Library
+- `Playwright`
 
-Current route flow:
-- `/` redirects by session state
-- `/login` is the auth entry screen
-- `/dashboard` is the authenticated home for the shared app shell
-- `/times`, `/ranking`, `/profile`, and `/settings` currently live inside the authenticated shell as safe placeholders
-- `/scoreboard` remains as a legacy redirect to `/dashboard`
-- invalid routes render a branded `404` screen
-- route rendering failures use a branded retry/recovery screen
+## Rotas Principais
 
-If `DATABASE_URL` is missing, auth stays disabled and login/signup remain unavailable. In the current codebase, the authenticated dashboard and protected scoreboard APIs also remain unavailable without a real session, even though the domain layer still keeps an in-memory fallback for local development.
+- `/`
+  - redireciona para `/dashboard` ou `/login` conforme a sessao
+- `/login`
+  - login e cadastro
+- `/dashboard`
+  - visao principal autenticada com placar e historico recente
+- `/times`
+  - listagem e criacao de times
+- `/times/[id]`
+  - detalhe do time, membros, estatisticas e confrontos diretos
+- `/ranking`
+  - ranking geral com filtros por tipo de time e periodo
+- `/head-to-head`
+  - comparacao entre dois times acessiveis ao usuario
+- `/profile`
+  - perfil do usuario e estatisticas derivadas do historico
+- `/settings`
+  - placeholder para configuracoes futuras
+- `/scoreboard`
+  - redirect legado para `/dashboard`
 
-When `DATABASE_URL` is configured, apply the Prisma migration before first use:
+## APIs Atuais
+
+Todas as rotas abaixo dependem de `DATABASE_URL`.
+Exceto `POST /api/auth/register`, elas tambem exigem sessao valida.
+
+- `GET /api/scoreboard`
+  - retorna o placar agregado dos times do usuario autenticado
+- `GET /api/matches`
+  - lista partidas ligadas aos times do usuario
+- `POST /api/matches`
+  - cria uma partida com `{ teamAId, teamBId, winnerTeamId, note? }`
+- `GET /api/teams`
+  - lista os times do usuario; aceita `?includeArchived=true`
+- `POST /api/teams`
+  - cria um time `solo` ou `duo`
+- `GET /api/teams/[id]`
+  - retorna detalhes de um time acessivel ao usuario
+- `PATCH /api/teams/[id]/archive`
+  - arquiva um time
+- `POST /api/teams/[id]/members`
+  - adiciona membro ao time
+- `DELETE /api/teams/[id]/members/[userId]`
+  - remove membro do time
+- `GET /api/users?username=...`
+  - resolve usuario por `username` para fluxos de time
+- `GET /api/profile`
+  - retorna o perfil do usuario autenticado
+- `PUT /api/profile`
+  - atualiza `displayName`, `email`, `avatarUrl` e `bio`
+- `POST /api/auth/register`
+  - cria usuario para login por credenciais
+
+## Regras Importantes
+
+- Login usa `username + password`
+- `email` nao e obrigatorio no cadastro inicial
+- Times sao criados pelos usuarios em runtime; nao existe seed de times fixos
+- Partidas so podem ser registradas entre times ativos
+- O usuario precisa pertencer a pelo menos um dos times da partida para registra-la
+- O fallback em memoria continua existindo para desenvolvimento isolado e testes, mas nao reabre a area autenticada nem substitui o fluxo real com banco
+
+## Desenvolvimento Local
+
+1. Copie `.env.example` para `.env.local`.
+2. Para subir o app com o fluxo real, configure:
+
+```bash
+DATABASE_URL=postgresql://...
+NEXTAUTH_SECRET=algum-segredo-local
+NEXT_PUBLIC_APP_ENV=development
+```
+
+3. Aplique as migrations e rode o seed:
 
 ```bash
 npm run prisma:deploy
 npm run prisma:seed
 ```
 
-Also set `NEXTAUTH_SECRET` in every environment before enabling real auth.
-If `DATABASE_URL` exists without `NEXTAUTH_SECRET`, the app now treats auth as invalid configuration instead of falling back to an implicit secret.
-Production should run only behind HTTPS so Auth.js can issue secure session cookies.
-When auth is enabled, repeated failures on login/signup are tracked by normalized `email + ip`, blocking after `5` failures in `10` minutes with progressive cooldowns `15 -> 30 -> 60` minutes.
+4. Suba a aplicacao:
 
-## API
-- `GET /api/scoreboard`
-- `GET /api/matches`
-- `POST /api/matches`
-- `POST /api/auth/register`
-
-Example body:
-
-```json
-{
-  "winnerTeamId": "frontend",
-  "note": "optional"
-}
+```bash
+npm run dev
 ```
 
-## Testing
+5. Abra `http://localhost:3000`.
+
+Se `DATABASE_URL` estiver vazio, o app ainda sobe para desenvolvimento de UI e execucao de parte dos testes, mas login, shell autenticada e APIs protegidas ficam indisponiveis.
+
+## Variaveis De Ambiente
+
+- `DATABASE_URL`
+  - conexao com PostgreSQL; obrigatoria para auth e dominio de times
+- `NEXTAUTH_SECRET`
+  - segredo usado pelo `Auth.js`; obrigatorio sempre que `DATABASE_URL` estiver definido
+- `NEXTAUTH_URL`
+  - opcional em desenvolvimento; recomendado quando necessario para callbacks/sessoes
+- `NEXT_PUBLIC_APP_ENV`
+  - label exibida na UI (`development`, `preview`, `production`)
+
+## Comandos Uteis
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run typecheck
+npm run test
+npm run test:watch
+npm run test:coverage
+npm run e2e
+npm run e2e:ui
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:deploy
+npm run prisma:seed
+```
+
+## Testes
+
+Cobertura atual:
+
+- regras de dominio em `src/lib/*.test.ts`
+- contratos de API em `src/app/api/**/*.test.ts`
+- componentes e fluxos principais em `src/components/**/*.test.tsx`
+- cenarios E2E com `Playwright`
+
+Comandos mais usados:
+
 - `npm run test`
-- `npm run test:watch`
-- `npm run test:coverage`
-- `npm run e2e`
-- `npm run e2e:ui`
+- `npm run lint`
 - `npm run typecheck`
+- `npm run build`
+- `npm run e2e`
 
-Current coverage focus:
-- domain logic in memory mode
-- API route contracts
-- dashboard behavior with mocked `fetch`
-- login and signup behavior with mocked auth calls
-- reusable composition components in `src/components/ui/*`
-- theme provider, toggle, and bootstrap behavior
-- authenticated shell navigation and account menu behavior
-- shared auth validation schemas and field error mapping
-- browser E2E for the authenticated login and scoreboard flow with `Playwright`
+## Banco E Seed
 
-Not covered yet:
-- Prisma-backed integration tests
+- Schema: `prisma/schema.prisma`
+- Migrations: `prisma/migrations/*`
+- Seed: `prisma/seed.mjs`
 
-## CI/CD And Repository Protection
-- GitHub Actions validates pull requests with `CI`, `Dependency Review`, and `CodeQL`.
-- GitHub Actions also runs an `E2E` workflow with a temporary Postgres service for browser coverage.
-- Production deploy now happens only from Git tags `v*` through the `Deploy Production Tag` workflow.
-- Before the production build, `Deploy Production Tag` runs `npm run prisma:deploy` against `DATABASE_URL`.
-- Dependabot is configured for weekly updates to `npm` dependencies and GitHub Actions.
-- Vercel automatic Git deployments are disabled in `vercel.json`.
-- Vercel remains the hosting platform, but production publication is controlled by GitHub Actions plus Vercel CLI.
-- The protected integration branch is `master`.
-- Recommended repository settings are to require PRs for `master`, require the `CI`, `Dependency Review`, and `CodeQL` checks, enable secret scanning and push protection, and keep Vercel Deployment Checks aligned with the required GitHub checks.
+O seed atual apenas garante que o ambiente esteja pronto; os times passam a existir somente quando usuarios os criam pela aplicacao.
 
-Operational details and follow-up recommendations live in `techspec/github-operations.md`.
-Git workflow, branch naming, commits, and release conventions live in `techspec/git-conventions.md`.
+## Documentacao
 
-For `Playwright` E2E, the repository does not require a dedicated Neon database.
-The GitHub Actions workflow provisions a temporary Postgres instance just for the E2E job.
-
-## Database
-The Prisma schema lives in `prisma/schema.prisma`.
-The initial migration lives in `prisma/migrations/0001_init/migration.sql`.
-The Prisma client is generated with `binaryTargets = ["native", "rhel-openssl-3.0.x"]` so local development keeps working while production builds still include the query engine required by the current Vercel runtime.
-
-## Documentation Notes
-- `AGENTS.md` is the fast-start guide for AI agents.
-- `techspec/techspec.md` is the central index for technical documentation.
-- `techspec/architecture.md`, `techspec/scoreboard.md`, `techspec/auth.md`, `techspec/runtime-environments.md`, `techspec/api-contracts.md`, `techspec/testing-strategy.md`, `techspec/persistence-and-migrations.md`, `techspec/theme-system.md`, `techspec/sidebar-layout.md`, and `techspec/roadmap.md` split the living technical docs by domain.
+- `PRD.md`
+  - registra a intencao original do `v1`, ainda centrada em times fixos; use como contexto historico, nao como retrato fiel do produto atual
+- `techspec/techspec.md`
+  - indice da documentacao tecnica viva
+- `techspec/testing-strategy.md`
+  - estrategia minima de validacao por tipo de mudanca
+- `techspec/github-operations.md`
+  - CI, checks obrigatorios e fluxo operacional
+- `techspec/git-conventions.md`
+  - convencoes de branch, commit e release
+- `CLAUDE.md`
+  - onboarding rapido para agentes/assistentes trabalhando no repositorio
