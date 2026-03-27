@@ -8,7 +8,7 @@
 ### Times
 
 - [x] **TEAM-01**: Usuário pode criar time do tipo solo (1 jogador, `type: solo`) com nome único
-- [ ] **TEAM-02**: Usuário pode ver página de detalhes do time (membros, stats e histórico de partidas)
+- [x] **TEAM-02**: Usuário pode ver página de detalhes do time (membros, stats e histórico de partidas)
 
 ### Dashboard
 
@@ -17,10 +17,10 @@
 
 ### Ranking
 
-- [ ] **RANK-01**: Página de ranking exibe todos os times ordenados por vitórias
-- [ ] **RANK-02**: Ranking mostra W/L e win rate % por time
-- [ ] **RANK-03**: Ranking mostra streak atual (sequência de vitórias/derrotas) por time
-- [ ] **RANK-04**: Ranking mostra total de partidas por time
+- [x] **RANK-01**: Página de ranking exibe todos os times ordenados por vitórias
+- [x] **RANK-02**: Ranking mostra W/L e win rate % por time
+- [x] **RANK-03**: Ranking mostra streak atual (sequência de vitórias/derrotas) por time
+- [x] **RANK-04**: Ranking mostra total de partidas por time
 - [x] **RANK-05**: Ranking suporta filtros por período (semana / mês / geral)
 
 ### Perfil
@@ -61,13 +61,13 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | TEAM-01 | Phase 6 | Complete |
-| TEAM-02 | Phase 7 | Pending |
+| TEAM-02 | Phase 7 | Complete |
 | DASH-01 | Phase 2 | Complete |
 | DASH-02 | Phase 2 | Complete |
-| RANK-01 | Phase 8 | Pending |
-| RANK-02 | Phase 8 | Pending |
-| RANK-03 | Phase 8 | Pending |
-| RANK-04 | Phase 8 | Pending |
+| RANK-01 | Phase 8 | Complete |
+| RANK-02 | Phase 8 | Complete |
+| RANK-03 | Phase 8 | Complete |
+| RANK-04 | Phase 8 | Complete |
 | RANK-05 | Phase 5 | Complete |
 | PROF-01 | Phase 5 | Complete |
 | PROF-02 | Phase 5 | Complete |

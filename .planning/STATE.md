@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07 shipped — PR #77"
-last_updated: "2026-03-27T02:27:52.848Z"
+status: "Phase 08 shipped — PR #78"
+last_updated: "2026-03-27T03:30:44.849Z"
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 15
-  completed_plans: 17
+  completed_phases: 7
+  total_plans: 17
+  completed_plans: 19
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Phase 07 shipped — PR #77
+**Status:** Phase 08 shipped — PR #78
 **Last updated:** 2026-03-26 — Phase 07 shipped (PR #77)
 
 ---
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 07 — team-details-access-member-actions
+**Current Focus:** Phase 08 — ranking-team-verification-recovery (Complete — traceability recovery closed Phase 4 audit blocker)
 
 **Scope Boundaries:**
 
@@ -223,6 +223,8 @@ Plan: Not started
 *Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
 *Last session: 2026-03-26 — Completed 05-05-PLAN.md (head-to-head route: resolveHeadToHeadData assembler D-15..D-17, /head-to-head page, HeadToHeadView URL-synced selectors, 11 tests)*
 *Last session: 2026-03-26 — Completed 05-04-PLAN.md (ranking period tabs: PeriodTabs component, TypeTabs cross-filter preservation, period-aware empty state, 7 new tests, RANK-05 complete)*
+*Last session: 2026-03-27 — Completed 08-01-PLAN.md (Phase 4 verification recovery: 04-VERIFICATION.md recreated with RANK-01..04 requirement-level evidence and TEAM-02 traceability note; 04-CODEX-CHECKS.md updated with Phase 8 recovery reruns; 20/20 tests pass, typecheck pass)*
+*Last session: 2026-03-27 — Completed 08-02-PLAN.md (traceability repair: ROADMAP.md traceability table corrected, milestone audit refreshed to passed, Phase 8 traceability recovery closes Phase 4 audit blocker; RANK-01..04 no longer orphaned; TEAM-02 canonical evidence confirmed at Phase 7)*
 *Last session: 2026-03-27 — Completed 06-01-PLAN.md (team creation flow wiring: TeamCreateForm solo component, /times?tab=create wired, 5 tests, TEAM-01 runtime gap closed)*
 *Last session: 2026-03-27 — Completed 06-02-PLAN.md (team-creation-flow-wiring E2E spec: create solo team flow Playwright test passes against real runtime, 2 tasks, 1 file, TEAM-01 gate closed)*
 *Last session: 2026-03-26 — Completed 07-01-PLAN.md (team-detail membership gate: TeamDetailResult discriminated union, isTeamMember gate before heavy queries, TeamDetailAccessDenied component, 11 tests, TEAM-02 access hardening)*
