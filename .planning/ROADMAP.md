@@ -161,7 +161,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Wire `/times?tab=create` solo form to `POST /api/teams` with client validation, status-aware feedback, and list refresh
+- [x] 06-01-PLAN.md — Wire `/times?tab=create` solo form to `POST /api/teams` with client validation, status-aware feedback, and list refresh
 - [ ] 06-02-PLAN.md — Add authenticated E2E coverage for create-solo flow and run phase gate verification commands
 
 **UI hint:** yes
