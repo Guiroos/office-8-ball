@@ -46,6 +46,8 @@ describe("GET /api/users", () => {
     const body = await response.json();
     expect(body.user.id).toBe("user-xyz");
     expect(body.user.username).toBe("jean.dev");
+    expect(body.user.displayName).toBe("Jean");
+    expect(body.user.avatarUrl).toBeNull();
   });
 
   it("returns 404 when username is not found", async () => {

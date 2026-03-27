@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 06 shipped — PR #76"
-last_updated: "2026-03-27T00:37:59.128Z"
+status: "Phase 07 shipped — PR #77"
+last_updated: "2026-03-27T02:27:52.848Z"
 progress:
   total_phases: 8
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 15
+  completed_phases: 6
+  total_plans: 15
+  completed_plans: 17
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Phase 06 shipped — PR #76
-**Last updated:** 2026-03-26 — 05-05 complete
+**Status:** Phase 07 shipped — PR #77
+**Last updated:** 2026-03-26 — Phase 07 shipped (PR #77)
 
 ---
 
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 06 — team-creation-flow-wiring
+**Current Focus:** Phase 07 — team-details-access-member-actions
 
 **Scope Boundaries:**
 
@@ -35,7 +35,7 @@ progress:
 
 ## Current Position
 
-Phase: 07
+Phase: 08
 Plan: Not started
 
 ## Roadmap Summary
@@ -165,6 +165,22 @@ Plan: Not started
     - Rationale: Keeps domain logic testable without DB; consistent with stats.ts and profile-stats.ts patterns
     - Implication: Page handles listUserTeams + listMatches, then passes arrays to resolveHeadToHeadData
 
+22. **getTeamDetailData returns TeamDetailResult discriminated union (not-found | forbidden | detail)** (Plan 07-01)
+    - Rationale: null was overloaded for both "team missing" and "non-member"; discriminated union makes all three outcomes explicit and type-safe
+    - Implication: Page must branch on .kind; forbidden case renders TeamDetailAccessDenied instead of calling notFound()
+
+23. **isTeamMember gate runs before heavy queries in getTeamDetailData** (Plan 07-01)
+    - Rationale: Mirrors existing API route pattern; prevents data leakage to non-members; avoids unnecessary DB work
+    - Implication: ranking, matches, users queries only execute when viewer is a confirmed member
+
+24. **Button "destructive" variant absent in design system — ghost + semantic tokens used for Confirmar button** (Plan 07-02)
+    - Rationale: Adding new variant to button requires design review; semantic tokens (border-destructive text-destructive) achieve the same visual intent within existing token system
+    - Implication: MemberList Confirmar button uses ghost variant with className override; no Button component changes needed
+
+25. **viewerId flows page → TeamDetailView → MemberList — keeps client components sessionless** (Plan 07-02)
+    - Rationale: page.tsx is server component and single auth authority; client components receive only what they need
+    - Implication: InviteMemberDialog and MemberList have no session dependency; testable in isolation with mock props
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -209,3 +225,5 @@ Plan: Not started
 *Last session: 2026-03-26 — Completed 05-04-PLAN.md (ranking period tabs: PeriodTabs component, TypeTabs cross-filter preservation, period-aware empty state, 7 new tests, RANK-05 complete)*
 *Last session: 2026-03-27 — Completed 06-01-PLAN.md (team creation flow wiring: TeamCreateForm solo component, /times?tab=create wired, 5 tests, TEAM-01 runtime gap closed)*
 *Last session: 2026-03-27 — Completed 06-02-PLAN.md (team-creation-flow-wiring E2E spec: create solo team flow Playwright test passes against real runtime, 2 tasks, 1 file, TEAM-01 gate closed)*
+*Last session: 2026-03-26 — Completed 07-01-PLAN.md (team-detail membership gate: TeamDetailResult discriminated union, isTeamMember gate before heavy queries, TeamDetailAccessDenied component, 11 tests, TEAM-02 access hardening)*
+*Last session: 2026-03-26 — Completed 07-02-PLAN.md (team member actions: InviteMemberDialog username lookup + POST, MemberList inline Confirmar/Cancelar + DELETE, 19 new component+route tests, E2E spec, TEAM-02 fully validated)*

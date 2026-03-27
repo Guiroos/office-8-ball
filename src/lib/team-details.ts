@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { listAllTeamsWithStats } from "@/lib/ranking";
 import { computeHeadToHead, computeTeamStats } from "@/lib/stats";
-import { listUserTeams } from "@/lib/teams";
+import { isTeamMember, listUserTeams } from "@/lib/teams";
 import type { MatchRecord, TeamRecord } from "@/lib/types";
 import type { TeamStats } from "@/lib/stats";
 
@@ -32,6 +32,11 @@ export type TeamDetailData = {
   h2hByRival: Record<string, TeamH2HSummary>;
   primaryRivalId: string | null;
 };
+
+export type TeamDetailResult =
+  | { kind: "not-found" }
+  | { kind: "forbidden"; teamId: string }
+  | { kind: "detail"; data: TeamDetailData };
 
 function normalizeTeam(team: {
   id: string;
@@ -81,14 +86,20 @@ function normalizeMatch(match: {
 export async function getTeamDetailData(
   teamId: string,
   viewerId: string,
-): Promise<TeamDetailData | null> {
+): Promise<TeamDetailResult> {
   const teamRow = await prisma.team.findUnique({
     where: { id: teamId },
     include: { members: true },
   });
 
   if (!teamRow || teamRow.status !== "active") {
-    return null;
+    return { kind: "not-found" };
+  }
+
+  // Membership gate: runs before any heavy queries — prevents data leakage to non-members
+  const isMember = await isTeamMember(teamId, viewerId);
+  if (!isMember) {
+    return { kind: "forbidden", teamId };
   }
 
   const team = normalizeTeam(teamRow);
@@ -185,13 +196,16 @@ export async function getTeamDetailData(
   }
 
   return {
-    team,
-    rankingPosition,
-    stats,
-    recentMatches,
-    members,
-    rivals,
-    h2hByRival,
-    primaryRivalId,
+    kind: "detail",
+    data: {
+      team,
+      rankingPosition,
+      stats,
+      recentMatches,
+      members,
+      rivals,
+      h2hByRival,
+      primaryRivalId,
+    },
   };
 }

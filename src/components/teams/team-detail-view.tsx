@@ -1,13 +1,13 @@
 import { H2HSection } from "@/components/teams/h2h-section";
+import { InviteMemberDialog } from "@/components/teams/invite-member-dialog";
 import { MemberList } from "@/components/teams/member-list";
 import { RecentMatchesList } from "@/components/teams/recent-matches-list";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
 import type { TeamDetailData } from "@/lib/team-details";
 
-export function TeamDetailView(data: TeamDetailData) {
+export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
   const teamNameById = Object.fromEntries([
     [data.team.id, data.team.name],
     ...data.rivals.map((rival) => [rival.id, rival.name]),
@@ -21,7 +21,7 @@ export function TeamDetailView(data: TeamDetailData) {
             <CardTitle className="title">{data.team.name}</CardTitle>
             <p className="text-sm text-muted-foreground">{data.team.type === "solo" ? "Solo" : "Duplas"}</p>
           </div>
-          <Button type="button">Convidar Membro</Button>
+          <InviteMemberDialog teamId={data.team.id} />
         </CardHeader>
       </Card>
 
@@ -42,7 +42,13 @@ export function TeamDetailView(data: TeamDetailData) {
         <Card className="border-border bg-surface">
           <CardContent className="space-y-4 p-6">
             <SectionHeader eyebrow="Time" title="Membros" />
-            <MemberList members={data.members} />
+            <MemberList
+                members={data.members}
+                teamId={data.team.id}
+                teamType={data.team.type}
+                createdBy={data.team.createdBy}
+                viewerId={data.viewerId}
+              />
           </CardContent>
         </Card>
 
