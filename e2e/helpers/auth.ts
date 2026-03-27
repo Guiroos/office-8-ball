@@ -42,3 +42,10 @@ export async function logout(page: Page, username: string) {
   await page.getByTestId("dashboard-sign-out").click();
   await expect(page).toHaveURL(/\/login$/);
 }
+
+export async function createTeam(page: Page, teamName: string) {
+  await page.goto("/times?tab=create");
+  await page.getByTestId("team-create-name").fill(teamName);
+  await page.getByTestId("team-create-submit").click();
+  await expect(page).toHaveURL(/\/times\?tab=teams/);
+}

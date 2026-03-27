@@ -70,7 +70,7 @@ test.describe("team member actions", () => {
     await page.goto(teamUrl);
 
     // Should see the access denied screen
-    await expect(page.getByText("Voce nao faz parte deste time.")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Voce nao faz parte deste time." })).toBeVisible();
     await expect(page.getByRole("link", { name: "Voltar para meus times" })).toBeVisible();
   });
 });
