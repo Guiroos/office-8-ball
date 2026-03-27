@@ -39,7 +39,7 @@ export async function isTeamMember(
 export async function createTeam(input: {
   name: string;
   createdBy: string;
-  type: 'solo' | 'duo';
+  type: "solo" | "duo";
   secondMemberUserId?: string;
 }): Promise<TeamRecord> {
   const team = await prisma.team.create({
@@ -48,12 +48,12 @@ export async function createTeam(input: {
       type: input.type,
       createdBy: input.createdBy,
       members: {
-        create: input.type === 'solo'
-          ? [{ userId: input.createdBy }]
-          : [
-              { userId: input.createdBy },
-              { userId: input.secondMemberUserId! },
-            ],
+        create: [
+          { userId: input.createdBy },
+          ...(input.type === "duo" && input.secondMemberUserId
+            ? [{ userId: input.secondMemberUserId }]
+            : []),
+        ],
       },
     },
     include: { members: true },
