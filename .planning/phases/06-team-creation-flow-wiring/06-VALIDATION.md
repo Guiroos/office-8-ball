@@ -40,7 +40,7 @@ created: 2026-03-26
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
 | 06-01-01 | 01 | 1 | TEAM-01 | component | `npm run test -- src/components/teams/team-create-form.test.tsx` | ❌ W0 | ⬜ pending |
 | 06-01-02 | 01 | 1 | TEAM-01 | route | `npm run test -- src/app/api/teams/route.test.ts` | ✅ | ⬜ pending |
-| 06-02-01 | 02 | 2 | TEAM-01 | e2e | `npm run e2e -- tests/teams/create-team.spec.ts` | ❌ W0 | ⬜ pending |
+| 06-02-01 | 02 | 2 | TEAM-01 | e2e | `npm run e2e -- e2e/team-create-flow.spec.ts` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,7 +49,7 @@ created: 2026-03-26
 ## Wave 0 Requirements
 
 - [ ] `src/components/teams/team-create-form.test.tsx` — create-tab submit and error/success handling
-- [ ] `tests/teams/create-team.spec.ts` — authenticated create-solo flow E2E
+- [ ] `e2e/team-create-flow.spec.ts` — authenticated create-solo flow E2E
 
 ---
 
