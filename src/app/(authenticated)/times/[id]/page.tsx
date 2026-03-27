@@ -42,5 +42,5 @@ export default async function TeamDetailPage({
     return <TeamDetailAccessDenied />;
   }
 
-  return <TeamDetailView {...detail.data} />;
+  return <TeamDetailView viewerId={user.id} {...detail.data} />;
 }
