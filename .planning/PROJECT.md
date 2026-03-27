@@ -38,6 +38,8 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 - ✓ Ranking com filtros de período (all/month/week) com tabs e preservação de query params — Validated in Phase 05: user-profiles-advanced-features
 - ✓ Página de perfil exibe stats agregadas reais (wins, losses, win rate, total) por time — Validated in Phase 05: user-profiles-advanced-features
 - ✓ Head-to-head: rota dedicada `/head-to-head` com URL compartilhável e fallback robusto — Validated in Phase 05: user-profiles-advanced-features
+- ✓ Acesso ao detalhe do time restrito a membros; não-membros veem tela de acesso negado — Validated in Phase 07: team-details-access-member-actions
+- ✓ Convite e remoção de membros conectados às rotas reais com feedback visual — Validated in Phase 07: team-details-access-member-actions
 - [ ] Página de times exibe os times do usuário com suas stats
 - [ ] Registro de partida conectado aos times dinâmicos (não mais hardcoded)
 - [ ] Melhorias visuais: aparência descontraída e profissional, margem sobre o tema atual
@@ -59,6 +61,7 @@ O ranking de times sempre atualizado — qualquer colega abre o app e vê imedia
 - **Scoreboard API ativa:** `/api/scoreboard` retorna W/L agregado para todos os times do usuário via `getScoreboard()` (sem limite de query)
 - **Schema do banco:** Modelos `User`, `Team`, `TeamMember`, `Match`, `AuthRateLimit` — teams tem `type` field disponível para distinguir `solo` vs `duo`
 - **Tema visual:** Sistema de cores e tema já criado com Tailwind + shadcn/ui; tem margem para refinamento no look & feel
+- **Acesso ao time:** Detalhe do time agora gated por `isTeamMember`; retorna union `not-found | forbidden | detail` antes de qualquer query pesada
 - **Escala:** Uso interno de escritório — performance não é preocupação crítica; confiabilidade e clareza visual são prioridade
 
 ## Constraints
