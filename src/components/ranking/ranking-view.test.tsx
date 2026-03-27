@@ -41,6 +41,7 @@ const teams: RankedTeam[] = [
     currentStreak: { type: "win", count: 2 },
     longestStreak: { type: "win", count: 2 },
     totalMatches: 4,
+    lastFiveResults: ["win", "win", "loss", "win"],
     rank: 1,
   },
   {
@@ -60,6 +61,7 @@ const teams: RankedTeam[] = [
     currentStreak: { type: "win", count: 1 },
     longestStreak: { type: "win", count: 2 },
     totalMatches: 6,
+    lastFiveResults: ["win", "loss", "loss", "win", "win"],
     rank: 2,
   },
   {
@@ -79,6 +81,7 @@ const teams: RankedTeam[] = [
     currentStreak: { type: "loss", count: 1 },
     longestStreak: { type: "win", count: 2 },
     totalMatches: 3,
+    lastFiveResults: ["loss", "win", "win"],
     rank: 3,
   },
   {
@@ -98,6 +101,7 @@ const teams: RankedTeam[] = [
     currentStreak: { type: "loss", count: 2 },
     longestStreak: { type: "win", count: 1 },
     totalMatches: 4,
+    lastFiveResults: ["loss", "loss", "win", "loss"],
     rank: 4,
   },
 ];
@@ -165,6 +169,20 @@ describe("RankingView", () => {
     const links = screen.getAllByRole("link");
     expect(links.some((link) => link.getAttribute("href") === "/times/team-1")).toBe(true);
     expect(links.some((link) => link.getAttribute("href") === "/times/team-4")).toBe(true);
+  });
+
+  it("renders the last 5 matches as visual indicators in standings rows", () => {
+    render(<RankingView teams={teams} activeType="all" mode="available" />);
+
+    const history = screen.getAllByLabelText("Últimas 5 partidas de Time Quatro");
+    expect(history).toHaveLength(2);
+
+    const desktopHistory = history[0]!;
+    expect(within(desktopHistory).getByLabelText("Partida 1: derrota")).toBeInTheDocument();
+    expect(within(desktopHistory).getByLabelText("Partida 2: derrota")).toBeInTheDocument();
+    expect(within(desktopHistory).getByLabelText("Partida 3: vitória")).toBeInTheDocument();
+    expect(within(desktopHistory).getByLabelText("Partida 4: derrota")).toBeInTheDocument();
+    expect(within(desktopHistory).getByLabelText("Partida 5: sem histórico")).toBeInTheDocument();
   });
 
   it("empty state in mode=available keeps both type and period tabs visible", () => {

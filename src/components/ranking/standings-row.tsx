@@ -4,16 +4,34 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { RankedTeam } from "@/lib/ranking";
 
+function RecentResultsDots({ results, teamName }: { results: RankedTeam["lastFiveResults"]; teamName: string }) {
+  const slots = [...results, ...Array.from({ length: Math.max(0, 5 - results.length) }, () => "none" as const)];
+
+  return (
+    <div className="flex items-center justify-center gap-1.5" aria-label={`Últimas 5 partidas de ${teamName}`}>
+      {slots.map((result, index) => (
+        <span
+          key={`${teamName}-${index}`}
+          aria-label={
+            result === "win"
+              ? `Partida ${index + 1}: vitória`
+              : result === "loss"
+                ? `Partida ${index + 1}: derrota`
+                : `Partida ${index + 1}: sem histórico`
+          }
+          className={cn(
+            "block h-2.5 w-2.5 rounded-full border",
+            result === "win" && "border-primary/70 bg-primary",
+            result === "loss" && "border-danger/70 bg-danger",
+            result === "none" && "border-border bg-surface-muted",
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function StandingsRow({ team }: { team: RankedTeam }) {
-  const isWinStreak = team.currentStreak.type === "win";
-  const isLossStreak = team.currentStreak.type === "loss";
-
-  const streak = isWinStreak
-    ? `${team.currentStreak.count}V`
-    : isLossStreak
-      ? `${team.currentStreak.count}D`
-      : "-";
-
   return (
     <Link
       href={`/times/${team.id}`}
@@ -39,16 +57,10 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
           <p className="text-sm font-medium">{team.winRate.toFixed(1)}%</p>
         </div>
         <div className="text-center">
-          <p className="caption text-muted-foreground">Sequência</p>
-          <p
-            className={cn(
-              "text-sm font-medium",
-              isWinStreak && "text-primary",
-              isLossStreak && "text-danger",
-            )}
-          >
-            {streak} · {team.totalMatches}j
-          </p>
+          <p className="caption text-muted-foreground">Últimas 5</p>
+          <div className="mt-1 flex items-center justify-center">
+            <RecentResultsDots results={team.lastFiveResults} teamName={team.name} />
+          </div>
         </div>
       </div>
 
@@ -68,16 +80,9 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
             </p>
           </div>
         </div>
-        <p
-          className={cn(
-            "shrink-0 text-xs font-medium",
-            isWinStreak && "text-primary",
-            isLossStreak && "text-danger",
-            !isWinStreak && !isLossStreak && "text-muted-foreground",
-          )}
-        >
-          {streak}
-        </p>
+        <div className="shrink-0">
+          <RecentResultsDots results={team.lastFiveResults} teamName={team.name} />
+        </div>
       </div>
     </Link>
   );
