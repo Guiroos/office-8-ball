@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-27T00:29:51.307Z"
+status: "Phase 06 shipped — PR #76"
+last_updated: "2026-03-27T00:37:59.128Z"
 progress:
   total_phases: 8
   completed_phases: 5
@@ -14,7 +14,7 @@ progress:
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to plan
+**Status:** Phase 06 shipped — PR #76
 **Last updated:** 2026-03-26 — 05-05 complete
 
 ---
