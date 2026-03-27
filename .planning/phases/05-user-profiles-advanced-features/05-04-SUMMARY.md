@@ -72,7 +72,7 @@ Each task was committed atomically:
 1. **Task 1: Implementar tabs de período e preservação de query params cruzados** - `6928f03` (feat)
 2. **Task 2: Atualizar testes comportamentais do ranking para period + type** - `d7024d8` (test)
 
-**Plan metadata:** TBD (docs commit)
+**Plan metadata:** `146e6da` (docs: complete plan)
 
 ## Files Created/Modified
 - `src/components/ranking/period-tabs.tsx` - New PeriodTabs component, all/month/week tabs, preserves activeType in hrefs
