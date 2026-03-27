@@ -43,6 +43,18 @@ describe("listAllTeamsWithStats", () => {
     expect(mockTeamFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { status: "active", type: "solo" },
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  displayName: true,
+                },
+              },
+            },
+          },
+        },
       }),
     );
   });
@@ -58,7 +70,18 @@ describe("listAllTeamsWithStats", () => {
         createdBy: "u1",
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
         updatedAt: new Date("2026-01-01T00:00:00.000Z"),
-        members: [],
+        members: [
+          {
+            userId: "u1",
+            joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+            user: { username: "alpha.one", displayName: "Alpha One" },
+          },
+          {
+            userId: "u2",
+            joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+            user: { username: "alpha.two", displayName: null },
+          },
+        ],
       },
       {
         id: "team-b",
@@ -68,7 +91,13 @@ describe("listAllTeamsWithStats", () => {
         createdBy: "u1",
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
         updatedAt: new Date("2026-01-01T00:00:00.000Z"),
-        members: [],
+        members: [
+          {
+            userId: "u3",
+            joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+            user: { username: "beta.one", displayName: "Beta One" },
+          },
+        ],
       },
     ]);
     mockMatchFindMany.mockResolvedValueOnce([
@@ -86,6 +115,7 @@ describe("listAllTeamsWithStats", () => {
     const result = await listAllTeamsWithStats();
 
     expect(result.map((team) => team.id)).toEqual(["team-a", "team-b"]);
+    expect(result[0]?.memberNames).toEqual(["Alpha One", "alpha.two"]);
     expect(result[0]?.rank).toBe(1);
     expect(result[1]?.rank).toBe(2);
   });

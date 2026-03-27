@@ -33,6 +33,7 @@ const teams: RankedTeam[] = [
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     members: [],
+    memberNames: ["Ana", "Bruno"],
     teamId: "team-1",
     wins: 3,
     losses: 1,
@@ -51,6 +52,7 @@ const teams: RankedTeam[] = [
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     members: [],
+    memberNames: ["Carla"],
     teamId: "team-2",
     wins: 4,
     losses: 2,
@@ -69,6 +71,7 @@ const teams: RankedTeam[] = [
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     members: [],
+    memberNames: ["Davi", "Elisa"],
     teamId: "team-3",
     wins: 2,
     losses: 1,
@@ -87,6 +90,7 @@ const teams: RankedTeam[] = [
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     members: [],
+    memberNames: ["Fábio", "Gabi"],
     teamId: "team-4",
     wins: 1,
     losses: 3,
@@ -116,6 +120,27 @@ describe("RankingView", () => {
 
     expect(within(standings).getAllByText("Time Quatro")).toHaveLength(2);
     expect(within(standings).queryByText("Time Cinco")).not.toBeInTheDocument();
+  });
+
+  it("renders member display names as podium subtitle", () => {
+    render(<RankingView teams={teams} activeType="all" mode="available" />);
+
+    expect(screen.getByText("Ana • Bruno")).toBeInTheDocument();
+    expect(screen.getByText("Carla")).toBeInTheDocument();
+    expect(screen.getByText("Davi • Elisa")).toBeInTheDocument();
+    expect(screen.queryByText("Fábio • Gabi")).not.toBeInTheDocument();
+  });
+
+  it("renders a team type badge on podium cards", () => {
+    render(<RankingView teams={teams} activeType="all" mode="available" />);
+
+    const teamOneLink = screen.getAllByRole("link").find((link) => link.getAttribute("href") === "/times/team-1");
+    const teamTwoLink = screen.getAllByRole("link").find((link) => link.getAttribute("href") === "/times/team-2");
+
+    expect(teamOneLink).toBeDefined();
+    expect(teamTwoLink).toBeDefined();
+    expect(within(teamOneLink!).getByText("Dupla")).toBeInTheDocument();
+    expect(within(teamTwoLink!).getByText("Solo")).toBeInTheDocument();
   });
 
   it("renders available empty-state copy", () => {
