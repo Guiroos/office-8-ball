@@ -14,7 +14,7 @@
 - [x] **Phase 3: Stats Computation Module** — Pure functions for W/L aggregation, win rates, streaks, and head-to-head metrics (completed 2026-03-25)
 - [x] **Phase 4: Ranking & Team Details** — Ranking page with live standings; team detail pages with stats and roster (completed 2026-03-25)
 - [x] **Phase 5: User Profiles & Advanced Features** — User profile with aggregated stats; head-to-head history; time-based ranking filters (planned 2026-03-26) (completed 2026-03-26)
-- [ ] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26)
+- [x] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26) (completed 2026-03-27)
 - [ ] **Phase 7: Team Details Access & Member Actions** — Enforce member-only team detail access and wire invite/remove UI actions to member endpoints (planned 2026-03-26)
 - [ ] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `TEAM-02` and `RANK-01..04` (planned 2026-03-26)
 
@@ -158,11 +158,11 @@ Plans:
 3. API and client error paths are handled (including auth and validation failures) without placeholder dead-ends
 4. Flow "Create solo team" passes end-to-end in authenticated runtime
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 06-01-PLAN.md — Wire `/times?tab=create` solo form to `POST /api/teams` with client validation, status-aware feedback, and list refresh
-- [ ] 06-02-PLAN.md — Add authenticated E2E coverage for create-solo flow and run phase gate verification commands
+- [x] 06-02-PLAN.md — Add authenticated E2E coverage for create-solo flow and run phase gate verification commands
 
 **UI hint:** yes
 
@@ -216,7 +216,7 @@ Plans:
 | 3. Stats Computation Module | 1/1 | Complete   | 2026-03-25 |
 | 4. Ranking & Team Details | 3/3 | Complete   | 2026-03-25 |
 | 5. User Profiles & Advanced Features | 5/5 | Complete   | 2026-03-26 |
-| 6. Team Creation Flow Wiring | 0/0 | Planned   | - |
+| 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 0/0 | Planned   | - |
 | 8. Ranking/Team Verification Recovery | 0/0 | Planned   | - |
 
