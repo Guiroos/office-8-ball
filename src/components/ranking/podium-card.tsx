@@ -53,6 +53,8 @@ export function PodiumCard({ team }: { team: RankedTeam }) {
       : team.currentStreak.type === "loss"
         ? `${team.currentStreak.count}D`
         : "-";
+  const membersLabel = team.memberNames.join(" • ");
+  const typeLabel = team.type === "solo" ? "Solo" : "Dupla";
 
   return (
     <Link href={`/times/${team.id}`} className="block focus-visible:outline-none">
@@ -75,7 +77,15 @@ export function PodiumCard({ team }: { team: RankedTeam }) {
               {config.icon}
               {config.label}
             </Badge>
-            <p className="text-base font-bold leading-snug">{team.name}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-base font-bold leading-snug">{team.name}</p>
+              <Badge variant="outline" className="text-[11px]">
+                {typeLabel}
+              </Badge>
+            </div>
+            {membersLabel ? (
+              <p className="text-sm leading-snug text-muted-foreground">{membersLabel}</p>
+            ) : null}
           </div>
           <span
             className={cn(

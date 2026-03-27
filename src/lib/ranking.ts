@@ -4,7 +4,7 @@ import { resolvePeriodWindow } from "@/lib/time-period";
 import type { MatchRecord, RankingPeriod, TeamRecord } from "@/lib/types";
 import type { TeamStats } from "@/lib/stats";
 
-export type RankedTeam = TeamRecord & TeamStats & { rank: number };
+export type RankedTeam = TeamRecord & TeamStats & { rank: number; memberNames: string[] };
 
 function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -18,8 +18,12 @@ function normalizeTeam(team: {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
-  members: { userId: string; joinedAt: Date }[];
-}): TeamRecord {
+  members: {
+    userId: string;
+    joinedAt: Date;
+    user: { username: string; displayName: string | null };
+  }[];
+}): TeamRecord & { memberNames: string[] } {
   return {
     id: team.id,
     name: team.name,
@@ -32,6 +36,7 @@ function normalizeTeam(team: {
       userId: member.userId,
       joinedAt: member.joinedAt.toISOString(),
     })),
+    memberNames: team.members.map((member) => member.user.displayName ?? member.user.username),
   };
 }
 
@@ -63,7 +68,18 @@ export async function listAllTeamsWithStats(
 
   const teamRows = await prisma.team.findMany({
     where: { status: "active", ...(type ? { type } : {}) },
-    include: { members: true },
+    include: {
+      members: {
+        include: {
+          user: {
+            select: {
+              username: true,
+              displayName: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   const teams = teamRows.map(normalizeTeam);
