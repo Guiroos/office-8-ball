@@ -158,7 +158,11 @@ Plans:
 3. API and client error paths are handled (including auth and validation failures) without placeholder dead-ends
 4. Flow "Create solo team" passes end-to-end in authenticated runtime
 
-**Plans:** 0 plans
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Wire `/times?tab=create` solo form to `POST /api/teams` with client validation, status-aware feedback, and list refresh
+- [ ] 06-02-PLAN.md — Add authenticated E2E coverage for create-solo flow and run phase gate verification commands
 
 **UI hint:** yes
 
