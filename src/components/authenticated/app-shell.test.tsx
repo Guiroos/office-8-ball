@@ -6,6 +6,7 @@ import { AppShell } from "@/components/authenticated/app-shell";
 
 const signOutMock = vi.fn();
 const usePathnameMock = vi.fn();
+const pushMock = vi.fn();
 
 vi.mock("next/link", () => ({
   default: ({
@@ -21,8 +22,7 @@ vi.mock("next/link", () => ({
       href={href}
       {...props}
       onClick={(event) => {
-        event.preventDefault();
-        onClick?.();
+        onClick?.(event);
       }}
     >
       {children}
@@ -32,6 +32,9 @@ vi.mock("next/link", () => ({
 
 vi.mock("next/navigation", () => ({
   usePathname: () => usePathnameMock(),
+  useRouter: () => ({
+    push: pushMock,
+  }),
 }));
 
 vi.mock("next-auth/react", () => ({
@@ -123,5 +126,26 @@ describe("AppShell", () => {
     await user.click(screen.getByRole("button", { name: "Sair" }));
 
     expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/login" });
+  });
+
+  it("uses client navigation when a different sidebar route is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AppShell
+        user={{
+          id: "user-1",
+          username: "gui.dev",
+          displayName: "Gui Dev",
+          avatarUrl: null,
+        }}
+      >
+        <div>Conteudo interno</div>
+      </AppShell>,
+    );
+
+    await user.click(screen.getAllByRole("link", { name: "Times" })[0]);
+
+    expect(pushMock).toHaveBeenCalledWith("/times");
   });
 });

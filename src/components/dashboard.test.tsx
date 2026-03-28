@@ -292,6 +292,45 @@ describe("Dashboard", () => {
     expect(backendNote).toHaveValue("quase uma humilhação");
   });
 
+  it("updates the scoreboard optimistically before the mutation finishes", async () => {
+    let resolveCreateMatch = () => undefined;
+
+    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+      const url = String(input);
+
+      if (url === "/api/teams") {
+        return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/scoreboard") {
+        return jsonResponse(initialScoreboard) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && !init?.method) {
+        return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && init?.method === "POST") {
+        return new Promise((resolve) => {
+          resolveCreateMatch = () => {
+            resolve(jsonResponse(createMatchResponse, true, 201) as ReturnType<typeof fetch>);
+          };
+        }) as ReturnType<typeof fetch>;
+      }
+
+      throw new Error(`Unexpected fetch to ${url}`);
+    });
+
+    render(<Dashboard />);
+
+    await screen.findByRole("button", { name: "Vitória Frontend" });
+    await userEvent.click(screen.getByRole("button", { name: "Vitória Frontend" }));
+
+    expect(await screen.findByText("frontend lidera por 1.")).toBeInTheDocument();
+
+    resolveCreateMatch();
+  });
+
   it("limits each note field to 140 characters and keeps the counters independent", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
