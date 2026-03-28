@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   ChevronDown,
@@ -14,7 +14,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { type ComponentType, type ReactNode, useMemo, useState } from "react";
+import { type ComponentType, type MouseEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -112,11 +112,13 @@ function ShellIdentity({
   isOpen,
   onToggle,
   onClose,
+  onNavigate,
 }: {
   user: SessionUser;
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  onNavigate?: (href: string, onBeforeNavigate?: () => void) => void;
 }) {
   const primaryName = user.displayName ?? user.username;
 
@@ -154,7 +156,7 @@ function ShellIdentity({
             onClick={onClose}
           />
           <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-2.5 shadow-xl">
-            <UserMenu onClose={onClose} />
+            <UserMenu onClose={onClose} onNavigate={onNavigate ?? (() => undefined)} />
           </div>
         </>
       ) : null}
@@ -164,8 +166,10 @@ function ShellIdentity({
 
 function UserMenu({
   onClose,
+  onNavigate,
 }: {
   onClose: () => void;
+  onNavigate: (href: string, onBeforeNavigate?: () => void) => void;
 }) {
   return (
     <div
@@ -175,7 +179,10 @@ function UserMenu({
     >
       <Link
         href="/profile"
-        onClick={onClose}
+        onClick={(event) => {
+          event.preventDefault();
+          onNavigate("/profile", onClose);
+        }}
         role="menuitem"
         className="flex items-center gap-3 rounded-sm border border-transparent px-3 py-2.5 text-sm font-semibold text-sidebar-foreground transition hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar-menu"
       >
@@ -213,7 +220,7 @@ function SidebarContent({
 }: {
   pathname: string;
   user: SessionUser;
-  onNavigate?: () => void;
+  onNavigate?: (href: string, onBeforeNavigate?: () => void) => void;
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -230,6 +237,7 @@ function SidebarContent({
         isOpen={isUserMenuOpen}
         onToggle={() => setIsUserMenuOpen((current) => !current)}
         onClose={() => setIsUserMenuOpen(false)}
+        onNavigate={onNavigate}
       />
     </div>
   );
@@ -240,8 +248,22 @@ function SidebarNavigation({
   onNavigate,
 }: {
   pathname: string;
-  onNavigate?: () => void;
+  onNavigate?: (href: string, onBeforeNavigate?: () => void) => void;
 }) {
+  function handleClick(
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+    isActive: boolean,
+  ) {
+    if (isActive) {
+      onNavigate?.(href);
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate?.(href);
+  }
+
   return (
     <nav
       className="text-sidebar-foreground grid gap-2"
@@ -255,7 +277,7 @@ function SidebarNavigation({
           <Link
             key={item.href}
             href={item.href}
-            onClick={onNavigate}
+            onClick={(event) => handleClick(event, item.href, isActive)}
             className={cn(
               "flex items-center gap-4 rounded-xs border px-4 py-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
               isActive
@@ -274,19 +296,48 @@ function SidebarNavigation({
 }
 
 export function AppShell({ user, children }: AppShellProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const isRoutePending = pendingHref !== null && pendingHref !== pathname;
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
+  function handleNavigation(href: string, onBeforeNavigate?: () => void) {
+    onBeforeNavigate?.();
+
+    if (href === pathname) {
+      setPendingHref(null);
+      return;
+    }
+
+    setPendingHref(href);
+    router.push(href);
+  }
 
   return (
     <div className="min-h-dvh">
       <div className="flex min-h-dvh w-full">
         <aside className="text-sidebar-foreground hidden w-[260px] shrink-0 bg-sidebar lg:flex lg:flex-col lg:border-r lg:border-sidebar-border">
           <div className="sticky top-0 flex h-dvh flex-col px-4 py-6">
-            <SidebarContent pathname={pathname} user={user} />
+            <SidebarContent pathname={pathname} user={user} onNavigate={handleNavigation} />
           </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col bg-content-gradient">
+          <div
+            aria-hidden="true"
+            className={cn(
+              "sticky top-0 z-20 h-1 overflow-hidden transition-opacity",
+              isRoutePending ? "opacity-100" : "opacity-0",
+            )}
+          >
+            <div className="h-full w-full animate-pulse bg-gold-gradient" />
+          </div>
+
           <header className="flex items-center justify-between border-b border-border bg-surface/92 px-4 py-3 backdrop-blur lg:hidden">
             <SidebarBrand />
 
@@ -330,7 +381,11 @@ export function AppShell({ user, children }: AppShellProps) {
               <SidebarContent
                 user={user}
                 pathname={pathname}
-                onNavigate={() => setIsMobileSidebarOpen(false)}
+                onNavigate={(href, onBeforeNavigate) =>
+                  handleNavigation(href, () => {
+                    onBeforeNavigate?.();
+                    setIsMobileSidebarOpen(false);
+                  })}
               />
             </div>
           </div>

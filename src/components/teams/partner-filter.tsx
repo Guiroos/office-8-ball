@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,10 @@ export function TeamPartnerFilter({
   partners,
 }: TeamPartnerFilterProps) {
   const router = useRouter();
+  const [isPending, startNavigation] = useTransition();
+  const [optimisticPartnerId, setOptimisticPartnerId] = useState(activePartnerId);
   const hasPartners = partners.length > 0;
+  const displayedPartnerId = isPending ? optimisticPartnerId : activePartnerId;
   const options = [
     {
       label: "Todos os parceiros",
@@ -55,17 +59,27 @@ export function TeamPartnerFilter({
       </Label>
       <Select
         id="team-partner-filter"
-        value={activePartnerId}
-        disabled={!hasPartners}
+        value={displayedPartnerId}
+        disabled={!hasPartners || isPending}
         onValueChange={(nextValue) => {
           if (nextValue !== activePartnerId) {
-            router.push(buildHref(nextValue));
+            setOptimisticPartnerId(nextValue);
+            startNavigation(() => {
+              router.push(buildHref(nextValue));
+            });
           }
         }}
         className="h-10 rounded-lg px-3"
         showDescriptionInTrigger={false}
         options={options}
       />
+      <p className="text-xs text-muted-foreground">
+        {isPending
+          ? "Atualizando filtro..."
+          : hasPartners
+            ? "Troque o parceiro para refinar a lista sem perder o contexto."
+            : "Nenhuma dupla com parceiro ainda."}
+      </p>
     </div>
   );
 }

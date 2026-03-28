@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,9 @@ export function PeriodTabs({
   activeType: "all" | "solo" | "duo";
 }) {
   const router = useRouter();
+  const [isPending, startNavigation] = useTransition();
+  const [optimisticPeriod, setOptimisticPeriod] = useState(activePeriod);
+  const displayedPeriod = isPending ? optimisticPeriod : activePeriod;
 
   function buildHref(period: RankingPeriod): string {
     const params = new URLSearchParams();
@@ -37,16 +41,23 @@ export function PeriodTabs({
       </Label>
       <Select
         id="ranking-period-filter"
-        value={activePeriod}
+        value={displayedPeriod}
+        disabled={isPending}
         onValueChange={(nextValue) => {
           if (nextValue !== activePeriod) {
-            router.push(buildHref(nextValue as RankingPeriod));
+            setOptimisticPeriod(nextValue as RankingPeriod);
+            startNavigation(() => {
+              router.push(buildHref(nextValue as RankingPeriod));
+            });
           }
         }}
         className="h-10 rounded-lg px-3"
         showDescriptionInTrigger={false}
         options={TABS}
       />
+      <p className="text-xs text-muted-foreground">
+        {isPending ? "Atualizando período..." : "A janela muda na hora e o ranking confirma em seguida."}
+      </p>
     </div>
   );
 }

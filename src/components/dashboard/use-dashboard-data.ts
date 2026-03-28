@@ -23,6 +23,69 @@ type RegisterWinInput = {
   note: string;
 };
 
+function buildOptimisticDashboardState(
+  current: DashboardState,
+  winnerTeamId: string,
+  teamAId: string,
+  teamBId: string,
+  note: string,
+) {
+  if (!current.scoreboard) {
+    return null;
+  }
+
+  const loserTeamId = teamAId === winnerTeamId ? teamBId : teamAId;
+  const optimisticMatch: MatchRecord = {
+    id: `optimistic-${winnerTeamId}-${Date.now()}`,
+    teamAId,
+    teamBId,
+    winnerTeamId,
+    loserTeamId,
+    playedAt: new Date().toISOString(),
+    note: note.trim() || null,
+  };
+
+  const nextTeams = current.scoreboard.teams.map((entry) => {
+    if (entry.id === winnerTeamId) {
+      return {
+        ...entry,
+        wins: entry.wins + 1,
+      };
+    }
+
+    if (entry.id === loserTeamId) {
+      return {
+        ...entry,
+        losses: entry.losses + 1,
+      };
+    }
+
+    return entry;
+  });
+
+  const sortedByWins = [...nextTeams].sort((left, right) => right.wins - left.wins);
+  const leader = sortedByWins[0] ?? null;
+  const runnerUp = sortedByWins[1] ?? null;
+  const leadBy = leader && runnerUp ? Math.max(leader.wins - runnerUp.wins, 0) : leader?.wins ?? 0;
+  const leaderTeamId =
+    leader && runnerUp && leader.wins === runnerUp.wins
+      ? null
+      : leader?.id ?? null;
+
+  return {
+    optimisticMatch,
+    nextState: {
+      scoreboard: {
+        teams: nextTeams,
+        leaderTeamId,
+        leadBy,
+        totalMatches: current.scoreboard.totalMatches + 1,
+      },
+      matches: [optimisticMatch, ...current.matches],
+    },
+  };
+}
+
 async function fetchDashboardData() {
   const [scoreboardResponse, matchesResponse] = await Promise.all([
     fetch("/api/scoreboard", { cache: "no-store" }),
@@ -93,6 +156,12 @@ export function useDashboardData() {
 
   async function registerWin({ teamId, teamAId, teamBId, note }: RegisterWinInput) {
     setSubmittingTeamId(teamId);
+    const previousState = state;
+    const optimistic = buildOptimisticDashboardState(state, teamId, teamAId, teamBId, note);
+
+    if (optimistic) {
+      setState(optimistic.nextState);
+    }
 
     const execute = async () => {
       const response = await fetch("/api/matches", {
@@ -108,9 +177,25 @@ export function useDashboardData() {
         throw new Error(payload?.error ?? "Não foi possível salvar a partida.");
       }
 
-      await response.json() as CreateMatchResponse;
-      const dashboardData = await fetchDashboardData();
-      setState(dashboardData);
+      const createdMatch = await response.json() as CreateMatchResponse;
+
+      if (optimistic) {
+        setState((current) => ({
+          ...current,
+          matches: current.matches.map((match) =>
+            match.id === optimistic.optimisticMatch.id
+              ? createdMatch.match
+              : match),
+        }));
+      }
+
+      try {
+        const dashboardData = await fetchDashboardData();
+        setState(dashboardData);
+      } catch {
+        // Keep the optimistic-confirmed state when background revalidation fails.
+      }
+
       return "Partida registrada com sucesso.";
     };
 
@@ -129,6 +214,7 @@ export function useDashboardData() {
       await promise;
       return true;
     } catch {
+      setState(previousState);
       return false;
     } finally {
       setSubmittingTeamId(null);

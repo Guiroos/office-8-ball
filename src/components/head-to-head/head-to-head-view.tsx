@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
@@ -21,31 +22,44 @@ type Props = {
  */
 export function HeadToHeadView({ data }: Props) {
   const router = useRouter();
+  const [isPending, startNavigation] = useTransition();
   const { pair, warning, options, summary } = data;
+  const teamAId = pair.teamA?.id ?? "";
+  const teamBId = pair.teamB?.id ?? "";
+  const [optimisticTeamAId, setOptimisticTeamAId] = useState(teamAId);
+  const [optimisticTeamBId, setOptimisticTeamBId] = useState(teamBId);
+  const displayedTeamAId = isPending ? optimisticTeamAId : teamAId;
+  const displayedTeamBId = isPending ? optimisticTeamBId : teamBId;
 
   function buildUrl(teamAId: string | null, teamBId: string | null) {
     const params = new URLSearchParams();
     if (teamAId) params.set("teamA", teamAId);
     if (teamBId) params.set("teamB", teamBId);
-    return `/head-to-head?${params.toString()}`;
+    const query = params.toString();
+    return query ? `/head-to-head?${query}` : "/head-to-head";
   }
 
   function handleTeamAChange(newValue: string) {
     const newTeamAId = newValue || null;
     // D-17: prevent selecting same team on both sides
     const teamBId = pair.teamB?.id === newTeamAId ? null : pair.teamB?.id ?? null;
-    router.push(buildUrl(newTeamAId, teamBId));
+    setOptimisticTeamAId(newTeamAId ?? "");
+    setOptimisticTeamBId(teamBId ?? "");
+    startNavigation(() => {
+      router.push(buildUrl(newTeamAId, teamBId));
+    });
   }
 
   function handleTeamBChange(newValue: string) {
     const newTeamBId = newValue || null;
     // D-17: prevent selecting same team on both sides
     const teamAId = pair.teamA?.id === newTeamBId ? null : pair.teamA?.id ?? null;
-    router.push(buildUrl(teamAId, newTeamBId));
+    setOptimisticTeamAId(teamAId ?? "");
+    setOptimisticTeamBId(newTeamBId ?? "");
+    startNavigation(() => {
+      router.push(buildUrl(teamAId, newTeamBId));
+    });
   }
-
-  const teamAId = pair.teamA?.id ?? "";
-  const teamBId = pair.teamB?.id ?? "";
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -76,13 +90,14 @@ export function HeadToHeadView({ data }: Props) {
             </Label>
             <Select
               id="selector-team-a"
-              value={teamAId}
+              value={displayedTeamAId}
+              disabled={isPending}
               onValueChange={handleTeamAChange}
               placeholder="Selecione um time..."
               options={[
                 { value: "", label: "Selecione um time..." },
                 ...options
-                  .filter((team: TeamRecord) => team.id !== teamBId)
+                  .filter((team: TeamRecord) => team.id !== displayedTeamBId)
                   .map((team: TeamRecord) => ({
                     value: team.id,
                     label: team.name,
@@ -99,13 +114,14 @@ export function HeadToHeadView({ data }: Props) {
             </Label>
             <Select
               id="selector-team-b"
-              value={teamBId}
+              value={displayedTeamBId}
+              disabled={isPending}
               onValueChange={handleTeamBChange}
               placeholder="Selecione um time..."
               options={[
                 { value: "", label: "Selecione um time..." },
                 ...options
-                  .filter((team: TeamRecord) => team.id !== teamAId)
+                  .filter((team: TeamRecord) => team.id !== displayedTeamAId)
                   .map((team: TeamRecord) => ({
                     value: team.id,
                     label: team.name,
@@ -115,6 +131,10 @@ export function HeadToHeadView({ data }: Props) {
             />
           </div>
         </div>
+
+        {isPending ? (
+          <p className="text-sm text-muted-foreground">Atualizando confronto...</p>
+        ) : null}
 
         {/* H2H summary */}
         {pair.teamA && pair.teamB ? (

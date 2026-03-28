@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
+import { useState, useTransition } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -44,6 +45,7 @@ export function ProfileEditDialog({
   profile,
   onSave,
 }: ProfileEditDialogProps) {
+  const [isClosing, startCloseTransition] = useTransition();
   const [form, setForm] = useState({
     displayName: profile.displayName ?? "",
     email: profile.email ?? "",
@@ -51,7 +53,8 @@ export function ProfileEditDialog({
     bio: profile.bio ?? "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isBusy = isSubmitting || isClosing;
 
   function updateField(field: keyof typeof form, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -72,7 +75,7 @@ export function ProfileEditDialog({
       return;
     }
 
-    setLoading(true);
+    setIsSubmitting(true);
     setErrors({});
 
     const body: Record<string, string | null> = {
@@ -102,9 +105,11 @@ export function ProfileEditDialog({
       const updated = (await res.json()) as ProfileResponse;
       toast.success("Perfil atualizado.");
       onSave(updated);
-      onOpenChange(false);
+      startCloseTransition(() => {
+        onOpenChange(false);
+      });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -122,7 +127,7 @@ export function ProfileEditDialog({
               value={form.displayName}
               onChange={(e) => updateField("displayName", e.target.value)}
               placeholder="Como quer ser chamado?"
-              disabled={loading}
+              disabled={isBusy}
             />
             <FieldError>{errors.displayName}</FieldError>
           </Field>
@@ -134,7 +139,7 @@ export function ProfileEditDialog({
               value={form.email}
               onChange={(e) => updateField("email", e.target.value)}
               placeholder="gui@office8ball.dev"
-              disabled={loading}
+              disabled={isBusy}
             />
             <FieldError>{errors.email}</FieldError>
           </Field>
@@ -145,7 +150,7 @@ export function ProfileEditDialog({
               value={form.avatarUrl}
               onChange={(e) => updateField("avatarUrl", e.target.value)}
               placeholder="https://gravatar.com/avatar/..."
-              disabled={loading}
+              disabled={isBusy}
             />
             <FieldError>{errors.avatarUrl}</FieldError>
           </Field>
@@ -156,7 +161,7 @@ export function ProfileEditDialog({
               value={form.bio}
               onChange={(e) => updateField("bio", e.target.value)}
               placeholder="Conta um pouco sobre você"
-              disabled={loading}
+              disabled={isBusy}
               maxLength={200}
               rows={4}
             />
@@ -167,12 +172,17 @@ export function ProfileEditDialog({
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              disabled={loading}
+              disabled={isBusy}
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Salvando..." : "Salvar"}
+            <Button type="submit" disabled={isBusy}>
+              {isBusy ? (
+                <>
+                  <Loader2Icon className="size-4 animate-spin" />
+                  {isSubmitting ? "Salvando..." : "Fechando..."}
+                </>
+              ) : "Salvar"}
             </Button>
           </DialogFooter>
         </form>
