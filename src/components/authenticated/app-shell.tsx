@@ -14,7 +14,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { type ComponentType, type MouseEvent, type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ComponentType, type MouseEvent, type ReactNode, useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -300,11 +300,16 @@ export function AppShell({ user, children }: AppShellProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const isRoutePending = pendingHref !== null && pendingHref !== pathname;
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  useEffect(() => {
+  // Clear pendingHref whenever pathname changes (covers Back/Forward navigation too).
+  // Derived-state-during-render pattern: avoids a useEffect round-trip.
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setPendingHref(null);
-  }, [pathname]);
+  }
+
+  const isRoutePending = pendingHref !== null && pendingHref !== pathname;
 
   function handleNavigation(href: string, onBeforeNavigate?: () => void) {
     onBeforeNavigate?.();
