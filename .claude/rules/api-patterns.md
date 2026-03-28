@@ -15,4 +15,4 @@ paths:
 
 ## Input Validation
 
-- Validate request payloads before any mutation: `isValidTeamId()` for match endpoints, Zod schemas from `auth-validation.ts` for auth endpoints. Return HTTP 400 with `{ error: string }`. Never validate team IDs via database lookup -- `TEAMS` is the source of truth.
+- Validate request payloads before any mutation: Zod schemas for input shape (auth, team creation); DB lookup via `getTeamById()` for team existence; `isTeamMember()` check for membership. Return HTTP 400 on validation failure, 403 on membership failure, 404 when team not found. Never hardcode team IDs — teams are fully dynamic.

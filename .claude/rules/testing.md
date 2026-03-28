@@ -8,20 +8,9 @@ paths:
 
 ## Data Layer Tests
 
-Tests that exercise the in-memory data layer must follow this isolation pattern in `beforeEach`:
+Data layer tests (e.g. `src/lib/data.test.ts`, `src/lib/stats.test.ts`) do not rely on an in-memory fallback — there is no `memoryState` to reset. The data layer returns empty/default responses when `DATABASE_URL` is absent, so tests stub Prisma at the module level or work with pure functions that receive match arrays as arguments.
 
-```ts
-delete process.env.DATABASE_URL;
-vi.resetModules();
-```
-
-Then re-import the module under test with a dynamic import inside each test:
-
-```ts
-const { getScoreboard, listMatches } = await import("@/lib/data");
-```
-
-The in-memory `memoryState` is module-level. A static top-level import would share state across tests, producing non-deterministic results. `vi.resetModules()` resets that state between tests.
+For modules that check `hasDatabaseUrl()` internally, ensure `DATABASE_URL` is absent in the test environment (delete it in `beforeEach` if needed) so the guard path is exercised without a real database.
 
 ## Route Tests
 

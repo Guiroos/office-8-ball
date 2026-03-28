@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Office 8 Ball is a Next.js 16 scoreboard app for two fixed office teams (`frontend` and `backend`). Flow: login → `/dashboard` → register a match winner → scoreboard updates. See `.claude/rules/` for domain invariants, architecture constraints, testing patterns, and safe-change checklist.
+Office 8 Ball is a Next.js 16 office billiards tracker. Users create teams (solo or duo), record match results, and track standings via a dynamic ranking. Flow: login → `/dashboard` → register a match winner → scoreboard updates. Teams are fully user-created — no hardcoded team IDs. See `.claude/rules/` for domain invariants, architecture constraints, testing patterns, and safe-change checklist.
 
 ## Tech Stack
 
@@ -38,10 +38,14 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 
 ## Directory Structure
 
-- `src/lib/` — domain (constants, types, data), auth, Prisma client
+- `src/lib/` — domain layer: `types.ts`, `data.ts`, `teams.ts`, `team-details.ts`, `stats.ts`, `ranking.ts`, `profile-stats.ts`, `head-to-head.ts`, `time-period.ts`; auth: `auth.ts`, `auth-validation.ts`, `auth-rate-limit.ts`; Prisma client: `prisma.ts`
 - `src/components/ui/` — shadcn primitives (Button, Card, Input, Badge, etc.)
-- `src/components/primitives/` — domain reusables (StatTile, SectionHeader, IconCallout)
+- `src/components/primitives/` — domain reusables (StatTile, SectionHeader, IconCallout, FormField)
 - `src/components/dashboard/` — main scoreboard feature
+- `src/components/teams/` — team list, team detail, creation dialog, member management
+- `src/components/ranking/` — ranking view, podium, period/type tabs, standings rows
+- `src/components/profile/` — profile page and edit dialog
+- `src/components/head-to-head/` — head-to-head view
 - `src/components/authenticated/` — app shell and sidebar layout
 - `src/components/login/` — login/register screen
 - `src/components/theme/` — theme provider, toggle, and core system
@@ -51,13 +55,29 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 
 ## Routes
 
+**Pages**
 - `/` — redirects by session state
 - `/login` — public; credentials-only login/signup
+- `/scoreboard` — legacy redirect to `/dashboard`
 - `/(authenticated)/dashboard` — main scoreboard (protected)
-- `/scoreboard` — legacy redirect to dashboard
-- `/api/scoreboard` — GET aggregated scoreboard (session required)
-- `/api/matches` — GET/POST matches (session required)
+- `/(authenticated)/times` — team list + create team
+- `/(authenticated)/times/[id]` — team detail (members, matches, H2H)
+- `/(authenticated)/ranking` — full team rankings with period/type filters
+- `/(authenticated)/head-to-head` — head-to-head comparison between two user teams
+- `/(authenticated)/profile` — user profile and stats
+- `/(authenticated)/settings` — app settings
+
+**API**
 - `/api/auth/register` — POST signup
+- `/api/matches` — GET recent matches / POST register result
+- `/api/scoreboard` — GET aggregated scoreboard (all matches, no limit)
+- `/api/teams` — GET user teams / POST create team
+- `/api/teams/[id]` — GET team detail / PATCH / DELETE (archive)
+- `/api/teams/[id]/members` — POST invite member
+- `/api/teams/[id]/members/[userId]` — DELETE remove member
+- `/api/teams/[id]/archive` — POST archive team
+- `/api/profile` — GET/PATCH user profile
+- `/api/users` — GET user search (for member invite)
 
 ## Architecture Decisions
 
@@ -74,16 +94,16 @@ See `.claude/rules/architecture.md`, `domain.md`, and `auth.md` for the full con
 - Never install new packages without asking first.
 - Never skip tests or bypass git hooks (`--no-verify`).
 - Only read files directly relevant to the current task.
-- When changing `src/lib/data.ts`, verify behavior both with and without `DATABASE_URL`.
+- `DATABASE_URL` is required for all runtime functionality. Routes return 503 when absent — do not add new routes that bypass this guard.
 - Do not change API status codes (401, 409, 429, 500, 503) without also updating client-side error handling.
 - Update `.claude/rules/` or `techspec/` only when behavior actually changed — no preemptive doc edits.
 
 ## Testing
 
 - Unit/integration: Vitest + Testing Library (jsdom); E2E: Playwright (real Postgres, CI only).
-- Data layer tests: use `vi.resetModules()` + dynamic imports to isolate `memoryState` between tests.
+- Data layer tests: most domain functions (`stats.ts`, `ranking.ts`, `head-to-head.ts`, `time-period.ts`) are pure — pass match arrays directly. For modules that check `hasDatabaseUrl()`, delete `process.env.DATABASE_URL` in `beforeEach`.
 - Route tests: mock `@/lib/auth` and stub `getAuthenticatedUser` — never call real Auth.js in unit tests.
-- Never import Prisma in test files — all tests run against in-memory mode.
+- Never import Prisma in test files directly.
 
 See `.claude/rules/testing.md` for the full isolation pattern.
 
@@ -134,9 +154,9 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 ### Constraints
 
 - **Tech stack:** Next.js + Prisma + PostgreSQL — não introduzir serviço backend separado
-- **Dois modos:** App deve continuar funcionando em modo in-memory (sem DATABASE_URL) para dev e testes — qualquer nova rota precisa respeitar esse guard
+- **DATABASE_URL obrigatório:** Todas as rotas retornam 503 sem banco — nunca adicionar rota que ignore esse guard
 - **Schema:** Nunca modificar `prisma/schema.prisma` sem aprovação explícita — mudanças requerem migration e seed atualizados juntos
-- **Auth:** Credenciais apenas (email/senha) — sem OAuth para v1
+- **Auth:** Credenciais apenas (username/senha) — sem OAuth para v1
 - **Deploy:** Vercel + GitHub Actions; migrations rodadas antes do build no CI
 <!-- GSD:project-end -->
 
@@ -197,7 +217,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 ## Configuration Files
 - `tsconfig.json` - Strict mode, ES2017 target, Next.js plugin, path aliases
 - `next.config.ts - Security headers (CSP, X-Frame-Options, HSTS in production), remote image patterns
-- `prisma.config.ts` - PostgreSQL datasource, schema at `prisma/schema.prisma`, migrations at `prisma/migrations`, seed at `prisma/seed.mjs`
+- `prisma/schema.prisma` - PostgreSQL datasource, schema definitions, models (User, Team, TeamMember, Match, AuthRateLimit); migrations at `prisma/migrations`, seed at `prisma/seed.mjs`
 - `vitest.config.ts` - jsdom, `@/` path alias, mock for `next/image`, coverage via v8
 - `playwright.config.ts` - Chromium only, baseURL from `PLAYWRIGHT_BASE_URL`, test dir `e2e/`, HTML reporter
 - `postcss.config.mjs` - Tailwind v4 PostCSS plugin + custom wildcard font-size removal for Turbopack
@@ -210,9 +230,6 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - `NEXT_PUBLIC_APP_ENV` - Shown in UI; values: "development", "preview", "production"
 - `PLAYWRIGHT_BASE_URL` - Test server URL (defaults to `http://127.0.0.1:3000`)
 - `CI` - Set by CI runner; triggers single-worker Playwright mode and retries
-- Authentication is disabled
-- Matches and users are stored in RAM
-- Used for local development and unit test isolation
 ## Platform Requirements
 - Node.js (version managed by project; run `node --version` to verify)
 - PostgreSQL (or Neon Postgres account for remote DB)
@@ -247,7 +264,6 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 | Route handlers | Named exports matching HTTP verbs | `export async function GET()` |
 | Hooks | `use` prefix | `useDashboardData` |
 ## Component Patterns
-### CVA for Variants
 ### Styling Rules
 - **Semantic design tokens only** — no arbitrary Tailwind values (`[#abc123]`, `[var(--token)]`)
 - Shadow pattern: `shadow-sm shadow-{color}/{opacity}` (e.g., `shadow-sm shadow-gold/35`)
@@ -257,11 +273,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Server components by default (no `"use client"`)
 - Add `"use client"` only when using browser APIs, event handlers, or React hooks
 - Data fetching hooks (`use-dashboard-data.ts`) are client-side
-## Type Patterns
-### Domain Types
-### API Response Types
 ## API Route Patterns
-### Auth Guard (every protected route)
 ### Input Validation
 - Use Zod schemas for request body validation
 - Return HTTP 400 with `{ error: string }` on validation failure
@@ -287,14 +299,13 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Not found: return 404 with `{ error: "..." }`
 - Business violations: return 422 with descriptive message
 ### Client Side
-- API errors surface through `use-dashboard-data.ts` hook state
+- API errors surface through each feature's data hook state (e.g. `use-dashboard-data.ts`, `use-teams-data.ts`)
 - Toast notifications via `sonner` for user-facing feedback
 ## Language in Code
 - Error messages and validation messages in **Brazilian Portuguese**
 - Code identifiers, comments, and type names in **English**
 - Git commits in English (conventional commits)
 - PR bodies in Portuguese (sections: "O que muda" / "Como testar")
-## In-Memory Fallback Pattern
 ## Component Layer Rules
 - `ui/` components: shadcn primitives only, no domain logic
 - `primitives/` components: domain-aware reusables (StatTile, SectionHeader)
@@ -307,8 +318,8 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 ## Pattern Overview
 - Next.js 16 App Router with route groups for authentication
 - Layered architecture: domain layer → API routes → client components
-- Session-based auth (Auth.js v4 with JWT) with optional in-memory fallback
-- Prisma ORM with PostgreSQL; dual-mode support (database or in-memory for testing)
+- Session-based auth (Auth.js v4 with JWT); `DATABASE_URL` required at runtime
+- Prisma ORM with PostgreSQL; routes return 503 when DB is absent
 - Client-side state via React hooks only (no Redux/Zustand)
 - All data derivation on-demand — no persisted scoreboard counters
 ## Layers
@@ -317,9 +328,9 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Contains: Page components, feature-specific components, UI primitives
 - Depends on: Domain types, client-side data hooks, theme system
 - Used by: Next.js pages in `src/app/`
-- Purpose: Constants, types, derived data calculations
-- Location: `src/lib/constants.ts`, `src/lib/types.ts`, `src/lib/data.ts`
-- Contains: Type definitions (TeamRecord, MatchRecord, etc.), data normalization, helper functions
+- Purpose: Domain types, match/team CRUD, stats computation
+- Location: `src/lib/types.ts`, `src/lib/data.ts`, `src/lib/teams.ts`, `src/lib/team-details.ts`, `src/lib/stats.ts`, `src/lib/ranking.ts`, `src/lib/profile-stats.ts`, `src/lib/head-to-head.ts`, `src/lib/time-period.ts`
+- Contains: Type definitions (TeamRecord, MatchRecord, etc.), data normalization, pure stats functions
 - Depends on: Prisma client
 - Used by: API routes, components via custom hooks
 - Purpose: REST endpoints for authentication, teams, matches, profile
@@ -399,12 +410,12 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Auth payload validated with `validateLoginPayload()` and `validateRegisterPayload()`
 - Team IDs validated: teams must exist, be active, user must be member
 - All protected routes call `getAuthenticatedUser()` at handler start
-- Middleware enforces authentication for `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings`
+- Middleware enforces authentication for `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings`, `/head-to-head`
 - Public routes: `/`, `/login`, `/api/auth/*`, `/api/auth/register`
 - Session stored as JWT in HttpOnly cookie; strategy set in `getAuthOptions()`
 - User can only see own teams and matches
 - User must be team member to register a match for that team
-- Team archived by creator or admin (not yet implemented)
+- Team archived by creator; `POST /api/teams/[id]/archive` is implemented
 <!-- GSD:architecture-end -->
 
 <!-- GSD:workflow-start source:GSD defaults -->

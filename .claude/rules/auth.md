@@ -18,5 +18,5 @@ paths:
 
 - Rate limiting is Prisma-backed, keyed by `action:username:ip`. Call sequence: `buildAuthRateLimitKey()`, `getAuthRateLimitStatus()`, `registerAuthFailure()` on failure, `clearAuthRateLimit()` on success.
 - Blocked requests return 429 with `retryAfterSeconds`; block duration escalates exponentially (15m, 30m, 60m max).
-- Not available in in-memory mode — do not call rate-limit functions when `DATABASE_URL` is absent.
+- Rate limiting requires `DATABASE_URL`. Do not call rate-limit functions when `DATABASE_URL` is absent; routes return 503 before reaching the rate-limit check.
 - **Why:** Skipping the sequence (e.g. clearing on failure) silently disables lockout and leaves brute-force protection broken.
