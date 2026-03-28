@@ -217,8 +217,18 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
     return null;
   }
 
+  const profile = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      displayName: true,
+      avatarUrl: true,
+    },
+  });
+
   return {
     id: session.user.id,
     username: session.user.username,
+    displayName: profile?.displayName ?? null,
+    avatarUrl: profile?.avatarUrl ?? null,
   };
 }

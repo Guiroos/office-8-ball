@@ -149,6 +149,37 @@ describe("auth helpers", () => {
     });
   });
 
+  it("returns the authenticated user enriched with display fields", async () => {
+    process.env.DATABASE_URL = "postgres://local";
+    process.env.NEXTAUTH_SECRET = "test-secret";
+    getServerSessionMock.mockResolvedValue({
+      user: {
+        id: "user-1",
+        username: "gui.dev",
+      },
+    });
+    findUniqueUserMock.mockResolvedValue({
+      displayName: "Gui Dev",
+      avatarUrl: "https://example.com/avatar.png",
+    });
+
+    const auth = await import("@/lib/auth");
+
+    await expect(auth.getAuthenticatedUser()).resolves.toEqual({
+      id: "user-1",
+      username: "gui.dev",
+      displayName: "Gui Dev",
+      avatarUrl: "https://example.com/avatar.png",
+    });
+    expect(findUniqueUserMock).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      select: {
+        displayName: true,
+        avatarUrl: true,
+      },
+    });
+  });
+
   it("blocks login when the limiter is already active", async () => {
     process.env.DATABASE_URL = "postgres://local";
     process.env.NEXTAUTH_SECRET = "test-secret";

@@ -80,6 +80,8 @@ describe("/api/auth/register", () => {
       user: {
         id: "user-1",
         username: "gui.dev",
+        displayName: null,
+        avatarUrl: null,
       },
     });
   });
