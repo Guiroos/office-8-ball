@@ -1,5 +1,44 @@
 import { prisma } from "@/lib/prisma";
-import type { TeamRecord } from "@/lib/types";
+import { computeTeamStats } from "@/lib/stats";
+import type { MatchRecord, TeamRecord } from "@/lib/types";
+
+export type TeamPartnerRecord = {
+  userId: string;
+  username: string;
+  displayName: string;
+};
+
+export type UserTeamOverview = TeamRecord & {
+  partners: TeamPartnerRecord[];
+  summary: {
+    wins: number;
+    losses: number;
+    winRate: number;
+    totalMatches: number;
+    lastFiveResults: Array<"win" | "loss">;
+    lastPlayedAt: string | null;
+  };
+};
+
+function normalizeMatch(match: {
+  id: string;
+  teamAId: string;
+  teamBId: string;
+  winnerTeamId: string;
+  playedAt: Date;
+  note: string | null;
+}): MatchRecord {
+  return {
+    id: match.id,
+    teamAId: match.teamAId,
+    teamBId: match.teamBId,
+    winnerTeamId: match.winnerTeamId,
+    loserTeamId:
+      match.teamAId === match.winnerTeamId ? match.teamBId : match.teamAId,
+    playedAt: match.playedAt.toISOString(),
+    note: match.note,
+  };
+}
 
 function normalizeTeam(team: {
   id: string;
@@ -76,6 +115,77 @@ export async function listUserTeams(
   });
 
   return memberships.map((m) => normalizeTeam(m.team));
+}
+
+export async function listUserTeamsWithPartners(
+  userId: string,
+  includeArchived = false,
+): Promise<UserTeamOverview[]> {
+  const memberships = await prisma.teamMember.findMany({
+    where: {
+      userId,
+      ...(includeArchived ? {} : { team: { status: "active" } }),
+    },
+    include: {
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  displayName: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { joinedAt: "desc" },
+  });
+
+  const teams = memberships.map(({ team }) => team);
+  if (teams.length === 0) return [];
+
+  const teamIds = teams.map((team) => team.id);
+  const matchRows = await prisma.match.findMany({
+    where: {
+      OR: [{ teamAId: { in: teamIds } }, { teamBId: { in: teamIds } }],
+    },
+    orderBy: { playedAt: "desc" },
+  });
+  const matches = matchRows.map(normalizeMatch);
+
+  return teams.map((team) => {
+    const summary = computeTeamStats(team.id, matches);
+    const lastPlayedAt =
+      matches.find((match) => match.teamAId === team.id || match.teamBId === team.id)?.playedAt ?? null;
+
+    return {
+      ...normalizeTeam(team),
+      partners: team.members
+        .filter((member) => member.userId !== userId)
+        .map((member) => {
+          const username = member.user?.username ?? member.userId;
+
+          return {
+            userId: member.userId,
+            username,
+            displayName: member.user?.displayName ?? username,
+          };
+        }),
+      summary: {
+        wins: summary.wins,
+        losses: summary.losses,
+        winRate: summary.winRate,
+        totalMatches: summary.totalMatches,
+        lastFiveResults: summary.lastFiveResults,
+        lastPlayedAt,
+      },
+    };
+  });
 }
 
 export async function getTeamById(teamId: string): Promise<TeamRecord | null> {
