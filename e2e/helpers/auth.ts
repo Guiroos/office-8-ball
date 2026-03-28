@@ -43,9 +43,26 @@ export async function logout(page: Page, username: string) {
   await expect(page).toHaveURL(/\/login$/);
 }
 
+export async function openCreateTeamDialog(page: Page) {
+  await page.goto("/times");
+
+  const emptyStateTrigger = page.getByRole("button", { name: "Criar primeiro time" });
+  const sidebarTrigger = page.getByRole("button", { name: "Criar Novo Time" });
+
+  if (await emptyStateTrigger.isVisible()) {
+    await emptyStateTrigger.click();
+  } else {
+    await sidebarTrigger.click();
+  }
+
+  await expect(page.getByRole("dialog")).toBeVisible();
+}
+
 export async function createTeam(page: Page, teamName: string) {
-  await page.goto("/times?tab=create");
+  await openCreateTeamDialog(page);
   await page.getByTestId("team-create-name").fill(teamName);
   await page.getByTestId("team-create-submit").click();
-  await expect(page).toHaveURL(/\/times\?tab=teams/);
+  await expect(page).toHaveURL(/\/times\/[^/?#]+$/);
+
+  return page.url();
 }
