@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -29,10 +30,12 @@ function mapErrorStatus(status: number, fallbackMessage: string): string {
 
 export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
   const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
   const [open, setOpen] = useState(false);
   const [usernameInput, setUsernameInput] = useState("");
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isBusy = isSubmitting || isRefreshing;
 
   function handleOpenChange(value: boolean) {
     setOpen(value);
@@ -52,7 +55,7 @@ export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
     }
 
     setInlineError(null);
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       // Step 1: lookup user by username via GET /api/users
@@ -87,15 +90,22 @@ export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
 
       toast.success("Membro adicionado com sucesso.");
       handleOpenChange(false);
-      router.refresh();
+      startRefresh(() => {
+        router.refresh();
+      });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   }
 
   return (
     <>
-      <Button type="button" className="w-full sm:w-auto" onClick={() => setOpen(true)}>
+      <Button
+        type="button"
+        className="w-full sm:w-auto"
+        onClick={() => setOpen(true)}
+        disabled={isBusy}
+      >
         Convidar Membro
       </Button>
 
@@ -115,7 +125,7 @@ export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
                   setUsernameInput(e.target.value);
                   setInlineError(null);
                 }}
-                disabled={loading}
+                disabled={isBusy}
               />
               {inlineError && (
                 <p className="text-sm text-destructive">{inlineError}</p>
@@ -126,12 +136,17 @@ export function InviteMemberDialog({ teamId }: InviteMemberDialogProps) {
                 type="button"
                 variant="ghost"
                 onClick={() => handleOpenChange(false)}
-                disabled={loading}
+                disabled={isBusy}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Convidando..." : "Convidar"}
+              <Button type="submit" disabled={isBusy}>
+                {isBusy ? (
+                  <>
+                    <Loader2Icon className="size-4 animate-spin" />
+                    {isSubmitting ? "Convidando..." : "Atualizando time..."}
+                  </>
+                ) : "Convidar"}
               </Button>
             </DialogFooter>
           </form>

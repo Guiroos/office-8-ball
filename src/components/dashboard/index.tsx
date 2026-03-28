@@ -58,6 +58,7 @@ function TeamScoreCard({
   team,
   teamVariant,
   wins,
+  isBusy,
   isLeader,
   isSubmitting,
   note,
@@ -67,6 +68,7 @@ function TeamScoreCard({
   team: TeamRecord;
   teamVariant: "alpha" | "beta";
   wins: number;
+  isBusy: boolean;
   isLeader: boolean;
   isSubmitting: boolean;
   note: string;
@@ -138,7 +140,7 @@ function TeamScoreCard({
             data-testid={`team-note-${team.id}`}
             maxLength={140}
             rows={3}
-            disabled={isSubmitting}
+            disabled={isBusy}
             placeholder="Vale zoeira curta, sem tese de retrospectiva."
             className="resize-none border-border-strong placeholder:text-foreground-soft"
             onChange={(event) => {
@@ -157,7 +159,7 @@ function TeamScoreCard({
               void onRegisterWin(team.id);
             });
           }}
-          disabled={isSubmitting}
+          disabled={isBusy}
         >
           {isSubmitting ? "Registrando..." : `Vitória ${team.name}`}
         </Button>
@@ -218,7 +220,7 @@ export function Dashboard() {
           <SectionHeader
             eyebrow="Placar atual"
             title="Frontend vs Backend"
-            description="Registro rápido, sem rodeio e sem update otimista antes da persistência fechar."
+            description="Registro rápido com resposta imediata na mesa e confirmação automática assim que a API fecha."
             inverse
             actions={
               <div className="grid gap-3 sm:grid-cols-3">
@@ -234,7 +236,7 @@ export function Dashboard() {
                   label="Ritmo"
                   value={loading || teamsLoading ? "Carregando..." : "Mesa pronta"}
                   description={
-                    submittingTeamId ? "gravando partida" : "aguardando a próxima treta"
+                    submittingTeamId ? "placar otimista, sincronizando na API" : "aguardando a próxima treta"
                   }
                   tone="inverse"
                 />
@@ -255,6 +257,7 @@ export function Dashboard() {
                 team={team}
                 teamVariant={getTeamVariant(index)}
                 wins={scoreboard?.teams.find((entry) => entry.id === team.id)?.wins ?? 0}
+                isBusy={submittingTeamId !== null}
                 isLeader={scoreboard?.leaderTeamId === team.id}
                 isSubmitting={submittingTeamId === team.id}
                 note={notesByTeam[team.id] ?? ""}

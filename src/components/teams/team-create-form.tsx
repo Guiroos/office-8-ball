@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
+import { useState, useTransition } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -29,10 +30,12 @@ type TeamCreateFormProps = {
 
 export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
   const router = useRouter();
+  const [isNavigating, startNavigation] = useTransition();
   const [name, setName] = useState("");
   const [type, setType] = useState<TeamRecord["type"]>("solo");
   const [nameError, setNameError] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isBusy = isSubmitting || isNavigating;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,7 +47,7 @@ export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
     }
 
     setNameError(undefined);
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/teams", {
@@ -70,9 +73,11 @@ export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
       setName("");
       setType("solo");
       onSuccess?.(createdTeam);
-      router.push(`/times/${createdTeam.team.id}`);
+      startNavigation(() => {
+        router.push(`/times/${createdTeam.team.id}`);
+      });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -90,7 +95,7 @@ export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
             setNameError(undefined);
           }}
           placeholder="Ex: Solo Wolves"
-          disabled={loading}
+          disabled={isBusy}
           invalid={!!nameError}
           aria-describedby={nameError ? "team-name-error" : undefined}
         />
@@ -108,6 +113,7 @@ export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
               active={type === option}
               className="flex-1"
               aria-pressed={type === option}
+              disabled={isBusy}
             >
               {option === "solo" ? "Solo" : "Duplas"}
             </SegmentedControlItem>
@@ -117,24 +123,34 @@ export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
 
       {onCancel ? (
         <DialogFooter>
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isBusy}>
             Cancelar
           </Button>
           <Button
             type="submit"
             data-testid="team-create-submit"
-            disabled={loading}
+            disabled={isBusy}
           >
-            {loading ? "Criando..." : "Criar Time"}
+            {isBusy ? (
+              <>
+                <Loader2Icon className="size-4 animate-spin" />
+                {isSubmitting ? "Criando..." : "Abrindo time..."}
+              </>
+            ) : "Criar Time"}
           </Button>
         </DialogFooter>
       ) : (
         <Button
           type="submit"
           data-testid="team-create-submit"
-          disabled={loading}
+          disabled={isBusy}
         >
-          {loading ? "Criando..." : "Criar Time"}
+          {isBusy ? (
+            <>
+              <Loader2Icon className="size-4 animate-spin" />
+              {isSubmitting ? "Criando..." : "Abrindo time..."}
+            </>
+          ) : "Criar Time"}
         </Button>
       )}
     </form>

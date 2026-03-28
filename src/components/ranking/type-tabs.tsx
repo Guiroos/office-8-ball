@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,9 @@ export function TypeTabs({
   activePeriod?: "all" | "month" | "week";
 }) {
   const router = useRouter();
+  const [isPending, startNavigation] = useTransition();
+  const [optimisticType, setOptimisticType] = useState(activeType);
+  const displayedType = isPending ? optimisticType : activeType;
 
   function buildHref(type: RankingType): string {
     const params = new URLSearchParams();
@@ -37,16 +41,23 @@ export function TypeTabs({
       </Label>
       <Select
         id="ranking-type-filter"
-        value={activeType}
+        value={displayedType}
+        disabled={isPending}
         onValueChange={(nextValue) => {
           if (nextValue !== activeType) {
-            router.push(buildHref(nextValue as RankingType));
+            setOptimisticType(nextValue as RankingType);
+            startNavigation(() => {
+              router.push(buildHref(nextValue as RankingType));
+            });
           }
         }}
         className="h-10 rounded-lg px-3"
         showDescriptionInTrigger={false}
         options={TYPE_VALUES}
       />
+      <p className="text-xs text-muted-foreground">
+        {isPending ? "Atualizando categoria..." : "Troque a modalidade sem resetar o restante do ranking."}
+      </p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -35,12 +35,15 @@ function mapErrorStatus(status: number, fallbackMessage: string): string {
 
 export function MemberList({ members, teamId, teamType, createdBy, viewerId }: MemberListProps) {
   const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
   const [confirmingUserId, setConfirmingUserId] = useState<string | null>(null);
   const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+  const [optimisticRemovedUserIds, setOptimisticRemovedUserIds] = useState<string[]>([]);
+  const visibleMembers = members.filter((member) => !optimisticRemovedUserIds.includes(member.userId));
 
   // Minimum member threshold: solo requires > 1, duo requires > 2
   const minMembersForRemoval = teamType === "solo" ? 1 : 2;
-  const canRemoveAny = members.length > minMembersForRemoval;
+  const canRemoveAny = visibleMembers.length > minMembersForRemoval;
 
   function isRemovable(member: TeamMemberView): boolean {
     if (member.userId === createdBy) return false;
@@ -50,6 +53,10 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
 
   async function handleRemove(userId: string) {
     setRemovingUserId(userId);
+    setOptimisticRemovedUserIds((current) =>
+      current.includes(userId) ? current : [...current, userId]);
+    let didSucceed = false;
+
     try {
       const res = await fetch(`/api/teams/${teamId}/members/${userId}`, {
         method: "DELETE",
@@ -59,24 +66,35 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         const message = mapErrorStatus(res.status, data.error ?? "Não foi possível gerenciar o time.");
         toast.error(message);
+        setConfirmingUserId(null);
         return;
       }
 
+      didSucceed = true;
       toast.success("Membro removido com sucesso.");
       setConfirmingUserId(null);
-      router.refresh();
+      startRefresh(() => {
+        router.refresh();
+      });
+      return;
+    } catch {
+      toast.error("Não foi possível gerenciar o time.");
+      setConfirmingUserId(null);
     } finally {
+      if (!didSucceed) {
+        setOptimisticRemovedUserIds((current) => current.filter((id) => id !== userId));
+      }
       setRemovingUserId(null);
     }
   }
 
-  if (members.length === 0) {
+  if (visibleMembers.length === 0) {
     return <p className="text-sm text-muted-foreground">Nenhum membro</p>;
   }
 
   return (
     <ul className="space-y-3">
-      {members.map((member) => {
+      {visibleMembers.map((member) => {
         const isConfirming = confirmingUserId === member.userId;
         const isRemoving = removingUserId === member.userId;
         const removable = isRemovable(member);
@@ -113,7 +131,7 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
                   size="sm"
                   className="w-full sm:w-auto"
                   onClick={() => setConfirmingUserId(member.userId)}
-                  disabled={isRemoving}
+                  disabled={isRemoving || isRefreshing}
                 >
                   Remover
                 </Button>
@@ -127,7 +145,7 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
                     size="sm"
                     className="w-full border-destructive text-destructive hover:bg-destructive/10 sm:w-auto"
                     onClick={() => handleRemove(member.userId)}
-                    disabled={isRemoving}
+                    disabled={isRemoving || isRefreshing}
                   >
                     {isRemoving ? "Removendo..." : "Confirmar"}
                   </Button>
@@ -137,7 +155,7 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
                     size="sm"
                     className="w-full sm:w-auto"
                     onClick={() => setConfirmingUserId(null)}
-                    disabled={isRemoving}
+                    disabled={isRemoving || isRefreshing}
                   >
                     Cancelar
                   </Button>
