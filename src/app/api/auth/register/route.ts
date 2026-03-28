@@ -105,7 +105,11 @@ export async function POST(request: Request) {
 
   return NextResponse.json<RegisterUserResponse>(
     {
-      user: createdUser,
+      user: {
+        ...createdUser,
+        displayName: null,
+        avatarUrl: null,
+      },
     },
     { status: 201 },
   );

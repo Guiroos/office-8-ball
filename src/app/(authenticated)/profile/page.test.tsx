@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { SessionUser } from "@/lib/types";
 
 // ── Mock auth before any imports that use it ───────────────────────────────────
 
-let currentUser: { id: string; username: string } | null = {
+let currentUser: SessionUser | null = {
   id: "user-1",
   username: "gui.dev",
+  displayName: "Gui Dev",
+  avatarUrl: null,
 };
 
 vi.mock("@/lib/auth", async () => {
@@ -89,7 +92,12 @@ const MOCK_PROFILE_DATA = {
 describe("ProfileRoute", () => {
   beforeEach(async () => {
     vi.resetModules();
-    currentUser = { id: "user-1", username: "gui.dev" };
+    currentUser = {
+      id: "user-1",
+      username: "gui.dev",
+      displayName: "Gui Dev",
+      avatarUrl: null,
+    };
     mockFindUniqueUser.mockResolvedValue(MOCK_DB_USER);
     mockComputeProfilePageData.mockReturnValue({
       userId: "user-1",

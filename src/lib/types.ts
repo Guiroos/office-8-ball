@@ -60,6 +60,8 @@ export type UserLookupResponse = {
 export type SessionUser = {
   id: string;
   username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
 };
 
 export type RegisterUserResponse = {

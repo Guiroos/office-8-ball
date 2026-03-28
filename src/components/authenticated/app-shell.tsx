@@ -1,15 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   ChevronDown,
-  Globe,
   LayoutDashboard,
   LogOut,
   Menu,
-  Settings,
   Shield,
   Trophy,
   Users,
@@ -18,7 +17,7 @@ import {
 import { type ComponentType, type ReactNode, useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -59,18 +58,21 @@ const navigationItems: NavigationItem[] = [
 
 function UserAvatar({ user }: { user: SessionUser }) {
   const initials = useMemo(() => {
-    return user.username
+    return (user.displayName ?? user.username)
       .trim()
       .split(/\s+/)
       .slice(0, 2)
       .map((chunk: string) => chunk.charAt(0).toUpperCase())
       .join("")
       .slice(0, 2);
-  }, [user.username]);
+  }, [user.displayName, user.username]);
 
   return (
     <div className="relative">
       <Avatar className="size-11 rounded-pill border-sidebar-border bg-avatar-gradient">
+        {user.avatarUrl ? (
+          <AvatarImage src={user.avatarUrl} alt={user.displayName ?? user.username} />
+        ) : null}
         <AvatarFallback className="bg-transparent text-sidebar-foreground tracking-label-sm">
           {initials || "OB"}
         </AvatarFallback>
@@ -82,58 +84,58 @@ function UserAvatar({ user }: { user: SessionUser }) {
 
 function SidebarBrand() {
   return (
-    <div className="flex items-center gap-3 px-1">
-      <div className="text-sidebar-foreground flex size-10 items-center justify-center rounded-xs border border-sidebar-border bg-brand-gradient shadow-sm">
-        <Globe className="size-5" />
-      </div>
+    <div className="border-b border-sidebar-border px-1 pb-5">
+      <div className="flex items-center gap-3">
+        <div className="overflow-hidden rounded-pill border border-sidebar-border shadow-sm shadow-black/20">
+          <Image
+            src="/pool-ball.png"
+            alt="Bola 8"
+            width={40}
+            height={40}
+            className="size-8 object-cover"
+            priority
+          />
+        </div>
 
-      <div>
-        <p className="text-sidebar-foreground text-lg font-bold tracking-[-0.03em]">
-          Office 8 Ball
-        </p>
-        <p className="text-sidebar-foreground-subtle text-xs font-medium tracking-label-sm uppercase">
-          Area autenticada
-        </p>
+        <div className="min-w-0">
+          <p className="font-display text-2xl font-black uppercase leading-none tracking-label-sm text-sidebar-foreground">
+            Sinuca Club
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-function UserFooter({
+function ShellIdentity({
   user,
-  pathname,
   isOpen,
   onToggle,
   onClose,
 }: {
   user: SessionUser;
-  pathname: string;
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
 }) {
-  const membershipLabel = pathname.startsWith("/dashboard")
-    ? "mesa ativa"
-    : pathname.startsWith("/ranking")
-      ? "visao aberta"
-      : "area autenticada";
+  const primaryName = user.displayName ?? user.username;
 
   return (
     <div className="relative border-t border-sidebar-border px-1 pt-5">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-3 rounded-sm px-3 py-3 text-left transition hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
+        className="flex w-full items-center gap-3 rounded-sm border border-sidebar-border bg-sidebar-hover px-3 py-3 text-left transition hover:bg-sidebar-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
         <UserAvatar user={user} />
         <div className="min-w-0 flex-1">
           <p className="text-sidebar-foreground truncate text-sm font-semibold">
-            {user.username}
+            {primaryName}
           </p>
-          <p className="truncate caption text-sidebar-accent">
-            {membershipLabel}
+          <p className="truncate text-xs font-medium text-sidebar-accent">
+            @{user.username}
           </p>
         </div>
         <ChevronDown
@@ -151,8 +153,8 @@ function UserFooter({
             className="fixed inset-0 z-10 cursor-default"
             onClick={onClose}
           />
-          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-3 shadow-xl">
-            <UserMenu pathname={pathname} user={user} onClose={onClose} />
+          <div className="absolute bottom-[calc(100%+0.75rem)] left-0 z-20 w-full rounded-lg border border-sidebar-border bg-sidebar-menu p-2.5 shadow-xl">
+            <UserMenu onClose={onClose} />
           </div>
         </>
       ) : null}
@@ -161,81 +163,36 @@ function UserFooter({
 }
 
 function UserMenu({
-  pathname,
-  user,
   onClose,
 }: {
-  pathname: string;
-  user: SessionUser;
   onClose: () => void;
 }) {
-  const accountLinks = [
-    {
-      href: "/profile",
-      label: "Ver perfil",
-      icon: Shield,
-      active: pathname.startsWith("/profile"),
-    },
-    {
-      href: "/settings",
-      label: "Configuracoes",
-      icon: Settings,
-      active: pathname.startsWith("/settings"),
-    },
-  ];
-
   return (
     <div
-      className="text-sidebar-foreground grid gap-1.5"
+      className="text-sidebar-foreground grid gap-1"
       role="menu"
       aria-label="Menu da conta"
     >
-      <div className="rounded-sm border border-sidebar-border bg-sidebar-hover px-3 py-3">
-        <div className="flex items-center gap-3">
-          <UserAvatar user={user} />
-          <div className="min-w-0">
-            <p className="text-sidebar-foreground truncate text-sm font-semibold">
-              {user.username}
-            </p>
-          </div>
-        </div>
-      </div>
+      <Link
+        href="/profile"
+        onClick={onClose}
+        role="menuitem"
+        className="flex items-center gap-3 rounded-sm border border-transparent px-3 py-2.5 text-sm font-semibold text-sidebar-foreground transition hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar-menu"
+      >
+        <Shield className="size-4" />
+        Ver perfil
+      </Link>
 
-      {accountLinks.map((link) => {
-        const Icon = link.icon;
-
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            onClick={onClose}
-            role="menuitem"
-            className={cn(
-              "flex items-center gap-3 rounded-sm border px-3 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar-menu",
-              link.active
-                ? "border-sidebar-active-strong bg-sidebar-active text-sidebar-foreground shadow-sm"
-                : "border-transparent text-sidebar-foreground-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
-            )}
-          >
-            <Icon className="size-4" />
-            {link.label}
-          </Link>
-        );
-      })}
-
-      <div className="mt-1 flex items-center justify-between rounded-sm border border-sidebar-border bg-sidebar-hover px-3 py-2.5">
-        <div>
-          <p className="text-sidebar-foreground text-sm font-semibold">Tema</p>
-        </div>
-        <ThemeToggle
-          variant="sidebar"
-          className="h-10 rounded-xs px-3 focus-visible:ring-offset-sidebar-menu"
-        />
-      </div>
+      <ThemeToggle
+        variant="sidebar"
+        layout="menu"
+        role="menuitem"
+        className="h-10 rounded-sm border-transparent bg-transparent px-3 text-sidebar-foreground shadow-none hover:bg-sidebar-hover focus-visible:ring-offset-sidebar-menu"
+      />
 
       <Button
         variant="sidebar"
-        className="mt-1 h-11 justify-start rounded-sm px-3 focus-visible:ring-offset-sidebar-menu"
+        className="h-10 justify-start rounded-sm border-transparent bg-transparent px-3 text-sidebar-foreground shadow-none hover:bg-sidebar-hover focus-visible:ring-offset-sidebar-menu"
         onClick={() => {
           onClose();
           void signOut({ callbackUrl: "/login" });
@@ -264,12 +221,11 @@ function SidebarContent({
     <div className="flex h-full flex-col gap-8">
       <SidebarBrand />
 
-      <div className="flex-1">
+      <div className="flex-1 pt-1">
         <SidebarNavigation pathname={pathname} onNavigate={onNavigate} />
       </div>
 
-      <UserFooter
-        pathname={pathname}
+      <ShellIdentity
         user={user}
         isOpen={isUserMenuOpen}
         onToggle={() => setIsUserMenuOpen((current) => !current)}
@@ -372,8 +328,8 @@ export function AppShell({ user, children }: AppShellProps) {
 
             <div className="min-h-0 flex-1 overflow-y-auto">
               <SidebarContent
-                pathname={pathname}
                 user={user}
+                pathname={pathname}
                 onNavigate={() => setIsMobileSidebarOpen(false)}
               />
             </div>

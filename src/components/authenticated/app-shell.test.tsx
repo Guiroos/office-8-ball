@@ -63,7 +63,9 @@ describe("AppShell", () => {
       <AppShell
         user={{
           id: "user-1",
-          username: "Gui Dev",
+          username: "gui.dev",
+          displayName: "Gui Dev",
+          avatarUrl: null,
         }}
       >
         <div>Conteudo interno</div>
@@ -91,7 +93,9 @@ describe("AppShell", () => {
       <AppShell
         user={{
           id: "user-1",
-          username: "Gui Dev",
+          username: "gui.dev",
+          displayName: "Gui Dev",
+          avatarUrl: "https://example.com/avatar.png",
         }}
       >
         <div>Conteudo interno</div>
@@ -104,9 +108,8 @@ describe("AppShell", () => {
       "href",
       "/profile",
     );
-    expect(screen.getByRole("menuitem", { name: "Ver perfil" })).toHaveClass(
-      "border-sidebar-active-strong",
-    );
+    expect(screen.getByText("@gui.dev")).toBeInTheDocument();
+    expect(screen.getByAltText("Gui Dev")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sair" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tema" })).toHaveAttribute("data-variant", "sidebar");
     expect(screen.getByRole("menu", { name: "Menu da conta" })).toHaveClass(
@@ -115,6 +118,7 @@ describe("AppShell", () => {
     expect(screen.getByRole("button", { name: "Sair" })).toHaveClass(
       "text-sidebar-foreground",
     );
+    expect(screen.queryByText("Configuracoes")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Sair" }));
 
