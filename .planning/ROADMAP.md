@@ -1,7 +1,7 @@
 # Roadmap: Office Sinuca Tracker v1
 
 **Created:** 2026-03-23
-**Phases:** 8
+**Phases:** 9
 **Granularity:** Standard
 **Coverage:** 12/12 v1 requirements mapped
 
@@ -17,6 +17,7 @@
 - [x] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26) (completed 2026-03-27)
 - [x] **Phase 7: Team Details Access & Member Actions** — Enforce member-only team detail access and wire invite/remove UI actions to member endpoints (planned 2026-03-26) (completed 2026-03-27)
 - [x] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `RANK-01..04`; `TEAM-02` cross-referenced to Phase 7 as canonical proof (planned 2026-03-26) (completed 2026-03-27)
+- [ ] **Phase 9: Auth Migration next-auth to better-auth** — Replace next-auth 4.24.13 with better-auth, preserving all auth behaviors: username/password login, database sessions, rate limiting, middleware-based route protection, DATABASE_URL guard (planned 2026-03-28)
 
 ---
 
@@ -215,6 +216,33 @@ Plans:
 
 ---
 
+### Phase 9: Auth Migration next-auth to better-auth
+
+**Goal:** Replace next-auth 4.24.13 with better-auth, preserving all existing auth behaviors: username/password login, database sessions, rate limiting, middleware-based route protection, and the DATABASE_URL guard pattern
+
+**Depends on:** Phase 8
+
+**Requirements:** AUTH-MIGRATION-01, AUTH-MIGRATION-02, AUTH-MIGRATION-03, AUTH-MIGRATION-04, AUTH-MIGRATION-05, AUTH-MIGRATION-06, AUTH-MIGRATION-07, AUTH-MIGRATION-08
+
+**Success Criteria** (what must be TRUE):
+1. better-auth installed; next-auth fully removed from dependencies and source
+2. Username/password login works with existing bcrypt-hashed passwords (no data migration)
+3. Sessions stored in database (session table); session shape { id, username } preserved for all consumers
+4. DATABASE_URL guard helpers preserved with identical signatures; routes return 503 without DB
+5. Client-side auth via @/lib/auth-client; no next-auth/react imports remain
+6. proxy.ts replaces middleware.ts with same route matcher config
+7. npm run test passes; npm run typecheck passes; npm run build succeeds
+
+**Plans:** 4 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Wave 0: Update test mocks (auth.test.ts, login-screen.test.tsx, app-shell.test.tsx) to reference better-auth/auth-client before production code changes
+- [ ] 09-02-PLAN.md — Wave 1: Install better-auth, rewrite src/lib/auth.ts, add Session + Account Prisma models + migration
+- [ ] 09-03-PLAN.md — Wave 2: Create src/lib/auth-client.ts, update login-screen.tsx and app-shell.tsx
+- [ ] 09-04-PLAN.md — Wave 3: Create proxy.ts, create [...all] route handler, delete [...nextauth] + next-auth.d.ts + middleware.ts; full suite verification
+
+---
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -227,6 +255,7 @@ Plans:
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 2/2 | Complete   | 2026-03-27 |
 | 8. Ranking/Team Verification Recovery | 2/2 | Complete   | 2026-03-27 |
+| 9. Auth Migration next-auth to better-auth | 0/4 | Planned    | — |
 
 ---
 
@@ -246,8 +275,16 @@ Plans:
 | PROF-01 | Phase 5 | Complete |
 | PROF-02 | Phase 5 | Complete |
 | PROF-03 | Phase 5 | Complete |
+| AUTH-MIGRATION-01 | Phase 9 | Planned |
+| AUTH-MIGRATION-02 | Phase 9 | Planned |
+| AUTH-MIGRATION-03 | Phase 9 | Planned |
+| AUTH-MIGRATION-04 | Phase 9 | Planned |
+| AUTH-MIGRATION-05 | Phase 9 | Planned |
+| AUTH-MIGRATION-06 | Phase 9 | Planned |
+| AUTH-MIGRATION-07 | Phase 9 | Planned |
+| AUTH-MIGRATION-08 | Phase 9 | Planned |
 
-**Coverage:** 12/12 v1 requirements mapped ✓
+**Coverage:** 12/12 v1 requirements mapped ✓ (+ 8 auth migration requirements)
 
 ---
 
@@ -260,3 +297,4 @@ Plans:
 *Phase 5 planned: 2026-03-26*
 *Gap closure phases added: 2026-03-26 (Phases 6-8)*
 *Phase 8 planned: 2026-03-26*
+*Phase 9 planned: 2026-03-28*
