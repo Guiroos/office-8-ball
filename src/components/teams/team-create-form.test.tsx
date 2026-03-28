@@ -64,7 +64,7 @@ describe("TeamCreateForm", () => {
     });
   });
 
-  it("shows success toast and calls router.push + router.refresh on 201 response", async () => {
+  it("shows success toast and redirects to the created team on 201 response", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 201,
@@ -90,8 +90,8 @@ describe("TeamCreateForm", () => {
 
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith("Time criado com sucesso.");
-      expect(mockPush).toHaveBeenCalledWith("/times?tab=teams");
-      expect(mockRefresh).toHaveBeenCalled();
+      expect(mockPush).toHaveBeenCalledWith("/times/team-1");
+      expect(mockRefresh).not.toHaveBeenCalled();
     });
   });
 

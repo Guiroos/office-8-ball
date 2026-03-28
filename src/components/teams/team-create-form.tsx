@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { Field, FieldError } from "@/components/primitives/form-field";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
@@ -22,7 +22,12 @@ const schema = z.object({
   type: z.enum(["solo", "duo"]),
 });
 
-export function TeamCreateForm() {
+type TeamCreateFormProps = {
+  onCancel?: () => void;
+  onSuccess?: (team: TeamResponse) => void;
+};
+
+export function TeamCreateForm({ onCancel, onSuccess }: TeamCreateFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [type, setType] = useState<TeamRecord["type"]>("solo");
@@ -60,57 +65,70 @@ export function TeamCreateForm() {
         return;
       }
 
-      await res.json() as TeamResponse;
+      const createdTeam = await res.json() as TeamResponse;
       toast.success("Time criado com sucesso.");
       setName("");
       setType("solo");
-      router.push("/times?tab=teams");
-      router.refresh();
+      onSuccess?.(createdTeam);
+      router.push(`/times/${createdTeam.team.id}`);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Card className="max-w-md p-6">
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <Field>
-          <Label htmlFor="team-name">Nome do Time</Label>
-          <Input
-            id="team-name"
-            name="name"
-            data-testid="team-create-name"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              setNameError(undefined);
-            }}
-            placeholder="Ex: Solo Wolves"
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <Field>
+        <Label htmlFor="team-name">Nome do Time</Label>
+        <Input
+          id="team-name"
+          name="name"
+          data-testid="team-create-name"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            setNameError(undefined);
+          }}
+          placeholder="Ex: Solo Wolves"
+          disabled={loading}
+          invalid={!!nameError}
+          aria-describedby={nameError ? "team-name-error" : undefined}
+        />
+        <FieldError id="team-name-error">{nameError}</FieldError>
+      </Field>
+
+      <Field>
+        <Label>Modalidade</Label>
+        <SegmentedControl aria-label="Seleção de modalidade" className="w-full">
+          {(["solo", "duo"] as const).map((option) => (
+            <SegmentedControlItem
+              key={option}
+              type="button"
+              onClick={() => setType(option)}
+              active={type === option}
+              className="flex-1"
+              aria-pressed={type === option}
+            >
+              {option === "solo" ? "Solo" : "Duplas"}
+            </SegmentedControlItem>
+          ))}
+        </SegmentedControl>
+      </Field>
+
+      {onCancel ? (
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            data-testid="team-create-submit"
             disabled={loading}
-            invalid={!!nameError}
-            aria-describedby={nameError ? "team-name-error" : undefined}
-          />
-          <FieldError id="team-name-error">{nameError}</FieldError>
-        </Field>
-
-        <Field>
-          <Label>Modalidade</Label>
-          <SegmentedControl aria-label="Seleção de modalidade" className="w-full">
-            {(["solo", "duo"] as const).map((option) => (
-              <SegmentedControlItem
-                key={option}
-                type="button"
-                onClick={() => setType(option)}
-                active={type === option}
-                className="flex-1"
-                aria-pressed={type === option}
-              >
-                {option === "solo" ? "Solo" : "Duplas"}
-              </SegmentedControlItem>
-            ))}
-          </SegmentedControl>
-        </Field>
-
+          >
+            {loading ? "Criando..." : "Criar Time"}
+          </Button>
+        </DialogFooter>
+      ) : (
         <Button
           type="submit"
           data-testid="team-create-submit"
@@ -118,7 +136,7 @@ export function TeamCreateForm() {
         >
           {loading ? "Criando..." : "Criar Time"}
         </Button>
-      </form>
-    </Card>
+      )}
+    </form>
   );
 }
