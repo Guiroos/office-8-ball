@@ -1,5 +1,6 @@
 {
-  "model_profile": "budget",
+  "model_profile": "inherit",
+  "resolve_model_ids": "omit",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
