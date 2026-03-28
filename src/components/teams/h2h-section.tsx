@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { StatTile } from "@/components/primitives/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/native-select";
+import { Select } from "@/components/ui/select";
 import type { TeamH2HSummary } from "@/lib/team-details";
 
 type RivalOption = { id: string; name: string; type: "solo" | "duo" };
@@ -42,17 +42,16 @@ export function H2HSection({
         <Label htmlFor="team-h2h-rival" className="caption text-muted-foreground">
           Selecione o adversário
         </Label>
-        <NativeSelect
+        <Select
           id="team-h2h-rival"
           value={selectedId}
-          onChange={(event) => setSelectedId(event.target.value)}
-        >
-          {rivals.map((rival) => (
-            <option key={rival.id} value={rival.id}>
-              {rival.name} ({formatTeamTypeLabel(rival.type)})
-            </option>
-          ))}
-        </NativeSelect>
+          onValueChange={setSelectedId}
+          options={rivals.map((rival) => ({
+            value: rival.id,
+            label: rival.name,
+            description: formatTeamTypeLabel(rival.type),
+          }))}
+        />
       </div>
 
       {!summary || summary.totalMatches === 0 ? (

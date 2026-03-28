@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/native-select";
+import { Select } from "@/components/ui/select";
 import type { HeadToHeadPageData } from "@/lib/head-to-head";
 import type { TeamRecord } from "@/lib/types";
 
@@ -30,15 +30,15 @@ export function HeadToHeadView({ data }: Props) {
     return `/head-to-head?${params.toString()}`;
   }
 
-  function handleTeamAChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const newTeamAId = event.target.value || null;
+  function handleTeamAChange(newValue: string) {
+    const newTeamAId = newValue || null;
     // D-17: prevent selecting same team on both sides
     const teamBId = pair.teamB?.id === newTeamAId ? null : pair.teamB?.id ?? null;
     router.push(buildUrl(newTeamAId, teamBId));
   }
 
-  function handleTeamBChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const newTeamBId = event.target.value || null;
+  function handleTeamBChange(newValue: string) {
+    const newTeamBId = newValue || null;
     // D-17: prevent selecting same team on both sides
     const teamAId = pair.teamA?.id === newTeamBId ? null : pair.teamA?.id ?? null;
     router.push(buildUrl(teamAId, newTeamBId));
@@ -74,20 +74,22 @@ export function HeadToHeadView({ data }: Props) {
             <Label htmlFor="selector-team-a">
               Team A
             </Label>
-            <NativeSelect
+            <Select
               id="selector-team-a"
               value={teamAId}
-              onChange={handleTeamAChange}
-            >
-              <option value="">Selecione um time...</option>
-              {options
-                .filter((team: TeamRecord) => team.id !== teamBId)
-                .map((team: TeamRecord) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
-                  </option>
-                ))}
-            </NativeSelect>
+              onValueChange={handleTeamAChange}
+              placeholder="Selecione um time..."
+              options={[
+                { value: "", label: "Selecione um time..." },
+                ...options
+                  .filter((team: TeamRecord) => team.id !== teamBId)
+                  .map((team: TeamRecord) => ({
+                    value: team.id,
+                    label: team.name,
+                    description: team.type === "solo" ? "Solo" : "Duplas",
+                  })),
+              ]}
+            />
           </div>
 
           {/* Team B selector */}
@@ -95,20 +97,22 @@ export function HeadToHeadView({ data }: Props) {
             <Label htmlFor="selector-team-b">
               Team B
             </Label>
-            <NativeSelect
+            <Select
               id="selector-team-b"
               value={teamBId}
-              onChange={handleTeamBChange}
-            >
-              <option value="">Selecione um time...</option>
-              {options
-                .filter((team: TeamRecord) => team.id !== teamAId)
-                .map((team: TeamRecord) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name} ({team.type === "solo" ? "Solo" : "Duplas"})
-                  </option>
-                ))}
-            </NativeSelect>
+              onValueChange={handleTeamBChange}
+              placeholder="Selecione um time..."
+              options={[
+                { value: "", label: "Selecione um time..." },
+                ...options
+                  .filter((team: TeamRecord) => team.id !== teamAId)
+                  .map((team: TeamRecord) => ({
+                    value: team.id,
+                    label: team.name,
+                    description: team.type === "solo" ? "Solo" : "Duplas",
+                  })),
+              ]}
+            />
           </div>
         </div>
 
