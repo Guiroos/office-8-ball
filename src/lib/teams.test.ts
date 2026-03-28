@@ -2,19 +2,25 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock Prisma — never import real Prisma in tests
 const mockTeamMemberFindUnique = vi.fn();
+const mockTeamMemberFindMany = vi.fn();
 const mockTeamMemberCreate = vi.fn();
 const mockTeamMemberDelete = vi.fn();
 const mockTeamFindUnique = vi.fn();
+const mockMatchFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     teamMember: {
       findUnique: (...args: unknown[]) => mockTeamMemberFindUnique(...args),
+      findMany: (...args: unknown[]) => mockTeamMemberFindMany(...args),
       create: (...args: unknown[]) => mockTeamMemberCreate(...args),
       delete: (...args: unknown[]) => mockTeamMemberDelete(...args),
     },
     team: {
       findUnique: (...args: unknown[]) => mockTeamFindUnique(...args),
+    },
+    match: {
+      findMany: (...args: unknown[]) => mockMatchFindMany(...args),
     },
   },
 }));
@@ -46,9 +52,133 @@ describe("teams.ts — member management", () => {
   beforeEach(() => {
     vi.resetModules();
     mockTeamMemberFindUnique.mockReset();
+    mockTeamMemberFindMany.mockReset();
     mockTeamMemberCreate.mockReset();
     mockTeamMemberDelete.mockReset();
     mockTeamFindUnique.mockReset();
+    mockMatchFindMany.mockReset();
+  });
+
+  describe("listUserTeamsWithPartners", () => {
+    it("returns active user teams with partner display data", async () => {
+      const { listUserTeamsWithPartners } = await import("@/lib/teams");
+
+      mockTeamMemberFindMany.mockResolvedValueOnce([
+        {
+          joinedAt: new Date("2026-01-10T00:00:00.000Z"),
+          team: {
+            ...makeTeam({
+              id: "team-duo",
+              name: "dupla afiada",
+              members: [
+                { userId: "user-creator", joinedAt: new Date("2026-01-01T00:00:00.000Z") },
+                { userId: "user-partner", joinedAt: new Date("2026-01-02T00:00:00.000Z") },
+              ],
+            }),
+            members: [
+              {
+                userId: "user-creator",
+                joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+                user: { id: "user-creator", username: "gui.dev", displayName: "Gui" },
+              },
+              {
+                userId: "user-partner",
+                joinedAt: new Date("2026-01-02T00:00:00.000Z"),
+                user: { id: "user-partner", username: "jean.dev", displayName: "Jean" },
+              },
+            ],
+          },
+        },
+        {
+          joinedAt: new Date("2026-01-09T00:00:00.000Z"),
+          team: {
+            ...makeTeam({
+              id: "team-solo",
+              type: "solo",
+              name: "lobo solo",
+              members: [
+                { userId: "user-creator", joinedAt: new Date("2026-01-01T00:00:00.000Z") },
+              ],
+            }),
+            members: [
+              {
+                userId: "user-creator",
+                joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+                user: { id: "user-creator", username: "gui.dev", displayName: "Gui" },
+              },
+            ],
+          },
+        },
+      ]);
+      mockMatchFindMany.mockResolvedValueOnce([
+        {
+          id: "match-1",
+          teamAId: "team-duo",
+          teamBId: "team-rival",
+          winnerTeamId: "team-duo",
+          playedAt: new Date("2026-01-11T00:00:00.000Z"),
+          note: null,
+        },
+      ]);
+
+      const result = await listUserTeamsWithPartners("user-creator");
+
+      expect(mockTeamMemberFindMany).toHaveBeenCalledWith({
+        where: {
+          userId: "user-creator",
+          team: { status: "active" },
+        },
+        include: {
+          team: {
+            include: {
+              members: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      username: true,
+                      displayName: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { joinedAt: "desc" },
+      });
+      expect(mockMatchFindMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ teamAId: { in: ["team-duo", "team-solo"] } }, { teamBId: { in: ["team-duo", "team-solo"] } }],
+        },
+        orderBy: { playedAt: "desc" },
+      });
+      expect(result).toHaveLength(2);
+      expect(result[0]?.partners).toEqual([
+        {
+          userId: "user-partner",
+          username: "jean.dev",
+          displayName: "Jean",
+        },
+      ]);
+      expect(result[0]?.summary).toEqual({
+        wins: 1,
+        losses: 0,
+        winRate: 100,
+        totalMatches: 1,
+        lastFiveResults: ["win"],
+        lastPlayedAt: "2026-01-11T00:00:00.000Z",
+      });
+      expect(result[1]?.summary).toEqual({
+        wins: 0,
+        losses: 0,
+        winRate: 0,
+        totalMatches: 0,
+        lastFiveResults: [],
+        lastPlayedAt: null,
+      });
+      expect(result[1]?.partners).toEqual([]);
+    });
   });
 
   describe("addTeamMember", () => {
