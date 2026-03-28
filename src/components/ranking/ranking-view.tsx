@@ -21,6 +21,13 @@ export function RankingView({
   activePeriod?: "all" | "month" | "week";
   mode: "available" | "unavailable";
 }) {
+  const filters = (
+    <div className="grid gap-3 sm:grid-cols-2 xl:ml-auto xl:w-full xl:max-w-xl">
+      <TypeTabs activeType={activeType} activePeriod={activePeriod} />
+      <PeriodTabs activePeriod={activePeriod} activeType={activeType} />
+    </div>
+  );
+
   if (mode === "unavailable") {
     return (
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -35,14 +42,12 @@ export function RankingView({
   if (teams.length === 0) {
     return (
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <p className="label-wide text-muted-foreground">Ranking</p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight">Placar de times</h1>
-        </div>
-        {/* per D-02, D-12: both filter groups remain visible in empty state */}
-        <TypeTabs activeType={activeType} activePeriod={activePeriod} />
-        <div className="mt-4">
-          <PeriodTabs activePeriod={activePeriod} activeType={activeType} />
+        <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <p className="label-wide text-muted-foreground">Ranking</p>
+            <h1 className="mt-1 text-xl font-semibold tracking-tight">Placar de times</h1>
+          </div>
+          {filters}
         </div>
         {/* per D-13: explicit empty state without automatic fallback to all-time */}
         <div
@@ -68,14 +73,12 @@ export function RankingView({
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <p className="label-wide text-muted-foreground">Ranking</p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight">Placar de times</h1>
-      </div>
-      {/* per D-02, D-12: type and period filters coexist */}
-      <TypeTabs activeType={activeType} activePeriod={activePeriod} />
-      <div className="mt-4">
-        <PeriodTabs activePeriod={activePeriod} activeType={activeType} />
+      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <p className="label-wide text-muted-foreground">Ranking</p>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight">Placar de times</h1>
+        </div>
+        {filters}
       </div>
 
       <section aria-label="Pódio" className="mt-6 grid gap-4 lg:grid-cols-3">
