@@ -31,6 +31,7 @@
   --border: var(--border-raw);
   --border-strong: var(--border-strong-raw);
   --border-inverse: var(--border-inverse-raw);
+  --overlay: var(--overlay-raw);
 
   /* Ring */
   --ring: var(--ring-raw);
@@ -164,6 +165,7 @@
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-border-inverse: var(--border-inverse);
+  --color-overlay: var(--overlay);
   --color-ring: var(--ring);
 
   /* Accent & Gold */
@@ -294,6 +296,10 @@
 
 @utility bg-avatar-gradient {
   background-image: var(--app-shell-avatar-gradient);
+}
+
+@utility bg-overlay {
+  background-color: var(--overlay);
 }
 
 @utility scale-98 {

@@ -115,6 +115,7 @@
   --border-raw: rgba(43, 33, 26, 0.16);
   --border-strong-raw: rgba(43, 33, 26, 0.24);
   --border-inverse-raw: rgba(255, 255, 255, 0.14); /* same in dark */
+  --overlay-raw: rgba(7, 17, 13, 0.72); /* same in dark */
 
   /* Ring */
   --ring-raw: rgba(199, 149, 31, 0.9);
