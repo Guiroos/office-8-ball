@@ -1,15 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 
 type RankingPeriod = "all" | "month" | "week";
 
-const TABS: Array<{ label: string; value: RankingPeriod }> = [
-  { label: "Todos os tempos", value: "all" },
-  { label: "Este mês", value: "month" },
-  { label: "Esta semana", value: "week" },
+const TABS: Array<{ label: string; value: RankingPeriod; description: string }> = [
+  { label: "Todos os tempos", value: "all", description: "Histórico completo" },
+  { label: "Este mês", value: "month", description: "Últimos 30 dias" },
+  { label: "Esta semana", value: "week", description: "Últimos 7 dias" },
 ];
 
 export function PeriodTabs({
@@ -19,6 +20,8 @@ export function PeriodTabs({
   activePeriod: RankingPeriod;
   activeType: "all" | "solo" | "duo";
 }) {
+  const router = useRouter();
+
   function buildHref(period: RankingPeriod): string {
     const params = new URLSearchParams();
     if (activeType !== "all") params.set("type", activeType);
@@ -28,21 +31,22 @@ export function PeriodTabs({
   }
 
   return (
-    <SegmentedControl aria-label="Filtro de período" role="navigation">
-      {TABS.map((tab) => {
-        const active = tab.value === activePeriod;
-        return (
-          <SegmentedControlItem
-            key={tab.value}
-            asChild
-            active={active}
-          >
-            <Link href={buildHref(tab.value)} aria-current={active ? "page" : undefined}>
-              {tab.label}
-            </Link>
-          </SegmentedControlItem>
-        );
-      })}
-    </SegmentedControl>
+    <div className="space-y-1 xl:space-y-0">
+      <Label htmlFor="ranking-period-filter" className="caption text-muted-foreground xl:sr-only">
+        Período
+      </Label>
+      <Select
+        id="ranking-period-filter"
+        value={activePeriod}
+        onValueChange={(nextValue) => {
+          if (nextValue !== activePeriod) {
+            router.push(buildHref(nextValue as RankingPeriod));
+          }
+        }}
+        className="h-10 rounded-lg px-3"
+        showDescriptionInTrigger={false}
+        options={TABS}
+      />
+    </div>
   );
 }

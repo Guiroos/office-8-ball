@@ -23,6 +23,7 @@ export type SelectProps = {
   invalid?: boolean;
   className?: string;
   popupClassName?: string;
+  showDescriptionInTrigger?: boolean;
   options: SelectOption[];
   onValueChange?: (value: string) => void;
 };
@@ -39,6 +40,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
       invalid = false,
       className,
       popupClassName,
+      showDescriptionInTrigger = true,
       options,
       onValueChange,
     },
@@ -98,7 +100,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                   <span className="truncate text-sm font-medium text-foreground">
                     {selectedOption.label}
                   </span>
-                  {selectedOption.description ? (
+                  {showDescriptionInTrigger && selectedOption.description ? (
                     <span className="truncate text-xs text-muted-foreground">
                       {selectedOption.description}
                     </span>
@@ -113,7 +115,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         </SelectPrimitive.Trigger>
 
         <SelectPrimitive.Portal>
-          <SelectPrimitive.Positioner sideOffset={8}>
+          <SelectPrimitive.Positioner alignItemWithTrigger={false} sideOffset={8}>
             <SelectPrimitive.Popup
               className={cn(
                 "z-50 overflow-hidden rounded-2xl border border-border bg-background shadow-lg shadow-foreground/10 backdrop-blur-sm transition-all duration-150 ease-out data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0",

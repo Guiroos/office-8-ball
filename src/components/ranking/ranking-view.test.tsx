@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { RankingView } from "@/components/ranking/ranking-view";
@@ -6,6 +7,13 @@ import type { RankedTeam } from "@/lib/ranking";
 
 const mockListAllTeamsWithStats = vi.fn();
 const mockHasDatabaseUrl = vi.fn();
+const mockPush = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
 
 vi.mock("@/lib/ranking", async () => {
   const actual = await vi.importActual<typeof import("@/lib/ranking")>("@/lib/ranking");
@@ -107,6 +115,10 @@ const teams: RankedTeam[] = [
 ];
 
 describe("RankingView", () => {
+  beforeEach(() => {
+    mockPush.mockReset();
+  });
+
   it("renders podium in 2 | 1 | 3 order", () => {
     render(<RankingView teams={teams} activeType="all" mode="available" />);
 
@@ -155,12 +167,8 @@ describe("RankingView", () => {
   it("renders unavailable header without ranking content", () => {
     render(<RankingView teams={[]} activeType="duo" mode="unavailable" />);
     expect(screen.getByRole("heading", { name: "Placar de times" })).toBeInTheDocument();
-    expect(
-      screen.queryByRole("navigation", { name: "Filtro de tipo de time" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("navigation", { name: "Filtro de período" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Categoria")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Período")).not.toBeInTheDocument();
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
 
@@ -189,10 +197,8 @@ describe("RankingView", () => {
     render(
       <RankingView teams={[]} activeType="solo" activePeriod="month" mode="available" />,
     );
-    // Type tabs nav present
-    expect(screen.getByRole("navigation", { name: "Filtro de tipo de time" })).toBeInTheDocument();
-    // Period tabs nav present
-    expect(screen.getByRole("navigation", { name: "Filtro de período" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Categoria")).toBeInTheDocument();
+    expect(screen.getByLabelText("Período")).toBeInTheDocument();
   });
 
   it("empty state shows period-aware message without falling back to all-time", () => {
@@ -204,20 +210,26 @@ describe("RankingView", () => {
     expect(screen.queryByText(/nesta categoria/)).not.toBeInTheDocument();
   });
 
-  it("type tab links preserve active period in href", () => {
+  it("type filter preserves active period when changing the selection", async () => {
+    const user = userEvent.setup();
+
     render(<RankingView teams={teams} activeType="all" activePeriod="month" mode="available" />);
-    const links = screen.getAllByRole("link");
-    // The "Solo" tab should include period=month when switching to solo
-    const soloLink = links.find((l) => l.textContent === "Solo");
-    expect(soloLink?.getAttribute("href")).toBe("/ranking?type=solo&period=month");
+
+    await user.click(screen.getByRole("combobox", { name: "Categoria" }));
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(mockPush).toHaveBeenCalledWith("/ranking?type=solo&period=month");
   });
 
-  it("period tab links preserve active type in href", () => {
+  it("period filter preserves active type when changing the selection", async () => {
+    const user = userEvent.setup();
+
     render(<RankingView teams={teams} activeType="solo" activePeriod="all" mode="available" />);
-    const links = screen.getAllByRole("link");
-    // The "Esta semana" tab should include type=solo when switching to week
-    const weekLink = links.find((l) => l.textContent === "Esta semana");
-    expect(weekLink?.getAttribute("href")).toBe("/ranking?type=solo&period=week");
+
+    await user.click(screen.getByRole("combobox", { name: "Período" }));
+    await user.keyboard("{ArrowDown}{ArrowDown}{Enter}");
+
+    expect(mockPush).toHaveBeenCalledWith("/ranking?type=solo&period=week");
   });
 });
 
