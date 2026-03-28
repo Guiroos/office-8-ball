@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createCredentials, signUp } from "./helpers/auth";
+import { createCredentials, openCreateTeamDialog, signUp } from "./helpers/auth";
 
 test.describe("team create flow", () => {
   test("create solo team flow", async ({ page }) => {
@@ -9,11 +9,14 @@ test.describe("team create flow", () => {
 
     await signUp(page, credentials);
 
-    await page.goto("/times?tab=create");
+    await openCreateTeamDialog(page);
     await page.getByTestId("team-create-name").fill(teamName);
     await page.getByTestId("team-create-submit").click();
 
-    await expect(page).toHaveURL(/\/times\?tab=teams/);
+    await expect(page).toHaveURL(/\/times\/[^/?#]+$/);
+    await expect(page.getByText(teamName.toLowerCase(), { exact: true })).toBeVisible();
+
+    await page.goto("/times");
     await expect(page.getByText(teamName.toLowerCase(), { exact: true })).toBeVisible();
 
     await page.reload();

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createCredentials, login, logout, signUp } from "./helpers/auth";
+import { createCredentials, createTeam, login, logout, signUp } from "./helpers/auth";
 
 test.describe("team member actions", () => {
   test("manage team members flow", async ({ page }) => {
@@ -15,16 +15,7 @@ test.describe("team member actions", () => {
     // Owner signs up and creates a solo team
     await signUp(page, owner);
 
-    await page.goto("/times?tab=create");
-    await page.getByTestId("team-create-name").fill(teamName);
-    await page.getByTestId("team-create-submit").click();
-    await expect(page).toHaveURL(/\/times\?tab=teams/);
-
-    // Open the team detail page by clicking the team card
-    await page.getByText(teamName.toLowerCase(), { exact: true }).click();
-    await expect(page).toHaveURL(/\/times\//);
-
-    // Save team URL for later use in authorization test
+    await createTeam(page, teamName);
     const teamUrl = page.url();
 
     // Invite the invitee by username (button text: "Convidar Membro")
@@ -53,15 +44,7 @@ test.describe("team member actions", () => {
 
     // Owner creates a team
     await signUp(page, owner);
-    await page.goto("/times?tab=create");
-    await page.getByTestId("team-create-name").fill(teamName);
-    await page.getByTestId("team-create-submit").click();
-    await expect(page).toHaveURL(/\/times\?tab=teams/);
-
-    // Open the team detail to get the URL
-    await page.getByText(teamName.toLowerCase(), { exact: true }).click();
-    await expect(page).toHaveURL(/\/times\//);
-    const teamUrl = page.url();
+    const teamUrl = await createTeam(page, teamName);
 
     await logout(page, owner.username);
 
