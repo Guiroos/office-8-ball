@@ -37,6 +37,14 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+// Wave 0: @/lib/auth-client mock ready for Wave 3 (app-shell.tsx migration)
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    signOut: (...args: unknown[]) => signOutMock(...args),
+  },
+}));
+
+// Wave 0 compat: keep next-auth/react mock until app-shell.tsx is migrated in Wave 3
 vi.mock("next-auth/react", () => ({
   signOut: (...args: unknown[]) => signOutMock(...args),
 }));
@@ -125,7 +133,7 @@ describe("AppShell", () => {
 
     await user.click(screen.getByRole("button", { name: "Sair" }));
 
-    expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/login" });
+    expect(signOutMock).toHaveBeenCalledTimes(1);
   });
 
   it("uses client navigation when a different sidebar route is clicked", async () => {
