@@ -1,224 +1,160 @@
-import { compare } from "bcryptjs";
-import type { NextAuthOptions } from "next-auth";
-import { getServerSession } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import { compare, hash } from "bcryptjs";
+import { betterAuth } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { username } from "better-auth/plugins";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-import {
-  AUTH_RATE_LIMIT_ERROR,
-  buildAuthRateLimitKey,
-  clearAuthRateLimit,
-  getAuthRateLimitStatus,
-  registerAuthFailure,
-} from "@/lib/auth-rate-limit";
-import {
-  validateLoginPayload,
-} from "@/lib/auth-validation";
 import { prisma } from "@/lib/prisma";
 import type { ApiErrorResponse, SessionUser } from "@/lib/types";
 
-type AuthRequestLike = {
-  headers?: Record<string, string | string[] | undefined>;
-};
-
-const AUTH_DISABLED_SECRET = "auth-disabled-no-database";
 const AUTH_UNAVAILABLE_DATABASE_ERROR =
   "Autenticacao indisponivel sem DATABASE_URL configurado.";
-const AUTH_UNAVAILABLE_SECRET_ERROR =
-  "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.";
+const BETTER_AUTH_SECRET_ERROR =
+  "Configuracao de autenticacao invalida: defina BETTER_AUTH_SECRET para usar o login.";
 const AUTH_REQUIRED_ERROR = "Autenticacao obrigatoria.";
 
-export function hasDatabaseUrl() {
+export function hasDatabaseUrl(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
 
-export function hasAuthSecret() {
-  return Boolean(process.env.NEXTAUTH_SECRET?.trim());
+export function hasAuthSecret(): boolean {
+  return Boolean(process.env.BETTER_AUTH_SECRET?.trim());
 }
 
-function shouldUseSecureAuthCookies() {
-  return (
-    process.env.NODE_ENV === "production" ||
-    process.env.NEXTAUTH_URL?.startsWith("https://")
-  );
-}
-
-function getAuthSecret() {
-  if (!hasDatabaseUrl()) {
-    return AUTH_DISABLED_SECRET;
-  }
-
-  const secret = process.env.NEXTAUTH_SECRET?.trim();
-
-  if (!secret) {
-    throw new Error(AUTH_UNAVAILABLE_SECRET_ERROR);
-  }
-
-  return secret;
-}
-
-export function isAuthAvailable() {
+export function isAuthAvailable(): boolean {
   return hasDatabaseUrl() && hasAuthSecret();
 }
 
-export function getAuthUnavailableError() {
-  if (hasDatabaseUrl()) {
-    if (!hasAuthSecret()) {
-      return AUTH_UNAVAILABLE_SECRET_ERROR;
-    }
-
-    return null;
-  }
-
-  return AUTH_UNAVAILABLE_DATABASE_ERROR;
+export function getAuthUnavailableError(): string | null {
+  if (!hasDatabaseUrl()) return AUTH_UNAVAILABLE_DATABASE_ERROR;
+  if (!hasAuthSecret()) return BETTER_AUTH_SECRET_ERROR;
+  return null;
 }
 
-export function getAuthUnavailableResponse() {
+export function getAuthUnavailableResponse(): NextResponse {
   return NextResponse.json<ApiErrorResponse>(
     { error: getAuthUnavailableError() ?? AUTH_UNAVAILABLE_DATABASE_ERROR },
     { status: hasDatabaseUrl() ? 500 : 503 },
   );
 }
 
-export function getAuthRequiredResponse() {
+export function getAuthRequiredResponse(): NextResponse {
   return NextResponse.json<ApiErrorResponse>(
     { error: AUTH_REQUIRED_ERROR },
     { status: 401 },
   );
 }
 
-export function getAuthOptions(): NextAuthOptions {
-  const useSecureCookies = shouldUseSecureAuthCookies();
+// Migration hook: ensures existing next-auth users (who have bcrypt hashes in
+// User.passwordHash but no account record) can sign in via better-auth.
+// On first sign-in, creates the account row by copying User.passwordHash
+// into accounts.password so the username plugin can verify it.
+const migrationMiddleware = createAuthMiddleware(async (ctx) => {
+  const path = ctx.path;
+  if (path !== "/sign-in/username") return;
 
-  return {
-    secret: getAuthSecret(),
-    session: {
-      strategy: "jwt",
-    },
-    useSecureCookies,
-    cookies: {
-      sessionToken: {
-        name: useSecureCookies
-          ? "__Secure-next-auth.session-token"
-          : "next-auth.session-token",
-        options: {
-          httpOnly: true,
-          sameSite: "lax",
-          path: "/",
-          secure: useSecureCookies,
-        },
-      },
-    },
-    pages: {
-      signIn: "/login",
-    },
-    providers: [
-      CredentialsProvider({
-        name: "Usuário e senha",
-        credentials: {
-          username: { label: "Username", type: "text" },
-          password: { label: "Senha", type: "password" },
-        },
-        async authorize(credentials, request) {
-          if (!isAuthAvailable()) {
-            return null;
-          }
+  const body = ctx.body as { username?: string } | undefined;
+  const inputUsername = body?.username;
+  if (!inputUsername) return;
 
-          const validation = validateLoginPayload({
-            username: String(credentials?.username ?? ""),
-            password: String(credentials?.password ?? ""),
-          });
+  const user = await ctx.context.adapter.findOne<{ id: string }>({
+    model: "user",
+    where: [{ field: "username", value: inputUsername.toLowerCase() }],
+  });
 
-          if (!validation.data) {
-            return null;
-          }
+  if (!user?.id) return;
 
-          const { username, password } = validation.data;
-          const rateLimitKey = buildAuthRateLimitKey({
-            action: "login",
-            username,
-            headers: (request as AuthRequestLike | undefined)?.headers,
-          });
-          const rateLimitStatus = await getAuthRateLimitStatus(rateLimitKey);
-
-          if (rateLimitStatus.blocked) {
-            throw new Error(AUTH_RATE_LIMIT_ERROR);
-          }
-
-          const user = await prisma.user.findUnique({
-            where: { username },
-          });
-
-          if (!user) {
-            const failure = await registerAuthFailure(rateLimitKey);
-
-            if (failure.blocked) {
-              throw new Error(AUTH_RATE_LIMIT_ERROR);
-            }
-
-            return null;
-          }
-
-          const isPasswordValid = await compare(password, user.passwordHash);
-
-          if (!isPasswordValid) {
-            const failure = await registerAuthFailure(rateLimitKey);
-
-            if (failure.blocked) {
-              throw new Error(AUTH_RATE_LIMIT_ERROR);
-            }
-
-            return null;
-          }
-
-          await clearAuthRateLimit(rateLimitKey);
-
-          return {
-            id: user.id,
-            name: user.username,
-            username: user.username,
-          };
-        },
-      }),
+  const existingAccount = await ctx.context.adapter.findOne({
+    model: "account",
+    where: [
+      { field: "userId", value: user.id },
+      { field: "providerId", value: "credential" },
     ],
-    callbacks: {
-      async jwt({ token, user }) {
-        if (user) {
-          token.username = user.username;
-        }
+  });
 
-        return token;
-      },
-      async session({ session, token }) {
-        if (session.user && token.sub) {
-          session.user.id = token.sub;
-          session.user.username = String(token.username ?? session.user.name ?? "");
-          session.user.name = session.user.username;
-        }
+  if (!existingAccount) {
+    // User signed up via next-auth — migrate their passwordHash to the accounts table.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, passwordHash: true },
+    });
 
-        return session;
+    if (dbUser?.passwordHash) {
+      await ctx.context.adapter.create({
+        model: "account",
+        data: {
+          id: crypto.randomUUID(),
+          accountId: dbUser.id,
+          providerId: "credential",
+          userId: dbUser.id,
+          password: dbUser.passwordHash,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+  }
+});
+
+export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET ?? "auth-disabled-no-database",
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  emailAndPassword: {
+    enabled: true,
+    password: {
+      hash: (password: string) => hash(password, 12),
+      // Standard bcrypt verification. The migration hook above ensures account.password
+      // is populated from User.passwordHash for users migrated from next-auth.
+      verify: async ({
+        hash: storedHash,
+        password: plaintext,
+      }: {
+        hash: string;
+        password: string;
+      }) => {
+        return compare(plaintext, storedHash);
       },
     },
-  };
-}
+  },
+  plugins: [username()],
+  user: {
+    modelName: "User",
+  },
+  hooks: {
+    before: migrationMiddleware,
+  },
+  advanced: {
+    defaultCookieAttributes: {
+      httpOnly: true,
+      sameSite: "lax" as const,
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+    },
+  },
+});
 
 export async function getAuthSession() {
   if (!isAuthAvailable()) {
     return null;
   }
-
-  return getServerSession(getAuthOptions());
+  return auth.api.getSession({ headers: await headers() });
 }
 
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {
   const session = await getAuthSession();
 
-  if (!session?.user?.id || !session.user.username) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sessionUser = (session as any)?.user;
+
+  if (!sessionUser?.id || !sessionUser?.username) {
     return null;
   }
 
   const profile = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: sessionUser.id },
     select: {
       displayName: true,
       avatarUrl: true,
@@ -226,8 +162,8 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
   });
 
   return {
-    id: session.user.id,
-    username: session.user.username,
+    id: sessionUser.id,
+    username: sessionUser.username,
     displayName: profile?.displayName ?? null,
     avatarUrl: profile?.avatarUrl ?? null,
   };
