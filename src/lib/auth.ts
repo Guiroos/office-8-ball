@@ -85,7 +85,6 @@ const migrationMiddleware = createAuthMiddleware(async (ctx) => {
       await ctx.context.adapter.create({
         model: "account",
         data: {
-          id: crypto.randomUUID(),
           accountId: dbUser.id,
           providerId: "credential",
           userId: dbUser.id,
