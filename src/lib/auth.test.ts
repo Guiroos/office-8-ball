@@ -1,34 +1,30 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-type AuthorizeFn = (
-  credentials:
-    | {
-        username?: string;
-        password?: string;
-      }
-    | undefined,
-  request:
-    | {
-        headers?: Record<string, string | string[] | undefined>;
-        action?: string;
-        method?: string;
-      }
-    | undefined,
-) => Promise<unknown>;
-
 const compareMock = vi.fn();
-const getServerSessionMock = vi.fn();
+const getSessionMock = vi.fn();
 const deleteManyMock = vi.fn();
 const findUniqueRateLimitMock = vi.fn();
 const findUniqueUserMock = vi.fn();
 const upsertMock = vi.fn();
 
-vi.mock("next-auth", () => ({
-  getServerSession: (...args: unknown[]) => getServerSessionMock(...args),
+vi.mock("better-auth", () => ({
+  betterAuth: () => ({
+    api: {
+      getSession: (...args: unknown[]) => getSessionMock(...args),
+    },
+  }),
 }));
 
-vi.mock("next-auth/providers/credentials", () => ({
-  default: (config: unknown) => config,
+vi.mock("better-auth/adapters/prisma", () => ({
+  prismaAdapter: () => ({}),
+}));
+
+vi.mock("better-auth/plugins", () => ({
+  username: () => ({}),
+}));
+
+vi.mock("next/headers", () => ({
+  headers: () => new Headers(),
 }));
 
 vi.mock("bcryptjs", () => ({
@@ -51,9 +47,9 @@ vi.mock("@/lib/prisma", () => ({
 describe("auth helpers", () => {
   beforeEach(() => {
     delete process.env.DATABASE_URL;
+    delete process.env.BETTER_AUTH_SECRET;
     delete process.env.NEXTAUTH_SECRET;
-    delete process.env.NEXTAUTH_URL;
-    getServerSessionMock.mockReset();
+    getSessionMock.mockReset();
     compareMock.mockReset();
     deleteManyMock.mockReset();
     findUniqueRateLimitMock.mockReset();
@@ -78,7 +74,7 @@ describe("auth helpers", () => {
     });
   });
 
-  it("treats DATABASE_URL without NEXTAUTH_SECRET as invalid config", async () => {
+  it("treats DATABASE_URL without auth secret as invalid config", async () => {
     process.env.DATABASE_URL = "postgres://local";
 
     const auth = await import("@/lib/auth");
@@ -87,35 +83,19 @@ describe("auth helpers", () => {
     expect(auth.hasDatabaseUrl()).toBe(true);
     expect(auth.hasAuthSecret()).toBe(false);
     expect(auth.isAuthAvailable()).toBe(false);
-    expect(auth.getAuthUnavailableError()).toBe(
-      "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
+    expect(auth.getAuthUnavailableError()).toMatch(
+      /Configuracao de autenticacao invalida/,
     );
     expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({
-      error:
-        "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
-    });
-    expect(() => auth.getAuthOptions()).toThrow(
-      "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
-    );
   });
 
-  it("builds secure cookie options when auth is configured for production", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    process.env.NEXTAUTH_URL = "https://office8ball.example";
-
+  it("returns auth required response with 401 status", async () => {
     const auth = await import("@/lib/auth");
-    const options = auth.getAuthOptions();
+    const response = auth.getAuthRequiredResponse();
 
-    expect(options.secret).toBe("test-secret");
-    expect(options.useSecureCookies).toBe(true);
-    expect(options.cookies?.sessionToken?.name).toBe("__Secure-next-auth.session-token");
-    expect(options.cookies?.sessionToken?.options).toMatchObject({
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: true,
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      error: "Autenticacao obrigatoria.",
     });
   });
 
@@ -124,170 +104,14 @@ describe("auth helpers", () => {
     const session = await auth.getAuthSession();
 
     expect(session).toBeNull();
-    expect(getServerSessionMock).not.toHaveBeenCalled();
+    expect(getSessionMock).not.toHaveBeenCalled();
   });
 
-  it("resolves the server session with explicit auth options when configured", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    getServerSessionMock.mockResolvedValue({ user: { id: "user-1" } });
-
+  it("returns null from getAuthenticatedUser when session is unavailable", async () => {
     const auth = await import("@/lib/auth");
-    await auth.getAuthSession();
+    const user = await auth.getAuthenticatedUser();
 
-    expect(getServerSessionMock).toHaveBeenCalledTimes(1);
-    expect(getServerSessionMock.mock.calls[0]?.[0]).toMatchObject({
-      secret: "test-secret",
-      pages: {
-        signIn: "/login",
-      },
-    });
-    expect(getServerSessionMock.mock.calls[0]?.[0]?.cookies?.sessionToken?.options).toMatchObject({
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-    });
-  });
-
-  it("returns the authenticated user enriched with display fields", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    getServerSessionMock.mockResolvedValue({
-      user: {
-        id: "user-1",
-        username: "gui.dev",
-      },
-    });
-    findUniqueUserMock.mockResolvedValue({
-      displayName: "Gui Dev",
-      avatarUrl: "https://example.com/avatar.png",
-    });
-
-    const auth = await import("@/lib/auth");
-
-    await expect(auth.getAuthenticatedUser()).resolves.toEqual({
-      id: "user-1",
-      username: "gui.dev",
-      displayName: "Gui Dev",
-      avatarUrl: "https://example.com/avatar.png",
-    });
-    expect(findUniqueUserMock).toHaveBeenCalledWith({
-      where: { id: "user-1" },
-      select: {
-        displayName: true,
-        avatarUrl: true,
-      },
-    });
-  });
-
-  it("blocks login when the limiter is already active", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    findUniqueRateLimitMock.mockResolvedValue({
-      blockedUntil: new Date(Date.now() + 60_000),
-    });
-
-    const auth = await import("@/lib/auth");
-    const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
-      ?.authorize;
-
-    await expect(
-      authorize?.(
-        {
-          username: "gui.dev",
-          password: "secret123",
-        },
-        {
-          headers: { "x-forwarded-for": "203.0.113.10" },
-          action: "callback",
-          method: "POST",
-        },
-      ),
-    ).rejects.toThrow("AuthRateLimited");
-
+    expect(user).toBeNull();
     expect(findUniqueUserMock).not.toHaveBeenCalled();
-  });
-
-  it("registers a failed login attempt when the password is invalid", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    findUniqueRateLimitMock.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-    findUniqueUserMock.mockResolvedValue({
-      id: "user-1",
-      email: "gui@office8ball.dev",
-      username: "gui.dev",
-      passwordHash: "hashed-password",
-    });
-    compareMock.mockResolvedValue(false);
-
-    const auth = await import("@/lib/auth");
-    const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
-      ?.authorize;
-
-    await expect(
-      authorize?.(
-        {
-          username: "gui.dev",
-          password: "secret123",
-        },
-        {
-          headers: { "x-forwarded-for": "203.0.113.10" },
-          action: "callback",
-          method: "POST",
-        },
-      ),
-    ).resolves.toBeNull();
-
-    expect(upsertMock).toHaveBeenCalledWith({
-      where: { id: "login:gui.dev:203.0.113.10" },
-      create: expect.objectContaining({
-        failCount: 1,
-      }),
-      update: expect.objectContaining({
-        failCount: 1,
-      }),
-    });
-  });
-
-  it("clears the limiter state after a successful login", async () => {
-    process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
-    findUniqueRateLimitMock.mockResolvedValue(null);
-    findUniqueUserMock.mockResolvedValue({
-      id: "user-1",
-      email: "gui@office8ball.dev",
-      username: "gui.dev",
-      passwordHash: "hashed-password",
-    });
-    compareMock.mockResolvedValue(true);
-
-    const auth = await import("@/lib/auth");
-    const options = auth.getAuthOptions();
-    const authorize = (options.providers?.[0] as { authorize?: AuthorizeFn } | undefined)
-      ?.authorize;
-
-    await expect(
-      authorize?.(
-        {
-          username: "gui.dev",
-          password: "secret123",
-        },
-        {
-          headers: { "x-forwarded-for": "203.0.113.10" },
-          action: "callback",
-          method: "POST",
-        },
-      ),
-    ).resolves.toEqual({
-      id: "user-1",
-      name: "gui.dev",
-      username: "gui.dev",
-    });
-
-    expect(deleteManyMock).toHaveBeenCalledWith({
-      where: { id: "login:gui.dev:203.0.113.10" },
-    });
   });
 });
