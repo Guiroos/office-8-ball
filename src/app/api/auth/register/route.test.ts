@@ -28,7 +28,7 @@ vi.mock("@/lib/prisma", () => ({
 describe("/api/auth/register", () => {
   beforeEach(() => {
     process.env.DATABASE_URL = "postgres://local";
-    process.env.NEXTAUTH_SECRET = "test-secret";
+    process.env.BETTER_AUTH_SECRET = "test-secret";
     findUniqueMock.mockReset();
     upsertMock.mockReset();
     deleteManyMock.mockReset();
@@ -228,8 +228,8 @@ describe("/api/auth/register", () => {
     });
   });
 
-  it("returns 503 when NEXTAUTH_SECRET is missing", async () => {
-    delete process.env.NEXTAUTH_SECRET;
+  it("returns 503 when BETTER_AUTH_SECRET is missing", async () => {
+    delete process.env.BETTER_AUTH_SECRET;
     const route = await import("@/app/api/auth/register/route");
 
     const response = await route.POST(
@@ -246,7 +246,7 @@ describe("/api/auth/register", () => {
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({
       error:
-        "Configuracao de autenticacao invalida: defina NEXTAUTH_SECRET para usar o login.",
+        "Configuracao de autenticacao invalida: defina BETTER_AUTH_SECRET para usar o login.",
     });
   });
 });
