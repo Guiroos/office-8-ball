@@ -38,8 +38,7 @@ jobs:
           --health-retries=5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/office_8_ball_e2e
-      NEXTAUTH_SECRET: e2e-test-secret
-      NEXTAUTH_URL: http://127.0.0.1:3000
+      BETTER_AUTH_SECRET: e2e-test-secret
       CI: true
 
     steps:
