@@ -142,3 +142,12 @@ None.
 ---
 *Phase: 09-auth-migration-next-auth-to-better-auth*
 *Completed: 2026-03-29*
+
+## Self-Check: PASSED
+
+- FOUND: `.planning/phases/09-auth-migration-next-auth-to-better-auth/09-04-SUMMARY.md`
+- FOUND: commit `4536d48` (feat - proxy.ts, [...all] route, delete next-auth files)
+- FOUND: commit `1727742` (chore - rename NEXTAUTH_SECRET to BETTER_AUTH_SECRET)
+- FOUND: commit `d1026f3` (fix - test update for BETTER_AUTH_SECRET)
+- FOUND: commit `0d52b67` (fix - remove id field from migration hook)
+- FOUND: commit `31473d6` (docs - SUMMARY.md and state metadata)
