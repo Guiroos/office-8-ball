@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'prisma/**'
-      - 'middleware.ts'
+      - 'proxy.ts'
       - 'next.config.*'
       - 'tsconfig*.json'
       - 'playwright.config.*'

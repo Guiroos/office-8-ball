@@ -24,7 +24,7 @@ jobs:
             src:
               - 'src/**'
               - 'prisma/**'
-              - 'middleware.ts'
+              - 'proxy.ts'
               - 'next.config.*'
               - 'tsconfig*.json'
               - 'vitest.config.*'
