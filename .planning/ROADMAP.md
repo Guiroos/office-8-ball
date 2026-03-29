@@ -233,10 +233,10 @@ Plans:
 6. proxy.ts replaces middleware.ts with same route matcher config
 7. npm run test passes; npm run typecheck passes; npm run build succeeds
 
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Wave 0: Update test mocks (auth.test.ts, login-screen.test.tsx, app-shell.test.tsx) to reference better-auth/auth-client before production code changes
+- [x] 09-01-PLAN.md — Wave 0: Update test mocks (auth.test.ts, login-screen.test.tsx, app-shell.test.tsx) to reference better-auth/auth-client before production code changes
 - [ ] 09-02-PLAN.md — Wave 1: Install better-auth, rewrite src/lib/auth.ts, add Session + Account Prisma models + migration
 - [ ] 09-03-PLAN.md — Wave 2: Create src/lib/auth-client.ts, update login-screen.tsx and app-shell.tsx
 - [ ] 09-04-PLAN.md — Wave 3: Create proxy.ts, create [...all] route handler, delete [...nextauth] + next-auth.d.ts + middleware.ts; full suite verification
@@ -255,7 +255,7 @@ Plans:
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 2/2 | Complete   | 2026-03-27 |
 | 8. Ranking/Team Verification Recovery | 2/2 | Complete   | 2026-03-27 |
-| 9. Auth Migration next-auth to better-auth | 0/4 | Planned    | — |
+| 9. Auth Migration next-auth to better-auth | 1/4 | In Progress|  |
 
 ---
 
