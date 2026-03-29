@@ -237,7 +237,7 @@ Plans:
 
 Plans:
 - [x] 09-01-PLAN.md — Wave 0: Update test mocks (auth.test.ts, login-screen.test.tsx, app-shell.test.tsx) to reference better-auth/auth-client before production code changes
-- [ ] 09-02-PLAN.md — Wave 1: Install better-auth, rewrite src/lib/auth.ts, add Session + Account Prisma models + migration
+- [x] 09-02-PLAN.md — Wave 1: Install better-auth, rewrite src/lib/auth.ts, add Session + Account Prisma models + migration
 - [ ] 09-03-PLAN.md — Wave 2: Create src/lib/auth-client.ts, update login-screen.tsx and app-shell.tsx
 - [ ] 09-04-PLAN.md — Wave 3: Create proxy.ts, create [...all] route handler, delete [...nextauth] + next-auth.d.ts + middleware.ts; full suite verification
 

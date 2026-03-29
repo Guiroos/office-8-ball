@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-29T22:26:55.363Z"
+last_updated: "2026-03-29T22:35:48.385Z"
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Executing Phase 09
+**Status:** Ready to execute
 **Last updated:** 2026-03-29 — Phase 09 Plan 01 complete (Wave 0 test mock updates)
 
 ---
@@ -36,7 +36,7 @@ progress:
 ## Current Position
 
 Phase: 09 (auth-migration-next-auth-to-better-auth) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Roadmap Summary
 
@@ -182,6 +182,10 @@ Plan: 2 of 4
     - Implication: InviteMemberDialog and MemberList have no session dependency; testable in isolation with mock props
 
 26. **Wave 0 dual-mock pattern: keep next-auth/react as compat relay alongside @/lib/auth-client mock** (Plan 09-01)
+
+27. **better-auth migration hook via createAuthMiddleware** (Plan 09-02)
+    - Rationale: The username plugin reads account.password BEFORE calling password.verify. Existing next-auth users have no account record — hook intercepts /sign-in/username and seeds account row from User.passwordHash on first sign-in
+    - Implication: Seamless migration without password resets; password.verify is standard bcrypt after hook populates account record
     - Rationale: Production components (login-screen.tsx, app-shell.tsx) still import from next-auth/react until Wave 3 migration. Removing the next-auth/react mock causes signIn-dependent tests to fail. Dual-mock wires both to the same signInMock/signOutMock for zero-failure Wave 0 baseline.
     - Implication: When Plan 03 migrates production components to @/lib/auth-client, the next-auth/react vi.mock blocks are removed from those test files
 
@@ -238,3 +242,4 @@ Plan: 2 of 4
 *Last session: 2026-03-26 — Completed 07-01-PLAN.md (team-detail membership gate: TeamDetailResult discriminated union, isTeamMember gate before heavy queries, TeamDetailAccessDenied component, 11 tests, TEAM-02 access hardening)*
 *Last session: 2026-03-26 — Completed 07-02-PLAN.md (team member actions: InviteMemberDialog username lookup + POST, MemberList inline Confirmar/Cancelar + DELETE, 19 new component+route tests, E2E spec, TEAM-02 fully validated)*
 *Last session: 2026-03-29 — Completed 09-01-PLAN.md (Wave 0 test mock updates: auth.test.ts better-auth mocks, login-screen.test.tsx + app-shell.test.tsx @/lib/auth-client mocks, 2 tasks, 3 files, 21 tests, stopped at Plan 2 of 4)*
+*Last session: 2026-03-29 — Completed 09-02-PLAN.md (better-auth core library swap: package swap + Prisma Session/Account models + auth.ts rewrite with betterAuth singleton + migration hook, 2 tasks, 5 files, 5 tests, stopped at Plan 3 of 4)*
