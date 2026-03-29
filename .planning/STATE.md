@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-03-29T22:40:02.006Z"
+status: verifying
+last_updated: "2026-03-29T23:00:46.479Z"
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 21
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last updated:** 2026-03-29 — Phase 09 Plan 01 complete (Wave 0 test mock updates)
 
 ---
@@ -244,3 +244,4 @@ Plan: 4 of 4
 *Last session: 2026-03-29 — Completed 09-01-PLAN.md (Wave 0 test mock updates: auth.test.ts better-auth mocks, login-screen.test.tsx + app-shell.test.tsx @/lib/auth-client mocks, 2 tasks, 3 files, 21 tests, stopped at Plan 2 of 4)*
 *Last session: 2026-03-29 — Completed 09-02-PLAN.md (better-auth core library swap: package swap + Prisma Session/Account models + auth.ts rewrite with betterAuth singleton + migration hook, 2 tasks, 5 files, 5 tests, stopped at Plan 3 of 4)*
 *Last session: 2026-03-29 — Completed 09-03-PLAN.md (auth client module + component migration: auth-client.ts created, login-screen.tsx + app-shell.tsx migrated from next-auth/react to authClient, 2 tasks, 3 files, 16 tests pass, stopped at Plan 4 of 4)*
+*Last session: 2026-03-29 — Completed 09-04-PLAN.md (final better-auth wiring: proxy.ts replaces middleware.ts, [...all] route handler replaces [...nextauth], NEXTAUTH_SECRET renamed to BETTER_AUTH_SECRET in env+CI, next-auth fully removed from runtime codebase, human-verified end-to-end, 4 tasks, 10 files, Phase 09 complete)*

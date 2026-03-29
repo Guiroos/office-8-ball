@@ -17,7 +17,7 @@
 - [x] **Phase 6: Team Creation Flow Wiring** — Wire `/times?tab=create` solo team submit flow to `POST /api/teams` with runtime validation and success/error handling (planned 2026-03-26) (completed 2026-03-27)
 - [x] **Phase 7: Team Details Access & Member Actions** — Enforce member-only team detail access and wire invite/remove UI actions to member endpoints (planned 2026-03-26) (completed 2026-03-27)
 - [x] **Phase 8: Ranking/Team Verification Recovery** — Re-verify Phase 4 requirements and restore verification traceability for `RANK-01..04`; `TEAM-02` cross-referenced to Phase 7 as canonical proof (planned 2026-03-26) (completed 2026-03-27)
-- [ ] **Phase 9: Auth Migration next-auth to better-auth** — Replace next-auth 4.24.13 with better-auth, preserving all auth behaviors: username/password login, database sessions, rate limiting, middleware-based route protection, DATABASE_URL guard (planned 2026-03-28)
+- [x] **Phase 9: Auth Migration next-auth to better-auth** — Replace next-auth 4.24.13 with better-auth, preserving all auth behaviors: username/password login, database sessions, rate limiting, middleware-based route protection, DATABASE_URL guard (planned 2026-03-28) (completed 2026-03-29)
 
 ---
 
@@ -233,13 +233,13 @@ Plans:
 6. proxy.ts replaces middleware.ts with same route matcher config
 7. npm run test passes; npm run typecheck passes; npm run build succeeds
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 09-01-PLAN.md — Wave 0: Update test mocks (auth.test.ts, login-screen.test.tsx, app-shell.test.tsx) to reference better-auth/auth-client before production code changes
 - [x] 09-02-PLAN.md — Wave 1: Install better-auth, rewrite src/lib/auth.ts, add Session + Account Prisma models + migration
 - [x] 09-03-PLAN.md — Wave 2: Create src/lib/auth-client.ts, update login-screen.tsx and app-shell.tsx
-- [ ] 09-04-PLAN.md — Wave 3: Create proxy.ts, create [...all] route handler, delete [...nextauth] + next-auth.d.ts + middleware.ts; full suite verification
+- [x] 09-04-PLAN.md — Wave 3: Create proxy.ts, create [...all] route handler, delete [...nextauth] + next-auth.d.ts + middleware.ts; full suite verification
 
 ---
 
@@ -255,7 +255,7 @@ Plans:
 | 6. Team Creation Flow Wiring | 2/2 | Complete   | 2026-03-27 |
 | 7. Team Details Access & Member Actions | 2/2 | Complete   | 2026-03-27 |
 | 8. Ranking/Team Verification Recovery | 2/2 | Complete   | 2026-03-27 |
-| 9. Auth Migration next-auth to better-auth | 3/4 | In Progress|  |
+| 9. Auth Migration next-auth to better-auth | 4/4 | Complete   | 2026-03-29 |
 
 ---
 
