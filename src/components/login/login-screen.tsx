@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { type FormEvent, useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -165,34 +165,38 @@ export function LoginScreen({
       throw new Error(payload?.error ?? "register_failed");
     }
 
-    const signInResult = await signIn("credentials", {
+    const { error: signInError } = await authClient.signIn.username({
       username: form.username,
       password: form.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
     });
 
-    if (!signInResult || signInResult.error) {
+    if (signInError) {
       setGeneralError("Conta criada, mas nao foi possivel abrir a sessao.");
-      throw new Error(signInResult?.error ?? "signin_after_register_failed");
+      throw new Error(
+        (typeof signInError === "object" && signInError !== null && "message" in signInError
+          ? (signInError as { message?: string }).message
+          : String(signInError)) ?? "signin_after_register_failed",
+      );
     }
   }
 
   async function handleLogin() {
-    const signInResult = await signIn("credentials", {
+    const { error } = await authClient.signIn.username({
       username: form.username,
       password: form.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
     });
 
-    if (!signInResult || signInResult.error) {
+    if (error) {
+      const errorMessage =
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message?: string }).message
+          : String(error);
       setGeneralError(
-        signInResult?.error === AUTH_RATE_LIMIT_ERROR
+        errorMessage === AUTH_RATE_LIMIT_ERROR
           ? "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente."
           : "Username ou senha invalidos.",
       );
-      throw new Error(signInResult?.error ?? "signin_failed");
+      throw new Error(errorMessage ?? "signin_failed");
     }
   }
 
@@ -224,7 +228,6 @@ export function LoginScreen({
       }
 
       router.push("/dashboard");
-      router.refresh();
     } catch {
       // Error feedback is already set by the auth handlers above.
     } finally {

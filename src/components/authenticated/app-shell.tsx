@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import {
   ChevronDown,
   LayoutDashboard,
@@ -171,6 +171,8 @@ function UserMenu({
   onClose: () => void;
   onNavigate: (href: string, onBeforeNavigate?: () => void) => void;
 }) {
+  const router = useRouter();
+
   return (
     <div
       className="text-sidebar-foreground grid gap-1"
@@ -202,7 +204,11 @@ function UserMenu({
         className="h-10 justify-start rounded-sm border-transparent bg-transparent px-3 text-sidebar-foreground shadow-none hover:bg-sidebar-hover focus-visible:ring-offset-sidebar-menu"
         onClick={() => {
           onClose();
-          void signOut({ callbackUrl: "/login" });
+          void authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => router.push("/login"),
+            },
+          });
         }}
         data-testid="dashboard-sign-out"
       >
