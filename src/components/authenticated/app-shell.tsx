@@ -14,8 +14,17 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { type ComponentType, type MouseEvent, type ReactNode, useMemo, useState } from "react";
+import {
+  Suspense,
+  type ComponentType,
+  type MouseEvent,
+  type ReactNode,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
+import { AuthenticatedRouteLoading } from "@/components/authenticated/authenticated-route-loading";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -306,16 +315,13 @@ export function AppShell({ user, children }: AppShellProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const [prevPathname, setPrevPathname] = useState(pathname);
+  const [isNavigating, startNavigation] = useTransition();
 
-  // Clear pendingHref whenever pathname changes (covers Back/Forward navigation too).
-  // Derived-state-during-render pattern: avoids a useEffect round-trip.
-  if (prevPathname !== pathname) {
-    setPrevPathname(pathname);
+  if (pendingHref === pathname && !isNavigating) {
     setPendingHref(null);
   }
 
-  const isRoutePending = pendingHref !== null && pendingHref !== pathname;
+  const isRoutePending = isNavigating || (pendingHref !== null && pendingHref !== pathname);
 
   function handleNavigation(href: string, onBeforeNavigate?: () => void) {
     onBeforeNavigate?.();
@@ -326,7 +332,9 @@ export function AppShell({ user, children }: AppShellProps) {
     }
 
     setPendingHref(href);
-    router.push(href);
+    startNavigation(() => {
+      router.push(href);
+    });
   }
 
   return (
@@ -339,6 +347,7 @@ export function AppShell({ user, children }: AppShellProps) {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col bg-content-gradient">
+          {isRoutePending ? <span className="sr-only" role="status">Carregando rota</span> : null}
           <div
             aria-hidden="true"
             className={cn(
@@ -363,7 +372,14 @@ export function AppShell({ user, children }: AppShellProps) {
             </Button>
           </header>
 
-          <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">{children}</div>
+          <div
+            className="min-w-0 flex-1 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
+            aria-busy={isRoutePending}
+          >
+            <Suspense fallback={<AuthenticatedRouteLoading framed={false} />}>
+              {children}
+            </Suspense>
+          </div>
         </div>
       </div>
 

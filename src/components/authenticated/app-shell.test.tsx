@@ -155,5 +155,6 @@ describe("AppShell", () => {
     await user.click(screen.getAllByRole("link", { name: "Times" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/times");
+    expect(screen.getByRole("status")).toHaveTextContent("Carregando rota");
   });
 });
