@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, type Prisma } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client/edge";
 
 declare global {
   var __office8ballPrisma: PrismaClient | undefined;
