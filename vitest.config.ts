@@ -5,8 +5,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "next/image": path.resolve(__dirname, "__mocks__/next-image.tsx"),
+      "@": path.resolve(import.meta.dirname, "src"),
+      "next/image": path.resolve(import.meta.dirname, "__mocks__/next-image.tsx"),
     },
   },
   test: {

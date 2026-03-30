@@ -11,6 +11,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    // vinext build artifacts
+    "dist/**",
     "next-env.d.ts",
     // GSD tooling — not part of the app bundle
     ".claude/**",

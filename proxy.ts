@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const authRequired = Boolean(process.env.DATABASE_URL?.trim());
 
-export default async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (!authRequired) {
     return NextResponse.next();
   }
@@ -16,6 +16,8 @@ export default async function proxy(request: NextRequest) {
 
   return NextResponse.next();
 }
+
+export default proxy;
 
 export const config = {
   matcher: [
