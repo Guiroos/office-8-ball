@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Definir a camada operacional minima do repositorio para manter qualidade, reduzir risco de supply chain e integrar os checks do GitHub com o fluxo de deploy controlado na Vercel.
+Definir a camada operacional minima do repositorio para manter qualidade, reduzir risco de supply chain e integrar os checks do GitHub com o fluxo de deploy controlado na Cloudflare Workers.
 
-O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plataforma de deploy, mas sem previews automaticos por Git enquanto `vercel.json` mantiver `git.deploymentEnabled: false`.
+O GitHub valida codigo, dependencias e seguranca. A Cloudflare Workers e a plataforma de deploy, com publicacao de producao acionada por tag via GitHub Actions.
 
 ## Estado atual
 
@@ -26,19 +26,19 @@ O GitHub valida codigo, dependencias e seguranca. A Vercel continua sendo a plat
 - `Deploy Production Tag`
   - roda em `push` de tags `v*` e por `workflow_dispatch`
   - aplica `prisma migrate deploy` usando `DATABASE_URL` antes do build
-  - usa `Vercel CLI` para publicar em producao a partir da tag liberada
+  - executa `wrangler deploy` para publicar em producao a partir da tag liberada
 
 ### Automacao de updates
 
 - `Dependabot` atualiza dependencias `npm` semanalmente
 - `Dependabot` tambem atualiza `github-actions` semanalmente
 
-### Publicacao na Vercel
+### Publicacao na Cloudflare
 
-- `vercel.json` define `git.deploymentEnabled: false`
-- commits e merges nao geram deploy automatico na Vercel
+- `wrangler.jsonc` define o worker e configuracao de runtime
+- commits e merges nao geram deploy automatico na Cloudflare
 - a publicacao de producao acontece apenas pelo workflow `Deploy Production Tag`
-- o fluxo de preview automatico por branch/PR deixa de existir com essa configuracao
+- ambientes de preview podem ser criados depois com `wrangler deploy` em workflows dedicados
 
 ## Contratos operacionais
 
@@ -48,7 +48,7 @@ Os nomes dos checks abaixo sao parte do contrato operacional do repositorio:
 - `Dependency Review`
 - `CodeQL`
 
-Se algum nome mudar, o ruleset do GitHub e os Deployment Checks da Vercel tambem precisam ser atualizados.
+Se algum nome mudar, o ruleset do GitHub e os Deployment Checks da plataforma de deploy tambem precisam ser atualizados.
 
 ## Fluxo esperado de PR
 
@@ -57,7 +57,7 @@ Se algum nome mudar, o ruleset do GitHub e os Deployment Checks da Vercel tambem
 3. O merge em `master` so deve ocorrer com os checks obrigatorios verdes.
 4. Quando a release estiver pronta, o time cria uma tag `vX.Y.Z`.
 5. O GitHub executa `Deploy Production Tag`.
-6. A Vercel publica a producao a partir da tag liberada.
+6. A Cloudflare publica a producao a partir da tag liberada.
 
 ## Configuracoes manuais recomendadas
 
@@ -81,17 +81,17 @@ Ativar tambem:
 
 As convencoes de branch naming, commits e releases ficam centralizadas em `techspec/git-conventions.md`.
 
-### Vercel
+### Cloudflare
 
 Manter:
 
-- projeto conectado ao repositorio
-- build/deploy de producao acionado por GitHub Actions com `Vercel CLI`
+- API token com permissao de deploy para o account alvo
+- build/deploy de producao acionado por GitHub Actions com `wrangler deploy`
 
 Configurar:
 
-- `DATABASE_URL`, `NEXTAUTH_SECRET`, `VERCEL_TOKEN`, `VERCEL_ORG_ID` e `VERCEL_PROJECT_ID` como secrets do GitHub Actions
-- automatic Git deployments desabilitados no projeto via `vercel.json`
+- `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` como secrets do GitHub Actions
+- `wrangler.jsonc` como fonte de verdade de deploy/runtime
 
 ## Limites e proximos passos
 
