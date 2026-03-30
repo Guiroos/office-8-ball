@@ -10,6 +10,18 @@ const globalForPrisma = globalThis as typeof globalThis & {
   __office8ballPrisma?: PrismaClient;
 };
 
+function getPgSslConfig(databaseUrl: string) {
+  const sslMode = new URL(databaseUrl).searchParams.get("sslmode");
+
+  if (!sslMode || sslMode === "disable") {
+    return undefined;
+  }
+
+  return {
+    rejectUnauthorized: true,
+  };
+}
+
 function createPrismaClient(): PrismaClient {
   const log: Array<"error" | "warn"> =
     process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
@@ -24,7 +36,9 @@ function createPrismaClient(): PrismaClient {
     allowExitOnIdle: true,
     connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 5_000,
+    keepAlive: true,
     max: 5,
+    ssl: getPgSslConfig(databaseUrl),
   });
 
   const adapter = new PrismaPg(pool, {
