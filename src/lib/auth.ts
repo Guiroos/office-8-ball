@@ -14,6 +14,31 @@ const AUTH_UNAVAILABLE_DATABASE_ERROR =
 const BETTER_AUTH_SECRET_ERROR =
   "Configuracao de autenticacao invalida: defina BETTER_AUTH_SECRET para usar o login.";
 const AUTH_REQUIRED_ERROR = "Autenticacao obrigatoria.";
+const AUTH_OPERATION_TIMEOUT_MS = 4_000;
+
+async function withTimeout<T>(
+  label: string,
+  operation: Promise<T>,
+  fallback: T,
+): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<T>((resolve) => {
+        timeoutHandle = setTimeout(() => {
+          console.error(`${label} timed out after ${AUTH_OPERATION_TIMEOUT_MS}ms`);
+          resolve(fallback);
+        }, AUTH_OPERATION_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
+  }
+}
 
 export function hasDatabaseUrl(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
@@ -139,7 +164,12 @@ export async function getAuthSession() {
   if (!isAuthAvailable()) {
     return null;
   }
-  return auth.api.getSession({ headers: await headers() });
+
+  return withTimeout(
+    "Auth session lookup",
+    auth.api.getSession({ headers: await headers() }),
+    null,
+  );
 }
 
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {
@@ -152,18 +182,22 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
     return null;
   }
 
-  const profile = await prisma.user.findUnique({
-    where: { id: sessionUser.id },
-    select: {
-      displayName: true,
-      avatarUrl: true,
-    },
-  });
+  const profile = await withTimeout(
+    "Authenticated user profile lookup",
+    prisma.user.findUnique({
+      where: { id: sessionUser.id },
+      select: {
+        displayName: true,
+        avatarUrl: true,
+      },
+    }),
+    null,
+  );
 
   return {
     id: sessionUser.id,
     username: sessionUser.username,
-    displayName: profile?.displayName ?? null,
-    avatarUrl: profile?.avatarUrl ?? null,
+    displayName: profile?.displayName ?? sessionUser.displayName ?? null,
+    avatarUrl: profile?.avatarUrl ?? sessionUser.avatarUrl ?? null,
   };
 }
