@@ -11,7 +11,7 @@ import { Field, FieldError } from "@/components/primitives/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
-import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit";
+import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit-shared";
 import {
   getLoginFieldErrors,
   getRegisterFieldErrors,

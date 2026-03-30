@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import {
   Calendar,
@@ -19,15 +21,17 @@ import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
 import type { ProfilePageData, ProfileResponse } from "@/lib/types";
 
-import Image from "next/image";
-
-import { ProfileEditDialog } from "./profile-edit-dialog";
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type ProfilePageProps = {
   data: ProfilePageData & { email: string | null };
 };
+
+const ProfileEditDialog = dynamic(() =>
+  import("@/components/profile/profile-edit-dialog").then((module) => ({
+    default: module.ProfileEditDialog,
+  })),
+);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -241,12 +245,14 @@ export function ProfilePage({ data }: ProfilePageProps) {
         </div>
       </div>
 
-      <ProfileEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        profile={editableProfile}
-        onSave={handleSave}
-      />
+      {editOpen ? (
+        <ProfileEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          profile={editableProfile}
+          onSave={handleSave}
+        />
+      ) : null}
     </div>
   );
 }

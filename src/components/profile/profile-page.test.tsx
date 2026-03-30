@@ -1,4 +1,4 @@
-import { act, render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProfilePage } from "@/components/profile/profile-page";
@@ -92,9 +92,11 @@ describe("ProfilePage", () => {
     vi.useRealTimers();
   });
 
-  it("opens edit dialog when Editar button is clicked", () => {
+  it("opens edit dialog when Editar button is clicked", async () => {
     render(<ProfilePage data={BASE_DATA} />);
     fireEvent.click(screen.getByText("Editar"));
-    expect(screen.getByText("Editar Perfil")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Editar Perfil")).toBeInTheDocument();
+    });
   });
 });

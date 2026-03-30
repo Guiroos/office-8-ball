@@ -1,4 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import {
+  AUTH_RATE_LIMIT_ERROR,
+  AUTH_RATE_LIMIT_MESSAGE,
+} from "@/lib/auth-rate-limit-shared";
 
 const WINDOW_MINUTES = 10;
 const FAILURE_LIMIT = 5;
@@ -6,9 +10,7 @@ const BLOCK_MINUTES = 15;
 const MAX_BLOCK_MINUTES = 60;
 const IP_FALLBACK = "unknown";
 
-export const AUTH_RATE_LIMIT_ERROR = "AuthRateLimited";
-export const AUTH_RATE_LIMIT_MESSAGE =
-  "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente.";
+export { AUTH_RATE_LIMIT_ERROR, AUTH_RATE_LIMIT_MESSAGE };
 
 export type AuthRateLimitAction = "login" | "register";
 

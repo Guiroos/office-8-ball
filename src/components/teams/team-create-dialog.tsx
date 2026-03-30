@@ -1,38 +1,50 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useState } from "react";
-
+import dynamic from "next/dynamic";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-import { TeamCreateForm } from "./team-create-form";
+  cloneElement,
+  isValidElement,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+} from "react";
+import { useState } from "react";
 
 type TeamCreateDialogProps = {
   children: ReactNode;
 };
 
+const TeamCreateDialogModal = dynamic(() =>
+  import("@/components/teams/team-create-dialog-modal").then((module) => ({
+    default: module.TeamCreateDialogModal,
+  })),
+);
+
 export function TeamCreateDialog({ children }: TeamCreateDialogProps) {
   const [open, setOpen] = useState(false);
 
+  if (!isValidElement(children)) {
+    return open ? <TeamCreateDialogModal open={open} onOpenChange={setOpen} /> : null;
+  }
+
+  const child = children as ReactElement<{ onClick?: (event: MouseEvent<HTMLElement>) => void }>;
+
+  const trigger = cloneElement(
+    child,
+    {
+      onClick: (event: MouseEvent<HTMLElement>) => {
+        child.props.onClick?.(event);
+        if (!event.defaultPrevented) {
+          setOpen(true);
+        }
+      },
+    },
+  );
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Criar Novo Time</DialogTitle>
-          <DialogDescription>
-            Configure um time solo ou em dupla para registrar partidas e acompanhar a evolução no ranking.
-          </DialogDescription>
-        </DialogHeader>
-        <TeamCreateForm onCancel={() => setOpen(false)} onSuccess={() => setOpen(false)} />
-      </DialogContent>
-    </Dialog>
+    <>
+      {trigger}
+      {open ? <TeamCreateDialogModal open={open} onOpenChange={setOpen} /> : null}
+    </>
   );
 }
