@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "office-8-ball",
+  "compatibility_date": "2026-03-30",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "main": "vinext/server/app-router-entry",
+  "assets": {
+    "not_found_handling": "none"
+  }
+}

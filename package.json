@@ -7,6 +7,7 @@
     "dev:e2e": "vinext dev --hostname 127.0.0.1 --port 3000",
     "build": "vinext build",
     "start": "vinext start",
+    "deploy:cloudflare": "wrangler deploy",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -54,6 +55,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.30.2",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -72,7 +74,8 @@
     "typescript": "^5",
     "vinext": "^0.0.38",
     "vite": "^8.0.3",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "wrangler": "^4.78.0"
   },
   "type": "module"
 }
