@@ -230,6 +230,14 @@ Plan: Not started
 
 - Phase 9 added: Auth migration next-auth to better-auth (prerequisite for vinext migration)
 
+---
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260330-hnu | Trocar driver pg TCP para neon serverless | 2026-03-30 | f9e521f | [260330-hnu-trocar-driver-pg-tcp-para-neon-serverles](./quick/260330-hnu-trocar-driver-pg-tcp-para-neon-serverles/) |
+
 *STATE.md created: 2026-03-23*
 *Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
 *Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
