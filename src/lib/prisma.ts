@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { PrismaClient } from "@/lib/prisma-client";
 
 declare global {
@@ -18,7 +19,23 @@ function createPrismaClient(): PrismaClient {
     return new PrismaClient({ log });
   }
 
-  const adapter = new PrismaPg({ connectionString: databaseUrl });
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    allowExitOnIdle: true,
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 5_000,
+    max: 5,
+  });
+
+  const adapter = new PrismaPg(pool, {
+    onConnectionError: (error) => {
+      console.error("Prisma PG connection error", error);
+    },
+    onPoolError: (error) => {
+      console.error("Prisma PG pool error", error);
+    },
+  });
+
   return new PrismaClient({ adapter, log });
 }
 
