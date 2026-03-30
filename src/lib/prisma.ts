@@ -1,5 +1,6 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { neonConfig } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import ws from "ws";
 import { PrismaClient } from "@/lib/prisma-client";
 
 declare global {
@@ -10,18 +11,6 @@ const globalForPrisma = globalThis as typeof globalThis & {
   __office8ballPrisma?: PrismaClient;
 };
 
-function getPgSslConfig(databaseUrl: string) {
-  const sslMode = new URL(databaseUrl).searchParams.get("sslmode");
-
-  if (!sslMode || sslMode === "disable") {
-    return undefined;
-  }
-
-  return {
-    rejectUnauthorized: true,
-  };
-}
-
 function createPrismaClient(): PrismaClient {
   const log: Array<"error" | "warn"> =
     process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
@@ -31,32 +20,16 @@ function createPrismaClient(): PrismaClient {
     return new PrismaClient({ log });
   }
 
-  const pool = new Pool({
-    connectionString: databaseUrl,
-    allowExitOnIdle: true,
-    connectionTimeoutMillis: 5_000,
-    idleTimeoutMillis: 5_000,
-    keepAlive: true,
-    max: 5,
-    ssl: getPgSslConfig(databaseUrl),
-  });
+  // Node.js precisa de ws para WebSocket; workerd tem WebSocket nativo.
+  if (typeof WebSocket === "undefined") {
+    neonConfig.webSocketConstructor = ws;
+  }
 
-  const adapter = new PrismaPg(pool, {
-    onConnectionError: (error) => {
-      console.error("Prisma PG connection error", error);
-    },
-    onPoolError: (error) => {
-      console.error("Prisma PG pool error", error);
-    },
-  });
+  const adapter = new PrismaNeon({ connectionString: databaseUrl });
 
   return new PrismaClient({ adapter, log });
 }
 
 export const prisma =
   globalForPrisma.__office8ballPrisma ??
-  createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.__office8ballPrisma = prisma;
-}
+  (globalForPrisma.__office8ballPrisma = createPrismaClient());
