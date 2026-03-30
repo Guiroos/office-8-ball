@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, type Prisma } from "@prisma/client/edge";
+import { PrismaClient } from "@/lib/prisma-client";
 
 declare global {
   var __office8ballPrisma: PrismaClient | undefined;
@@ -10,7 +10,7 @@ const globalForPrisma = globalThis as typeof globalThis & {
 };
 
 function createPrismaClient(): PrismaClient {
-  const log: Prisma.LogLevel[] =
+  const log: Array<"error" | "warn"> =
     process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"];
   const databaseUrl = process.env.DATABASE_URL?.trim();
 

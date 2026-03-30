@@ -60,3 +60,4 @@ yarn-error.log*
 
 .codex
 /dist/
+/src/generated/prisma/client/
