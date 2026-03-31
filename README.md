@@ -7,7 +7,7 @@ O projeto deixou de ser o `v1` de dois times fixos (`Frontend vs Backend`) e hoj
 ## Escopo Atual
 
 - App unico em `Next.js` com `App Router`
-- Autenticacao por credenciais com `Auth.js`
+- Autenticacao por credenciais com `better-auth`
 - Persistencia principal em `Prisma + PostgreSQL`
 - Times criados em runtime pelos usuarios; o seed nao cria mais times
 - Tipos de time suportados:
@@ -33,7 +33,7 @@ O projeto deixou de ser o `v1` de dois times fixos (`Frontend vs Backend`) e hoj
 - componentes locais no estilo `shadcn/ui`
 - `Prisma`
 - `PostgreSQL`
-- `Auth.js` (`next-auth`)
+- `better-auth`
 - `Zod`
 - `Vitest` + Testing Library
 - `Playwright`
@@ -109,7 +109,7 @@ Exceto `POST /api/auth/register`, elas tambem exigem sessao valida.
 
 ```bash
 DATABASE_URL=postgresql://...
-NEXTAUTH_SECRET=algum-segredo-local
+BETTER_AUTH_SECRET=algum-segredo-local
 NEXT_PUBLIC_APP_ENV=development
 ```
 
@@ -134,9 +134,9 @@ Se `DATABASE_URL` estiver vazio, o app ainda sobe para desenvolvimento de UI e e
 
 - `DATABASE_URL`
   - conexao com PostgreSQL; obrigatoria para auth e dominio de times
-- `NEXTAUTH_SECRET`
-  - segredo usado pelo `Auth.js`; obrigatorio sempre que `DATABASE_URL` estiver definido
-- `NEXTAUTH_URL`
+- `BETTER_AUTH_SECRET`
+  - segredo usado pelo `better-auth`; obrigatorio sempre que `DATABASE_URL` estiver definido
+- `BETTER_AUTH_URL`
   - opcional em desenvolvimento; recomendado quando necessario para callbacks/sessoes
 - `NEXT_PUBLIC_APP_ENV`
   - label exibida na UI (`development`, `preview`, `production`)
