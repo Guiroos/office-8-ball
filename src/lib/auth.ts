@@ -14,7 +14,9 @@ const AUTH_UNAVAILABLE_DATABASE_ERROR =
 const BETTER_AUTH_SECRET_ERROR =
   "Configuracao de autenticacao invalida: defina BETTER_AUTH_SECRET para usar o login.";
 const AUTH_REQUIRED_ERROR = "Autenticacao obrigatoria.";
-const AUTH_OPERATION_TIMEOUT_MS = 4_000;
+const AUTH_OPERATION_TIMEOUT_MS = Number(
+  process.env.AUTH_OPERATION_TIMEOUT_MS ?? 8_000,
+);
 
 async function withTimeout<T>(
   label: string,
@@ -25,7 +27,14 @@ async function withTimeout<T>(
 
   try {
     return await Promise.race([
-      operation,
+      // Catch errors so a rejected operation returns fallback instead of
+      // propagating — this ensures failed DB queries release pool connections
+      // immediately rather than leaving them stuck until the timer fires.
+      operation.catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`${label} failed: ${msg}`);
+        return fallback;
+      }),
       new Promise<T>((resolve) => {
         timeoutHandle = setTimeout(() => {
           console.error(`${label} timed out after ${AUTH_OPERATION_TIMEOUT_MS}ms`);
