@@ -111,8 +111,8 @@ See `.claude/rules/testing.md` for the full isolation pattern.
 
 ```
 DATABASE_URL=postgresql://...       # Required for auth and persistence
-NEXTAUTH_SECRET=...                 # Required when DATABASE_URL is set
-NEXTAUTH_URL=http://localhost:3000  # Optional in dev
+BETTER_AUTH_SECRET=...              # Required when DATABASE_URL is set
+BETTER_AUTH_URL=http://localhost:3000  # Base URL for better-auth
 ```
 
 ## Source of Truth
@@ -157,7 +157,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - **DATABASE_URL obrigatório:** Todas as rotas retornam 503 sem banco — nunca adicionar rota que ignore esse guard
 - **Schema:** Nunca modificar `prisma/schema.prisma` sem aprovação explícita — mudanças requerem migration e seed atualizados juntos
 - **Auth:** Credenciais apenas (username/senha) — sem OAuth para v1
-- **Deploy:** Vercel + GitHub Actions; migrations rodadas antes do build no CI
+- **Deploy:** Cloudflare Workers + GitHub Actions; migrations rodadas antes do build no CI
 <!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:codebase/STACK.md -->
@@ -170,7 +170,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - CSS - Tailwind-generated styles via PostCSS
 - HTML - Server-rendered via Next.js
 ## Runtime
-- Node.js (via Next.js/Vercel) - All execution
+- Node.js (via Next.js/Cloudflare Workers) - All execution
 - Browser (Chrome/Chromium) - E2E testing via Playwright
 - npm - Dependency management
 - Lockfile: `package-lock.json` (present, committed)
@@ -212,7 +212,6 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Zod 4.3.6 - Schema validation and TypeScript inference
 - sonner 2.0.7 - Toast notifications (presumed from package name)
 - tw-animate-css 1.4.0 - Tailwind animation utilities
-- @vercel/speed-insights 2.0.0 - Core Web Vitals monitoring
 - dotenv 17.3.1 - Environment variable loading for Prisma config
 ## Configuration Files
 - `tsconfig.json` - Strict mode, ES2017 target, Next.js plugin, path aliases
@@ -225,8 +224,8 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - `package.json` - Scripts for dev, build, test, lint, typecheck, e2e, prisma
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string (Neon Postgres recommended)
-- `NEXTAUTH_SECRET` - Auth.js session signing secret (only required when DATABASE_URL is set)
-- `NEXTAUTH_URL` - Session callback URL (defaults to `http://localhost:3000` in dev)
+- `BETTER_AUTH_SECRET` - better-auth session signing secret (only required when DATABASE_URL is set)
+- `BETTER_AUTH_URL` - better-auth base URL (defaults to `http://localhost:3000` in dev)
 - `NEXT_PUBLIC_APP_ENV` - Shown in UI; values: "development", "preview", "production"
 - `PLAYWRIGHT_BASE_URL` - Test server URL (defaults to `http://127.0.0.1:3000`)
 - `CI` - Set by CI runner; triggers single-worker Playwright mode and retries
@@ -234,7 +233,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Node.js (version managed by project; run `node --version` to verify)
 - PostgreSQL (or Neon Postgres account for remote DB)
 - Chromium (installed via `npm run e2e:install` for Playwright)
-- Vercel (primary deployment platform)
+- Cloudflare Workers (primary deployment platform)
 - PostgreSQL database (Neon or compatible)
 - Node.js runtime environment
 - Modern browsers (Chrome/Edge/Firefox/Safari)
