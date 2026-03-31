@@ -237,6 +237,7 @@ Plan: Not started
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260330-hnu | Trocar driver pg TCP para neon serverless | 2026-03-30 | f9e521f | [260330-hnu-trocar-driver-pg-tcp-para-neon-serverles](./quick/260330-hnu-trocar-driver-pg-tcp-para-neon-serverles/) |
+| 260330-w0w | Update Vercel references to Cloudflare Workers in docs | 2026-03-31 | d69dd1f | [260330-w0w-update-vercel-references-to-cloudflare-w](./quick/260330-w0w-update-vercel-references-to-cloudflare-w/) |
 
 *STATE.md created: 2026-03-23*
 *Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
