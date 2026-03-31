@@ -5,7 +5,7 @@ Office 8 Ball is a Next.js 16 office billiards tracker. Users create teams (solo
 ## Tech Stack
 
 - Next.js 16.1.6 (App Router) · React 19.2.3 · TypeScript 5
-- Prisma 6.19.2 + PostgreSQL · Auth.js v4 (next-auth 4.24.13) — credentials-only, JWT sessions
+- Prisma 6.19.2 + PostgreSQL · better-auth 1.5.6 — credentials-only, username/password sessions
 - Tailwind CSS 4.2.1 · shadcn/ui · class-variance-authority · Zod 4.3.6
 - Vitest 4 · @testing-library/react 16 · Playwright
 
@@ -102,7 +102,7 @@ See `.claude/rules/architecture.md`, `domain.md`, and `auth.md` for the full con
 
 - Unit/integration: Vitest + Testing Library (jsdom); E2E: Playwright (real Postgres, CI only).
 - Data layer tests: most domain functions (`stats.ts`, `ranking.ts`, `head-to-head.ts`, `time-period.ts`) are pure — pass match arrays directly. For modules that check `hasDatabaseUrl()`, delete `process.env.DATABASE_URL` in `beforeEach`.
-- Route tests: mock `@/lib/auth` and stub `getAuthenticatedUser` — never call real Auth.js in unit tests.
+- Route tests: mock `@/lib/auth` and stub `getAuthenticatedUser` — never call real better-auth in unit tests.
 - Never import Prisma in test files directly.
 
 See `.claude/rules/testing.md` for the full isolation pattern.
@@ -200,7 +200,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Prettier - Presumed for formatting (not explicitly configured; shadcn installs it)
 - Prisma 6.19.2 - ORM and schema management
 ## Key Dependencies
-- next-auth 4.24.13 - Session and credential-based authentication
+- better-auth 1.5.6 - Session and credential-based authentication
 - bcryptjs 3.0.3 - Password hashing (for credential validation)
 - @prisma/client 6.19.2 - Database client for PostgreSQL
 - @radix-ui/react-dialog 1.1.15 - Modal/dialog primitives
@@ -317,7 +317,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 ## Pattern Overview
 - Next.js 16 App Router with route groups for authentication
 - Layered architecture: domain layer → API routes → client components
-- Session-based auth (Auth.js v4 with JWT); `DATABASE_URL` required at runtime
+- Session-based auth (better-auth 1.5.6); `DATABASE_URL` required at runtime
 - Prisma ORM with PostgreSQL; routes return 503 when DB is absent
 - Client-side state via React hooks only (no Redux/Zustand)
 - All data derivation on-demand — no persisted scoreboard counters
@@ -339,8 +339,8 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Used by: Client components and external integrations
 - Purpose: Credential validation, session management, rate limiting
 - Location: `src/lib/auth.ts`, `src/lib/auth-validation.ts`, `src/lib/auth-rate-limit.ts`
-- Contains: Auth configuration (NextAuthOptions), user session extraction, password validation, request-based rate limiting
-- Depends on: bcryptjs, next-auth, Prisma
+- Contains: better-auth singleton config (betterAuth), migration hook (createAuthMiddleware), session helpers: getAuthSession, getAuthenticatedUser; availability guards: getAuthUnavailableResponse, getAuthRequiredResponse
+- Depends on: bcryptjs, better-auth, Prisma
 - Used by: Middleware, API routes, protected layouts
 - Purpose: Database schema and client initialization
 - Location: `prisma/schema.prisma`, `src/lib/prisma.ts`
@@ -350,7 +350,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Purpose: Request interception and protected route enforcement
 - Location: `middleware.ts` (root)
 - Contains: Auth guard middleware that redirects unauthenticated users to `/login`
-- Depends on: next-auth/middleware
+- Depends on: better-auth
 - Used by: Next.js router
 ## Data Flow
 - Dashboard state (scoreboard, matches) stored in React hook state via `useState`
@@ -380,9 +380,9 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - Location: `src/app/(authenticated)/layout.tsx`
 - Triggers: Any route under `/(authenticated)/*`
 - Responsibilities: Enforce authentication, render AppShell with sidebar and user menu
-- Location: `src/app/api/auth/[...nextauth]/route.ts`
-- Triggers: `POST /api/auth/signin`, `POST /api/auth/signout`, etc. (Auth.js internal)
-- Responsibilities: Delegate to CredentialsProvider, manage JWT session
+- Location: `src/app/api/auth/[...all]/route.ts`
+- Triggers: All requests to `/api/auth/*`
+- Responsibilities: Proxy all better-auth HTTP requests; handles sign-in, sign-out, and session endpoints
 - Location: `src/app/api/auth/register/route.ts`
 - Triggers: `POST /api/auth/register`
 - Responsibilities: Validate payload, check rate limit, hash password, create user, return 201
@@ -411,7 +411,7 @@ App de rastreamento de partidas de sinuca para o escritório. Colegas criam time
 - All protected routes call `getAuthenticatedUser()` at handler start
 - Middleware enforces authentication for `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings`, `/head-to-head`
 - Public routes: `/`, `/login`, `/api/auth/*`, `/api/auth/register`
-- Session stored as JWT in HttpOnly cookie; strategy set in `getAuthOptions()`
+- Session stored in HttpOnly cookie; managed by better-auth session handler
 - User can only see own teams and matches
 - User must be team member to register a match for that team
 - Team archived by creator; `POST /api/teams/[id]/archive` is implemented
