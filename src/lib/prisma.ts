@@ -1,6 +1,4 @@
-import { neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import ws from "ws";
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
 import { PrismaClient } from "@/lib/prisma-client";
 
 declare global {
@@ -20,12 +18,9 @@ function createPrismaClient(): PrismaClient {
     return new PrismaClient({ log });
   }
 
-  // Node.js precisa de ws para WebSocket; workerd tem WebSocket nativo.
-  if (typeof WebSocket === "undefined") {
-    neonConfig.webSocketConstructor = ws;
-  }
-
-  const adapter = new PrismaNeon({ connectionString: databaseUrl });
+  // PrismaNeonHttp usa fetch() em vez de WebSocket — funciona em workerd
+  // (dev via miniflare e produção) sem depender de pool TCP persistente.
+  const adapter = new PrismaNeonHttp(databaseUrl, {});
 
   return new PrismaClient({ adapter, log });
 }
