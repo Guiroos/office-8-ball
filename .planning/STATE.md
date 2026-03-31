@@ -15,7 +15,7 @@ progress:
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
 **Status:** Milestone complete
-**Last updated:** 2026-03-31 — Completed quick task 260330-wfk: Update stale next-auth references to better-auth in docs
+**Last updated:** 2026-03-31 — Completed quick task 260330-wnc: Fix 10 failing tests (vi.mock hoisting violations + login redirect)
 
 ---
 
@@ -239,6 +239,7 @@ Plan: Not started
 | 260330-hnu | Trocar driver pg TCP para neon serverless | 2026-03-30 | f9e521f | [260330-hnu-trocar-driver-pg-tcp-para-neon-serverles](./quick/260330-hnu-trocar-driver-pg-tcp-para-neon-serverles/) |
 | 260330-w0w | Update Vercel references to Cloudflare Workers in docs | 2026-03-31 | d69dd1f | [260330-w0w-update-vercel-references-to-cloudflare-w](./quick/260330-w0w-update-vercel-references-to-cloudflare-w/) |
 | 260330-wfk | Update stale next-auth references to better-auth in docs | 2026-03-31 | c7737bb | [260330-wfk-update-stale-next-auth-references-to-bet](./quick/260330-wfk-update-stale-next-auth-references-to-bet/) |
+| 260330-wnc | Fix 10 failing tests: vi.mock hoisting violations + login redirect | 2026-03-31 | 2370955 | [260330-wnc-fix-10-failing-tests-vitest-mock-factory](./quick/260330-wnc-fix-10-failing-tests-vitest-mock-factory/) |
 
 *STATE.md created: 2026-03-23*
 *Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
