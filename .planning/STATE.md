@@ -15,7 +15,7 @@ progress:
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
 **Status:** Milestone complete
-**Last updated:** 2026-03-29 — Phase 09 Plan 01 complete (Wave 0 test mock updates)
+**Last updated:** 2026-03-31 — Completed quick task 260330-w0w: Update Vercel references to Cloudflare Workers in docs
 
 ---
 
