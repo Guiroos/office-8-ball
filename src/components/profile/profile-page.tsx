@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
+import { getInitials } from "@/lib/format";
 import type { ProfilePageData, ProfileResponse } from "@/lib/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -34,16 +35,6 @@ const ProfileEditDialog = dynamic(() =>
 );
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function getInitials(username: string): string {
-  return username
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((c) => c.charAt(0).toUpperCase())
-    .join("")
-    .slice(0, 2);
-}
 
 function formatJoinDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString("pt-BR", {

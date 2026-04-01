@@ -1,11 +1,6 @@
 import type { ScoreboardData } from "@/lib/types";
 
-export function formatMatchDate(date: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(date));
-}
+export { formatMatchDate } from "@/lib/format";
 
 export function getLeadLabel(scoreboard: ScoreboardData) {
   if (!scoreboard.leaderTeamId || scoreboard.leadBy === 0) {

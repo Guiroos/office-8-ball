@@ -1,12 +1,6 @@
 import { Badge } from "@/components/ui/badge";
+import { formatMatchDate } from "@/lib/format";
 import type { MatchRecord } from "@/lib/types";
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
 
 export function RecentMatchesList({
   matches,
@@ -51,7 +45,7 @@ export function RecentMatchesList({
                   </div>
                 </div>
 
-                <p className="caption text-muted-foreground sm:text-right">{formatDate(match.playedAt)}</p>
+                <p className="caption text-muted-foreground sm:text-right">{formatMatchDate(match.playedAt)}</p>
               </div>
             </li>
           );

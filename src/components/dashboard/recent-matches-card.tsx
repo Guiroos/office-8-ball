@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmptyState } from "@/components/primitives/empty-state";
 import { SectionHeader } from "@/components/primitives/section-header";
 import type { MatchRecord } from "@/lib/types";
 
@@ -12,14 +13,10 @@ export function RecentMatchesCard({ matches }: { matches: MatchRecord[] }) {
         <SectionHeader eyebrow="Últimas partidas" title="Histórico recente" />
 
         {matches.length === 0 ? (
-          <div className="rounded-lg border border-border-strong bg-surface-emphasis p-5">
-            <strong className="block text-lg font-semibold">
-              Nenhuma partida registrada ainda.
-            </strong>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              A primeira vitória já pode vir carregada de provocação.
-            </p>
-          </div>
+          <EmptyState
+            title="Nenhuma partida registrada ainda."
+            description="A primeira vitória já pode vir carregada de provocação."
+          />
         ) : (
           <ScrollArea className="h-[26rem] w-full pr-4">
             <ul className="space-y-3 pb-1">

@@ -5,6 +5,7 @@ import { StatTile } from "@/components/primitives/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { formatTeamType } from "@/lib/format";
 import type { RankedTeam } from "@/lib/ranking";
 
 function getRankConfig(rank: number) {
@@ -54,7 +55,7 @@ export function PodiumCard({ team }: { team: RankedTeam }) {
         ? `${team.currentStreak.count}D`
         : "-";
   const membersLabel = team.memberNames.join(" • ");
-  const typeLabel = team.type === "solo" ? "Solo" : "Dupla";
+  const typeLabel = formatTeamType(team.type);
 
   return (
     <Link href={`/times/${team.id}`} className="block focus-visible:outline-none">
