@@ -2,6 +2,8 @@ import { randomBytes } from "node:crypto";
 
 import { expect, type Page } from "@playwright/test";
 
+type TeamMode = "solo" | "duo";
+
 type Credentials = {
   username: string;
   password: string;
@@ -58,9 +60,18 @@ export async function openCreateTeamDialog(page: Page) {
   await expect(page.getByRole("dialog")).toBeVisible();
 }
 
-export async function createTeam(page: Page, teamName: string) {
+export async function createTeam(
+  page: Page,
+  teamName: string,
+  mode: TeamMode = "solo",
+) {
   await openCreateTeamDialog(page);
   await page.getByTestId("team-create-name").fill(teamName);
+
+  if (mode === "duo") {
+    await page.getByRole("button", { name: "Duplas" }).click();
+  }
+
   await page.getByTestId("team-create-submit").click();
   await expect(page).toHaveURL(/\/times\/[^/?#]+$/);
 
