@@ -54,7 +54,7 @@ describe("LoginScreen", () => {
     expect(screen.getByRole("button", { name: "Criar conta" })).toBeInTheDocument();
   });
 
-  it("submits login credentials and redirects to the dashboard", async () => {
+  it("submits login credentials and redirects to /times", async () => {
     const user = userEvent.setup();
     signInMock.mockResolvedValue({ ok: true, error: undefined });
 
@@ -68,7 +68,7 @@ describe("LoginScreen", () => {
       expect(signInMock).toHaveBeenCalledTimes(1);
     });
 
-    expect(pushMock).toHaveBeenCalledWith("/dashboard");
+    expect(pushMock).toHaveBeenCalledWith("/times");
   });
 
   it("shows local validation after blur and clears it when the field is fixed", async () => {
@@ -137,7 +137,7 @@ describe("LoginScreen", () => {
     });
 
     expect(signInMock).toHaveBeenCalledTimes(1);
-    expect(pushMock).toHaveBeenCalledWith("/dashboard");
+    expect(pushMock).toHaveBeenCalledWith("/times");
     fetchMock.mockRestore();
   });
 

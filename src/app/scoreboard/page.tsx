@@ -5,7 +5,7 @@ import { getAuthenticatedUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Placar | Office 8 Ball",
-  description: "Rota legada que redireciona para o dashboard principal do Office 8 Ball.",
+  description: "Rota legada que redireciona para a area atual de times do Office 8 Ball.",
 };
 
 export default async function ScoreboardPage() {
@@ -15,5 +15,5 @@ export default async function ScoreboardPage() {
     redirect("/login");
   }
 
-  redirect("/dashboard");
+  redirect("/times");
 }

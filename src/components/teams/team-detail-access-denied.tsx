@@ -10,7 +10,7 @@ export function TeamDetailAccessDenied() {
       detail="Peca um convite a um membro atual ou volte para a lista dos seus times."
       nextStep="Abra /times e escolha um time do qual voce ja participa."
       primaryAction={{ label: "Voltar para meus times", href: "/times", icon: "back" }}
-      secondaryAction={{ label: "Ir para dashboard", href: "/dashboard", icon: "home", tone: "secondary" }}
+      secondaryAction={{ label: "Ir para times", href: "/times", icon: "home", tone: "secondary" }}
     />
   );
 }

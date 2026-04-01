@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-
-import { Dashboard } from "@/components/dashboard";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Office 8 Ball",
-  description: "Placar principal com historico recente das partidas do Office 8 Ball.",
+  title: "Dashboard (legado) | Office 8 Ball",
+  description: "Rota legada redirecionando para a area atual de times.",
 };
 
 export default function DashboardPage() {
-  return <Dashboard />;
+  redirect("/times");
 }

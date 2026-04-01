@@ -85,7 +85,7 @@ export async function signUp(page: Page, credentials: Credentials) {
     await page.getByTestId("login-submit").click();
 
     try {
-      await expect(page).toHaveURL(/\/dashboard$/, { timeout: 8000 });
+      await expect(page).toHaveURL(/\/times$/, { timeout: 8000 });
       return;
     } catch (error) {
       const transientRegisterError = page.getByText("Nao foi possivel criar a conta.");
@@ -104,7 +104,7 @@ export async function signUp(page: Page, credentials: Credentials) {
       ) {
         await page.getByTestId("login-mode-login").click();
         await page.getByTestId("login-submit").click();
-        await expect(page).toHaveURL(/\/dashboard$/, { timeout: 8000 });
+        await expect(page).toHaveURL(/\/times$/, { timeout: 8000 });
         return;
       }
 
@@ -112,7 +112,7 @@ export async function signUp(page: Page, credentials: Credentials) {
     }
   }
 
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/times$/);
 }
 
 export async function login(page: Page, credentials: Credentials) {
@@ -120,7 +120,7 @@ export async function login(page: Page, credentials: Credentials) {
   await page.getByLabel("Username").fill(credentials.username);
   await page.getByLabel("Senha").fill(credentials.password);
   await page.getByTestId("login-submit").click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/times$/);
 }
 
 export async function logout(page: Page, username: string) {

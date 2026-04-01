@@ -20,7 +20,7 @@ vi.mock("next/link", () => ({
 }));
 
 describe("PlaceholderPage", () => {
-  it("keeps the dashboard CTA with explicit inverse text on the brand button", () => {
+  it("keeps the /times CTA with explicit inverse text on the brand button", () => {
     render(
       <PlaceholderPage
         eyebrow="Times"
@@ -30,7 +30,7 @@ describe("PlaceholderPage", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Voltar para dashboard" })).toHaveClass(
+    expect(screen.getByRole("link", { name: "Voltar para times" })).toHaveClass(
       "text-foreground-inverse",
     );
   });

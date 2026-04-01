@@ -44,8 +44,8 @@ describe("RouteStateScreen", () => {
           icon: "home",
         }}
         secondaryAction={{
-          label: "Abrir dashboard",
-          href: "/dashboard",
+          label: "Abrir times",
+          href: "/times",
           icon: "back",
           tone: "secondary",
         }}
@@ -55,9 +55,9 @@ describe("RouteStateScreen", () => {
     expect(screen.getByText("404")).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: "Essa rota nao existe." })).toHaveLength(2);
     expect(screen.getByRole("link", { name: "Voltar ao inicio" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Abrir dashboard" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Abrir times" })).toHaveAttribute(
       "href",
-      "/dashboard",
+      "/times",
     );
   });
 

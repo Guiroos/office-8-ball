@@ -44,9 +44,9 @@ describe("TeamDetailAccessDenied", () => {
     expect(link).toHaveAttribute("href", "/times");
   });
 
-  it("renders a secondary link to /dashboard", () => {
+  it("renders a secondary link to /times", () => {
     render(<TeamDetailAccessDenied />);
-    const link = screen.getByRole("link", { name: /Ir para dashboard/i });
-    expect(link).toHaveAttribute("href", "/dashboard");
+    const link = screen.getByRole("link", { name: /Ir para times/i });
+    expect(link).toHaveAttribute("href", "/times");
   });
 });

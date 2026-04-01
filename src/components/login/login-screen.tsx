@@ -226,7 +226,7 @@ export function LoginScreen({
         await handleLogin();
       }
 
-      router.push("/dashboard");
+      router.push("/times");
     } catch {
       // Error feedback is already set by the auth handlers above.
     } finally {
