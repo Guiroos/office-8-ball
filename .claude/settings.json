@@ -7,16 +7,10 @@
           {
             "type": "command",
             "command": "if echo '$CLAUDE_TOOL_INPUT' | grep -qE '\"file_path\".*\\.env'; then echo 'Blocked: direct edits to .env files are not allowed'; exit 1; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
+          },
           {
             "type": "command",
-            "command": "node .claude/hooks/gsd-prompt-guard.js",
-            "timeout": 5
+            "command": "if echo '$CLAUDE_TOOL_INPUT' | grep -q 'prisma/schema.prisma'; then echo 'BLOCKED: prisma/schema.prisma requires explicit user approval before editing. Confirm with the user first.'; exit 2; fi"
           }
         ]
       }
@@ -28,26 +22,10 @@
           {
             "type": "command",
             "command": "cd /home/guiroos/Documentos/Projects/office-8-ball && npm run typecheck 2>&1 | tail -20"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
-        "hooks": [
+          },
           {
             "type": "command",
-            "command": "node .claude/hooks/gsd-context-monitor.js",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/gsd-check-update.js"
+            "command": "cd /home/guiroos/Documentos/Projects/office-8-ball && npm run lint -- --max-warnings=0 2>&1 | tail -15"
           }
         ]
       }
@@ -60,9 +38,5 @@
     "context7@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "node .claude/hooks/gsd-statusline.js"
   }
 }
