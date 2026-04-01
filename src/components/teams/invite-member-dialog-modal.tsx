@@ -22,6 +22,8 @@ type InviteMemberDialogModalProps = {
   teamId: string;
 };
 
+const USERNAME_PATTERN = /^[a-z0-9._-]{3,24}$/;
+
 function mapErrorStatus(status: number, fallbackMessage: string): string {
   if (status === 401) return "Faça login novamente para gerenciar membros.";
   if (status === 403) return "Você não pode gerenciar membros deste time.";
@@ -53,9 +55,16 @@ export function InviteMemberDialogModal({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    const normalized = usernameInput.trim().replace(/^@+/, "");
+    const normalized = usernameInput.trim().replace(/^@+/, "").toLowerCase();
     if (!normalized) {
       setInlineError("Informe um username.");
+      return;
+    }
+
+    if (!USERNAME_PATTERN.test(normalized)) {
+      setInlineError(
+        "Use de 3 a 24 caracteres com letras, números, ponto, tracinho ou underscore.",
+      );
       return;
     }
 
@@ -120,6 +129,9 @@ export function InviteMemberDialogModal({
               }}
               disabled={isBusy}
             />
+            <p className="text-xs text-muted-foreground">
+              Formato válido: 3 a 24 caracteres com letras, números, ponto, tracinho ou underscore.
+            </p>
             {inlineError ? <p className="text-sm text-destructive">{inlineError}</p> : null}
           </div>
           <DialogFooter>

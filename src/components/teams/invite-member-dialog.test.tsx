@@ -84,6 +84,20 @@ describe("InviteMemberDialog", () => {
     });
   });
 
+  it("shows inline error for invalid username format", async () => {
+    render(<InviteMemberDialog {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /convidar membro/i }));
+    await waitFor(() => expect(screen.getByPlaceholderText(/username/i)).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: "aa" } });
+    fireEvent.click(screen.getByRole("button", { name: /^convidar$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Use de 3 a 24 caracteres/i)).toBeInTheDocument();
+    });
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
   it("shows toast.success and calls router.refresh on successful invite", async () => {
     mockFetch
       .mockResolvedValueOnce({

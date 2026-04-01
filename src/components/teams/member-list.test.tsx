@@ -85,6 +85,9 @@ describe("MemberList", () => {
   it("does not show Remover when duo team has exactly 2 members", () => {
     render(<MemberList {...defaultProps} teamType="duo" />);
     expect(screen.queryByRole("button", { name: /remover/i })).toBeNull();
+    expect(
+      screen.getByText("Times de duplas precisam manter pelo menos 2 membros. Convide outro membro antes de remover."),
+    ).toBeInTheDocument();
   });
 
   it("shows Remover button for solo team with > 1 member", () => {

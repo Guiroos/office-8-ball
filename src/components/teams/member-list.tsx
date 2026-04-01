@@ -44,6 +44,8 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
   // Minimum member threshold: solo requires > 1, duo requires > 2
   const minMembersForRemoval = teamType === "solo" ? 1 : 2;
   const canRemoveAny = visibleMembers.length > minMembersForRemoval;
+  const hasNonCreatorMember = visibleMembers.some((member) => member.userId !== createdBy);
+  const showMinMembersHint = !canRemoveAny && hasNonCreatorMember;
 
   function isRemovable(member: TeamMemberView): boolean {
     if (member.userId === createdBy) return false;
@@ -93,78 +95,88 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
   }
 
   return (
-    <ul className="space-y-3">
-      {visibleMembers.map((member) => {
-        const isConfirming = confirmingUserId === member.userId;
-        const isRemoving = removingUserId === member.userId;
-        const removable = isRemovable(member);
-        const isViewer = member.userId === viewerId;
+    <div className="space-y-3">
+      {showMinMembersHint ? (
+        <p className="text-sm text-muted-foreground">
+          {teamType === "solo"
+            ? "Times solo precisam manter pelo menos 1 membro."
+            : "Times de duplas precisam manter pelo menos 2 membros. Convide outro membro antes de remover."}
+        </p>
+      ) : null}
 
-        return (
-          <li
-            key={member.userId}
-            className="flex flex-col gap-3 rounded-lg border border-border bg-surface-emphasis p-4 shadow-sm shadow-foreground/5 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <Avatar className="size-10 border-0 bg-surface">
-                <AvatarFallback className="bg-surface">
-                  {getInitials(member.displayName)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold">{member.displayName}</p>
-                  {isViewer ? <Badge variant="default">Você</Badge> : null}
-                  <Badge variant={member.role === "Criador" ? "gold" : "outline"}>
-                    {member.role}
-                  </Badge>
+      <ul className="space-y-3">
+        {visibleMembers.map((member) => {
+          const isConfirming = confirmingUserId === member.userId;
+          const isRemoving = removingUserId === member.userId;
+          const removable = isRemovable(member);
+          const isViewer = member.userId === viewerId;
+
+          return (
+            <li
+              key={member.userId}
+              className="flex flex-col gap-3 rounded-lg border border-border bg-surface-emphasis p-4 shadow-sm shadow-foreground/5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar className="size-10 border-0 bg-surface">
+                  <AvatarFallback className="bg-surface">
+                    {getInitials(member.displayName)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold">{member.displayName}</p>
+                    {isViewer ? <Badge variant="default">Você</Badge> : null}
+                    <Badge variant={member.role === "Criador" ? "gold" : "outline"}>
+                      {member.role}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">@{member.username}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">@{member.username}</p>
               </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-              {removable && !isConfirming && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="w-full sm:w-auto"
-                  onClick={() => setConfirmingUserId(member.userId)}
-                  disabled={isRemoving || isRefreshing}
-                >
-                  Remover
-                </Button>
-              )}
-
-              {isConfirming && (
-                <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full border-destructive text-destructive hover:bg-destructive/10 sm:w-auto"
-                    onClick={() => handleRemove(member.userId)}
-                    disabled={isRemoving || isRefreshing}
-                  >
-                    {isRemoving ? "Removendo..." : "Confirmar"}
-                  </Button>
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                {removable && !isConfirming && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="w-full sm:w-auto"
-                    onClick={() => setConfirmingUserId(null)}
+                    onClick={() => setConfirmingUserId(member.userId)}
                     disabled={isRemoving || isRefreshing}
                   >
-                    Cancelar
+                    Remover
                   </Button>
-                </>
-              )}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+                )}
+
+                {isConfirming && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full border-destructive text-destructive hover:bg-destructive/10 sm:w-auto"
+                      onClick={() => handleRemove(member.userId)}
+                      disabled={isRemoving || isRefreshing}
+                    >
+                      {isRemoving ? "Removendo..." : "Confirmar"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      onClick={() => setConfirmingUserId(null)}
+                      disabled={isRemoving || isRefreshing}
+                    >
+                      Cancelar
+                    </Button>
+                  </>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
