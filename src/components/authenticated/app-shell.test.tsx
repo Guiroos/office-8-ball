@@ -66,7 +66,7 @@ vi.mock("@/components/theme/theme-toggle", () => ({
 describe("AppShell", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    usePathnameMock.mockReturnValue("/dashboard");
+    usePathnameMock.mockReturnValue("/times");
   });
 
   it("renders the shared navigation and highlights the active page", () => {
@@ -86,7 +86,7 @@ describe("AppShell", () => {
     expect(screen.getByText("Conteudo interno")).toBeInTheDocument();
     expect(
       screen
-        .getAllByRole("link", { name: "Dashboard" })
+        .getAllByRole("link", { name: "Times" })
         .some((link) => link.getAttribute("aria-current") === "page"),
     ).toBe(true);
     expect(screen.getByRole("navigation", { name: "Navegacao principal" })).toHaveClass(
@@ -138,6 +138,7 @@ describe("AppShell", () => {
 
   it("uses client navigation when a different sidebar route is clicked", async () => {
     const user = userEvent.setup();
+    usePathnameMock.mockReturnValue("/ranking");
 
     render(
       <AppShell

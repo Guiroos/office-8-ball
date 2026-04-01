@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import {
   ChevronDown,
-  LayoutDashboard,
   LogOut,
   Menu,
   Shield,
@@ -46,12 +45,7 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    match: (pathname) => pathname === "/dashboard",
-  },
+  // Temporarily hidden from sidebar navigation until dashboard UX improvements are ready.
   {
     href: "/times",
     label: "Times",
