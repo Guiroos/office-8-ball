@@ -224,6 +224,8 @@ export function Partida() {
 
   const bothSelected = !!(myTeamId && opponentId);
   const vsLit = bothSelected && winnerId !== null;
+  const myTeamIsWinner = myTeamId !== null && winnerId === myTeamId;
+  const opponentIsWinner = opponentId !== null && winnerId === opponentId;
 
   const myWins = pairHistory.filter((m) => m.winnerTeamId === myTeamId).length;
   const oppWins = pairHistory.filter((m) => m.winnerTeamId === opponentId).length;
@@ -252,7 +254,7 @@ export function Partida() {
               teams={myTeams}
               selectedId={myTeamId}
               onSelect={setMyTeam}
-              isWinner={winnerId === myTeamId}
+              isWinner={myTeamIsWinner}
               onToggleWinner={() => myTeamId && toggleWinner(myTeamId)}
               canSelectWinner={bothSelected}
               loading={isLoadingTeams}
@@ -267,7 +269,7 @@ export function Partida() {
               teams={opponentTeams}
               selectedId={opponentId}
               onSelect={setOpponent}
-              isWinner={winnerId === opponentId}
+              isWinner={opponentIsWinner}
               onToggleWinner={() => opponentId && toggleWinner(opponentId)}
               canSelectWinner={bothSelected}
               loading={isLoadingTeams}
