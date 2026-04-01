@@ -194,7 +194,9 @@ function MatchHistoryItem({
         </div>
       </div>
       {match.note && (
-        <p className="ml-5 text-xs italic text-muted-foreground">"{match.note}"</p>
+        <p className="ml-5 text-xs italic text-muted-foreground">
+          &quot;{match.note}&quot;
+        </p>
       )}
     </div>
   );

@@ -152,7 +152,7 @@ describe("RankingView", () => {
 
     expect(teamOneLink).toBeDefined();
     expect(teamTwoLink).toBeDefined();
-    expect(within(teamOneLink!).getByText("Dupla")).toBeInTheDocument();
+    expect(within(teamOneLink!).getByText("Duplas")).toBeInTheDocument();
     expect(within(teamTwoLink!).getByText("Solo")).toBeInTheDocument();
   });
 
