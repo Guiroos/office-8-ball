@@ -86,19 +86,43 @@ export async function createTeam(input: {
       name: input.name.trim().toLowerCase(),
       type: input.type,
       createdBy: input.createdBy,
-      members: {
-        create: [
-          { userId: input.createdBy },
-          ...(input.type === "duo" && input.secondMemberUserId
-            ? [{ userId: input.secondMemberUserId }]
-            : []),
-        ],
-      },
     },
+  });
+
+  try {
+    await prisma.teamMember.create({
+      data: {
+        teamId: team.id,
+        userId: input.createdBy,
+      },
+    });
+
+    if (input.type === "duo" && input.secondMemberUserId) {
+      await prisma.teamMember.create({
+        data: {
+          teamId: team.id,
+          userId: input.secondMemberUserId,
+        },
+      });
+    }
+  } catch (error) {
+    await prisma.teamMember
+      .deleteMany({ where: { teamId: team.id } })
+      .catch(() => undefined);
+    await prisma.team.delete({ where: { id: team.id } }).catch(() => undefined);
+    throw error;
+  }
+
+  const teamWithMembers = await prisma.team.findUnique({
+    where: { id: team.id },
     include: { members: true },
   });
 
-  return normalizeTeam(team);
+  if (!teamWithMembers) {
+    throw new Error("Time não encontrado após criação.");
+  }
+
+  return normalizeTeam(teamWithMembers);
 }
 
 export async function listUserTeams(
@@ -115,6 +139,16 @@ export async function listUserTeams(
   });
 
   return memberships.map((m) => normalizeTeam(m.team));
+}
+
+export async function listActiveTeams(): Promise<TeamRecord[]> {
+  const teams = await prisma.team.findMany({
+    where: { status: "active" },
+    include: { members: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return teams.map(normalizeTeam);
 }
 
 export async function listUserTeamsWithPartners(
@@ -200,11 +234,19 @@ export async function getTeamById(teamId: string): Promise<TeamRecord | null> {
 }
 
 export async function archiveTeam(teamId: string): Promise<TeamRecord> {
-  const team = await prisma.team.update({
+  await prisma.team.update({
     where: { id: teamId },
     data: { status: "archived" },
+  });
+
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: { members: true },
   });
+
+  if (!team) {
+    throw new Error("Time não encontrado após arquivamento.");
+  }
 
   return normalizeTeam(team);
 }
