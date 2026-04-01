@@ -5,6 +5,12 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: "Executar deploy em producao no run manual"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,8 +20,48 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify:
+    name: Verify Release Candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BETTER_AUTH_SECRET: ci-test-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_ENV: production
+      CI: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build production bundle
+        run: npm run build
+
   deploy:
     name: Deploy Cloudflare Production Tag
+    needs: verify
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy_production) }}
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 20
@@ -30,6 +76,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Validate manual deploy source
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_production }}
+        run: |
+          if [[ "$GITHUB_REF_TYPE" != "tag" || ! "$GITHUB_REF_NAME" =~ ^v ]]; then
+            echo "::error::Manual production deploy must run from a v* tag ref."
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
