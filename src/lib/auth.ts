@@ -49,6 +49,63 @@ async function withTimeout<T>(
   }
 }
 
+function normalizeOrigin(value: string | null | undefined): string | null {
+  if (!value) return null;
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
+function addTrustedOrigin(
+  origins: Set<string>,
+  value: string | null | undefined,
+): void {
+  const normalized = normalizeOrigin(value);
+  if (!normalized) return;
+
+  origins.add(normalized);
+
+  const parsed = new URL(normalized);
+  if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+    const aliasHost = parsed.hostname === "localhost" ? "127.0.0.1" : "localhost";
+    const alias = `${parsed.protocol}//${aliasHost}${parsed.port ? `:${parsed.port}` : ""}`;
+    origins.add(alias);
+  }
+}
+
+function resolveRequestOrigin(request?: Request): string | null {
+  if (!request) return null;
+
+  const requestOrigin = normalizeOrigin(request.url);
+  if (requestOrigin) return requestOrigin;
+
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost ?? request.headers.get("host")?.split(",")[0]?.trim();
+  if (!host) return null;
+
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol =
+    forwardedProto === "http" || forwardedProto === "https"
+      ? forwardedProto
+      : process.env.NODE_ENV === "development"
+        ? "http"
+        : "https";
+
+  return normalizeOrigin(`${protocol}://${host}`);
+}
+
+function getAuthTrustedOrigins(request?: Request): string[] {
+  const origins = new Set<string>();
+
+  addTrustedOrigin(origins, process.env.BETTER_AUTH_URL);
+  addTrustedOrigin(origins, resolveRequestOrigin(request));
+
+  return Array.from(origins);
+}
+
 export function hasDatabaseUrl(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
@@ -134,7 +191,11 @@ const migrationMiddleware = createAuthMiddleware(async (ctx) => {
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET ?? "auth-disabled-no-database",
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  trustedOrigins: (request) => getAuthTrustedOrigins(request),
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+    transaction: false,
+  }),
   emailAndPassword: {
     enabled: true,
     password: {
