@@ -37,6 +37,7 @@ O projeto deixou de ser o `v1` de dois times fixos (`Frontend vs Backend`) e hoj
 - `Zod`
 - `Vitest` + Testing Library
 - `Playwright`
+- `Node.js >= 22`
 
 ## Rotas Principais
 
