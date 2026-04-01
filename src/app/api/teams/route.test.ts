@@ -15,12 +15,14 @@ vi.mock("@/lib/auth", async () => {
 
 const mockCreateTeam = vi.fn();
 const mockListUserTeams = vi.fn();
+const mockListActiveTeams = vi.fn();
 const mockFindUserByUsername = vi.fn();
 const mockFindUserById = vi.fn();
 
 vi.mock("@/lib/teams", () => ({
   createTeam: (...args: unknown[]) => mockCreateTeam(...args),
   listUserTeams: (...args: unknown[]) => mockListUserTeams(...args),
+  listActiveTeams: (...args: unknown[]) => mockListActiveTeams(...args),
   findUserByUsername: (...args: unknown[]) => mockFindUserByUsername(...args),
   findUserById: (...args: unknown[]) => mockFindUserById(...args),
 }));
@@ -31,6 +33,7 @@ describe("/api/teams", () => {
     vi.resetModules();
     mockCreateTeam.mockReset();
     mockListUserTeams.mockReset();
+    mockListActiveTeams.mockReset();
     mockFindUserByUsername.mockReset();
     mockFindUserById.mockReset();
     currentUser = { id: "user-abc", username: "gui.dev" };
@@ -69,6 +72,16 @@ describe("/api/teams", () => {
       await GET(new Request("http://localhost/api/teams?includeArchived=true"));
 
       expect(mockListUserTeams).toHaveBeenCalledWith("user-abc", true);
+    });
+
+    it("returns all active teams when scope=all", async () => {
+      mockListActiveTeams.mockResolvedValue([]);
+
+      const { GET } = await import("@/app/api/teams/route");
+      await GET(new Request("http://localhost/api/teams?scope=all"));
+
+      expect(mockListActiveTeams).toHaveBeenCalledWith();
+      expect(mockListUserTeams).not.toHaveBeenCalled();
     });
 
     it("returns 401 when not authenticated", async () => {

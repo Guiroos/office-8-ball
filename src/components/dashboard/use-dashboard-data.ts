@@ -16,6 +16,8 @@ type DashboardState = {
   matches: MatchRecord[];
 };
 
+type TeamsScope = "mine" | "all";
+
 type RegisterWinInput = {
   teamId: string;       // the winning team ID (winnerTeamId)
   teamAId: string;      // first team in the pair
@@ -105,14 +107,18 @@ async function fetchDashboardData() {
   };
 }
 
-export function useTeamsData() {
+function getTeamsUrl(scope: TeamsScope) {
+  return scope === "all" ? "/api/teams?scope=all" : "/api/teams";
+}
+
+export function useTeamsData(scope: TeamsScope = "mine") {
   const [teams, setTeams] = useState<TeamRecord[]>([]);
   const [teamsLoading, setTeamsLoading] = useState(true);
 
   useEffect(() => {
     void (async () => {
       try {
-        const response = await fetch("/api/teams", { cache: "no-store" });
+        const response = await fetch(getTeamsUrl(scope), { cache: "no-store" });
         if (!response.ok) throw new Error("Não foi possível carregar os times.");
         const json = (await response.json()) as TeamsResponse;
         setTeams(json.teams);
@@ -124,7 +130,7 @@ export function useTeamsData() {
         setTeamsLoading(false);
       }
     })();
-  }, []);
+  }, [scope]);
 
   return { teams, teamsLoading };
 }

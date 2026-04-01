@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   Shield,
+  Swords,
   Trophy,
   Users,
   X,
@@ -62,6 +63,12 @@ const navigationItems: NavigationItem[] = [
     label: "Ranking",
     icon: Trophy,
     match: (pathname) => pathname.startsWith("/ranking"),
+  },
+  {
+    href: "/partida",
+    label: "Partida",
+    icon: Swords,
+    match: (pathname) => pathname.startsWith("/partida"),
   },
 ];
 

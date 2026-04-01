@@ -116,7 +116,7 @@ describe("Dashboard", () => {
           return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
         }
 
-        if (url === "/api/teams") {
+        if (url.startsWith("/api/teams")) {
           return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
         }
 
@@ -131,7 +131,7 @@ describe("Dashboard", () => {
 
     expect(await screen.findByText("Nenhuma partida registrada ainda.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Frontend vs Backend" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 
   it("shows an error state when the initial load fails", async () => {
@@ -154,7 +154,7 @@ describe("Dashboard", () => {
       .mockImplementation((input, init) => {
         const url = String(input);
 
-        if (url === "/api/teams") {
+        if (url.startsWith("/api/teams")) {
           return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
         }
 
@@ -236,11 +236,125 @@ describe("Dashboard", () => {
     expect(backendNote).toHaveValue("fica para a próxima");
   });
 
+  it("registers the win against the selected opponent when user has 3+ teams", async () => {
+    const teamsWithThree: TeamsResponse = {
+      teams: [
+        {
+          id: "alpha",
+          name: "Alpha",
+          type: "duo",
+          status: "active",
+          createdBy: "user-1",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+          members: [{ userId: "user-1", joinedAt: "2026-01-01T00:00:00.000Z" }],
+        },
+        {
+          id: "beta",
+          name: "Beta",
+          type: "duo",
+          status: "active",
+          createdBy: "user-2",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+          members: [{ userId: "user-2", joinedAt: "2026-01-01T00:00:00.000Z" }],
+        },
+        {
+          id: "gamma",
+          name: "Gamma",
+          type: "duo",
+          status: "active",
+          createdBy: "user-3",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+          members: [{ userId: "user-3", joinedAt: "2026-01-01T00:00:00.000Z" }],
+        },
+      ],
+    };
+
+    const scoreboardThree: ScoreboardResponse = {
+      scoreboard: {
+        teams: [
+          { id: "alpha", wins: 0, losses: 0 },
+          { id: "beta", wins: 0, losses: 0 },
+          { id: "gamma", wins: 0, losses: 0 },
+        ],
+        leaderTeamId: null,
+        leadBy: 0,
+        totalMatches: 0,
+      },
+    };
+
+    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+      const url = String(input);
+
+      if (url.startsWith("/api/teams")) {
+        return jsonResponse(teamsWithThree) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/scoreboard") {
+        return jsonResponse(scoreboardThree) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && !init?.method) {
+        return jsonResponse(emptyMatches) as ReturnType<typeof fetch>;
+      }
+
+      if (url === "/api/matches" && init?.method === "POST") {
+        expect(init.body).toBe(
+          JSON.stringify({
+            teamAId: "alpha",
+            teamBId: "gamma",
+            winnerTeamId: "alpha",
+            note: "",
+          }),
+        );
+
+        return jsonResponse(
+          {
+            match: {
+              id: "match-10",
+              teamAId: "alpha",
+              teamBId: "gamma",
+              winnerTeamId: "alpha",
+              loserTeamId: "gamma",
+              playedAt: "2026-03-12T10:00:00.000Z",
+              note: null,
+            },
+          } satisfies CreateMatchResponse,
+          true,
+          201,
+        ) as ReturnType<typeof fetch>;
+      }
+
+      throw new Error(`Unexpected fetch to ${url}`);
+    });
+
+    render(<Dashboard />);
+
+    await screen.findByRole("button", { name: "Vitória Alpha" });
+    const alphaCard = screen
+      .getByRole("button", { name: "Vitória Alpha" })
+      .closest("[data-team='alpha']");
+
+    expect(alphaCard).not.toBeNull();
+
+    const opponentSelect = within(alphaCard as HTMLElement).getByTestId(
+      "opponent-select-alpha",
+    );
+    await userEvent.selectOptions(opponentSelect, "gamma");
+    await userEvent.click(screen.getByRole("button", { name: "Vitória Alpha" }));
+
+    await waitFor(() => {
+      expect(toast.promise).toHaveBeenCalled();
+    });
+  });
+
   it("preserves the note when saving fails", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
       const url = String(input);
 
-      if (url === "/api/teams") {
+      if (url.startsWith("/api/teams")) {
         return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
       }
 
@@ -298,7 +412,7 @@ describe("Dashboard", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
       const url = String(input);
 
-      if (url === "/api/teams") {
+      if (url.startsWith("/api/teams")) {
         return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
       }
 
@@ -335,7 +449,7 @@ describe("Dashboard", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
 
-      if (url === "/api/teams") {
+      if (url.startsWith("/api/teams")) {
         return jsonResponse(initialTeams) as ReturnType<typeof fetch>;
       }
 
