@@ -18,7 +18,7 @@
     "e2e:ui": "playwright test --ui",
     "e2e:headed": "playwright test --headed",
     "e2e:install": "playwright install chromium",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && node scripts/generate-node-prisma-client.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -81,7 +81,7 @@
     "wrangler": "^4.78.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "type": "module"
 }
