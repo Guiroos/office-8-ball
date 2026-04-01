@@ -1,6 +1,14 @@
 @import "tailwindcss/index.css";
 @import "./tokens.css";
 
+@font-face {
+  font-family: "Geist Sans Local";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
 
@@ -132,7 +140,7 @@
   --tracking-label-wide: 0.28em;
 
   /* Font families — generates: font-sans, font-body, font-display */
-  --font-sans: var(--font-geist-sans), "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: "Geist Sans Local", "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
   --font-body: var(--font-sans);
   --font-display: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
 
