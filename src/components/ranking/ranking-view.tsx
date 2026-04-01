@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/primitives/empty-state";
 import { PeriodTabs } from "@/components/ranking/period-tabs";
 import { PodiumCard } from "@/components/ranking/podium-card";
 import { StandingsRow } from "@/components/ranking/standings-row";
@@ -50,14 +51,11 @@ export function RankingView({
           {filters}
         </div>
         {/* per D-13: explicit empty state without automatic fallback to all-time */}
-        <div
+        <EmptyState
           data-testid="empty-state"
-          className="mt-6 rounded-lg border border-border bg-surface p-6"
-        >
-          <p className="text-muted-foreground">
-            Nenhum time encontrado {PERIOD_LABELS[activePeriod]}
-          </p>
-        </div>
+          description={`Nenhum time encontrado ${PERIOD_LABELS[activePeriod]}`}
+          className="mt-6 border-border bg-surface"
+        />
       </main>
     );
   }

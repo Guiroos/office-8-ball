@@ -73,13 +73,6 @@ export function TeamPartnerFilter({
         showDescriptionInTrigger={false}
         options={options}
       />
-      <p className="text-xs text-muted-foreground">
-        {isPending
-          ? "Atualizando filtro..."
-          : hasPartners
-            ? "Troque o parceiro para refinar a lista sem perder o contexto."
-            : "Nenhuma dupla com parceiro ainda."}
-      </p>
     </div>
   );
 }

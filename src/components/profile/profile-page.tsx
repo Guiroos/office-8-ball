@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import {
   Calendar,
@@ -17,11 +19,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
+import { getInitials } from "@/lib/format";
 import type { ProfilePageData, ProfileResponse } from "@/lib/types";
-
-import Image from "next/image";
-
-import { ProfileEditDialog } from "./profile-edit-dialog";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,17 +28,13 @@ export type ProfilePageProps = {
   data: ProfilePageData & { email: string | null };
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const ProfileEditDialog = dynamic(() =>
+  import("@/components/profile/profile-edit-dialog").then((module) => ({
+    default: module.ProfileEditDialog,
+  })),
+);
 
-function getInitials(username: string): string {
-  return username
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((c) => c.charAt(0).toUpperCase())
-    .join("")
-    .slice(0, 2);
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatJoinDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString("pt-BR", {
@@ -241,12 +236,14 @@ export function ProfilePage({ data }: ProfilePageProps) {
         </div>
       </div>
 
-      <ProfileEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        profile={editableProfile}
-        onSave={handleSave}
-      />
+      {editOpen ? (
+        <ProfileEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          profile={editableProfile}
+          onSave={handleSave}
+        />
+      ) : null}
     </div>
   );
 }

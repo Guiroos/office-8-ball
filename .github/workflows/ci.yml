@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - "**"
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
             src:
               - 'src/**'
               - 'prisma/**'
-              - 'middleware.ts'
+              - 'proxy.ts'
               - 'next.config.*'
               - 'tsconfig*.json'
               - 'vitest.config.*'
@@ -40,7 +40,7 @@ jobs:
     timeout-minutes: 15
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/office_8_ball_ci
-      NEXTAUTH_SECRET: ci-test-secret
+      BETTER_AUTH_SECRET: ci-test-secret
 
     steps:
       - name: Checkout repository
@@ -49,7 +49,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies

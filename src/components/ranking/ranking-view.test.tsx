@@ -5,9 +5,11 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { RankingView } from "@/components/ranking/ranking-view";
 import type { RankedTeam } from "@/lib/ranking";
 
-const mockListAllTeamsWithStats = vi.fn();
-const mockHasDatabaseUrl = vi.fn();
-const mockPush = vi.fn();
+const { mockListAllTeamsWithStats, mockHasDatabaseUrl, mockPush } = vi.hoisted(() => ({
+  mockListAllTeamsWithStats: vi.fn(),
+  mockHasDatabaseUrl: vi.fn(),
+  mockPush: vi.fn(),
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -15,21 +17,16 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/lib/ranking", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/ranking")>("@/lib/ranking");
-  return {
-    ...actual,
-    listAllTeamsWithStats: (...args: unknown[]) => mockListAllTeamsWithStats(...args),
-  };
-});
+vi.mock("@/lib/ranking", () => ({
+  listAllTeamsWithStats: (...args: unknown[]) => mockListAllTeamsWithStats(...args),
+}));
 
-vi.mock("@/lib/auth", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
-  return {
-    ...actual,
-    hasDatabaseUrl: () => mockHasDatabaseUrl(),
-  };
-});
+vi.mock("@/lib/auth", () => ({
+  hasDatabaseUrl: () => mockHasDatabaseUrl(),
+  getAuthenticatedUser: vi.fn(),
+  getAuthUnavailableResponse: vi.fn(() => new Response(JSON.stringify({ error: "unavailable" }), { status: 503 })),
+  getAuthRequiredResponse: vi.fn(() => new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 })),
+}));
 
 const teams: RankedTeam[] = [
   {
@@ -155,7 +152,7 @@ describe("RankingView", () => {
 
     expect(teamOneLink).toBeDefined();
     expect(teamTwoLink).toBeDefined();
-    expect(within(teamOneLink!).getByText("Dupla")).toBeInTheDocument();
+    expect(within(teamOneLink!).getByText("Duplas")).toBeInTheDocument();
     expect(within(teamTwoLink!).getByText("Solo")).toBeInTheDocument();
   });
 

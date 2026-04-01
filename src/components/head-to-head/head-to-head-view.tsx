@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { formatTeamType } from "@/lib/format";
 import type { HeadToHeadPageData } from "@/lib/head-to-head";
 import type { TeamRecord } from "@/lib/types";
 
@@ -101,7 +102,7 @@ export function HeadToHeadView({ data }: Props) {
                   .map((team: TeamRecord) => ({
                     value: team.id,
                     label: team.name,
-                    description: team.type === "solo" ? "Solo" : "Duplas",
+                    description: formatTeamType(team.type),
                   })),
               ]}
             />
@@ -125,7 +126,7 @@ export function HeadToHeadView({ data }: Props) {
                   .map((team: TeamRecord) => ({
                     value: team.id,
                     label: team.name,
-                    description: team.type === "solo" ? "Solo" : "Duplas",
+                    description: formatTeamType(team.type),
                   })),
               ]}
             />

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { type FormEvent, useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -11,7 +11,7 @@ import { Field, FieldError } from "@/components/primitives/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control";
-import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit";
+import { AUTH_RATE_LIMIT_ERROR } from "@/lib/auth-rate-limit-shared";
 import {
   getLoginFieldErrors,
   getRegisterFieldErrors,
@@ -19,7 +19,6 @@ import {
 } from "@/lib/auth-validation";
 import type { ApiErrorResponse } from "@/lib/types";
 
-import LoginPageImage from '../../../public/login/login-onboarding.png'
 
 type LoginScreenProps = {
   authAvailable: boolean;
@@ -165,34 +164,38 @@ export function LoginScreen({
       throw new Error(payload?.error ?? "register_failed");
     }
 
-    const signInResult = await signIn("credentials", {
+    const { error: signInError } = await authClient.signIn.username({
       username: form.username,
       password: form.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
     });
 
-    if (!signInResult || signInResult.error) {
+    if (signInError) {
       setGeneralError("Conta criada, mas nao foi possivel abrir a sessao.");
-      throw new Error(signInResult?.error ?? "signin_after_register_failed");
+      throw new Error(
+        (typeof signInError === "object" && signInError !== null && "message" in signInError
+          ? (signInError as { message?: string }).message
+          : String(signInError)) ?? "signin_after_register_failed",
+      );
     }
   }
 
   async function handleLogin() {
-    const signInResult = await signIn("credentials", {
+    const { error } = await authClient.signIn.username({
       username: form.username,
       password: form.password,
-      redirect: false,
-      callbackUrl: "/dashboard",
     });
 
-    if (!signInResult || signInResult.error) {
+    if (error) {
+      const errorMessage =
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message?: string }).message
+          : String(error);
       setGeneralError(
-        signInResult?.error === AUTH_RATE_LIMIT_ERROR
+        errorMessage === AUTH_RATE_LIMIT_ERROR
           ? "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente."
           : "Username ou senha invalidos.",
       );
-      throw new Error(signInResult?.error ?? "signin_failed");
+      throw new Error(errorMessage ?? "signin_failed");
     }
   }
 
@@ -224,7 +227,6 @@ export function LoginScreen({
       }
 
       router.push("/dashboard");
-      router.refresh();
     } catch {
       // Error feedback is already set by the auth handlers above.
     } finally {
@@ -254,7 +256,7 @@ export function LoginScreen({
           <div className="grid w-full min-h-0 flex-1 gap-4 lg:grid-cols-[1.08fr_0.92fr] lg:gap-5">
             <aside className="relative hidden min-h-0 overflow-hidden rounded-2xl border border-border-inverse bg-surface-brand shadow-lg shadow-gold/35 lg:flex">
               <Image
-                src={LoginPageImage}
+                src="/login/login-onboarding.png"
                 alt="Mesa de sinuca estilizada representando a rivalidade entre frontend e backend."
                 fill
                 sizes="(min-width: 1024px) 55vw, 0vw"

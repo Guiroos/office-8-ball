@@ -33,3 +33,22 @@ When modifying tokens, CSS variables, or the theme system, read `techspec/theme-
 
 - Always import from `@/` alias — no relative `../` paths.
 - Named exports everywhere except Next.js page and layout files.
+
+## Naming Conventions
+
+| Artifact | Convention | Example |
+|----------|------------|---------|
+| Files | `kebab-case` | `dashboard-hero.tsx`, `use-dashboard-data.ts` |
+| React components | `PascalCase` | `DashboardHero`, `StatTile` |
+| Functions/variables | `camelCase` | `getAuthenticatedUser`, `currentUser` |
+| Types/interfaces | `PascalCase` | `TeamRecord`, `MatchRecord`, `SessionUser` |
+| Constants | `SCREAMING_SNAKE` | `AUTH_RATE_LIMIT_ERROR` |
+| Route handlers | Named exports matching HTTP verbs | `export async function GET()` |
+| Hooks | `use` prefix | `useDashboardData` |
+
+## Language in Code
+
+- Error messages and validation messages: **Brazilian Portuguese**
+- Code identifiers, comments, type names: **English**
+- Git commits: English (conventional commits)
+- PR bodies: Portuguese (sections: "O que muda" / "Como testar")

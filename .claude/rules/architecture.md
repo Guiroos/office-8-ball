@@ -16,7 +16,7 @@ These rules apply for v1 and must not be broken without an explicit product or a
 
 ## CI / Deploy Changes
 
-When touching GitHub Actions, release flow, or Vercel config, read `techspec/github-operations.md` and `techspec/git-conventions.md` before editing. Constraint: keep Vercel as deployment platform; GitHub is for validation only.
+When touching GitHub Actions, release flow, or Cloudflare Workers config, read `techspec/github-operations.md` and `techspec/git-conventions.md` before editing. Constraint: keep Cloudflare Workers as deployment platform; GitHub is for validation only.
 
 ## Layer Map
 

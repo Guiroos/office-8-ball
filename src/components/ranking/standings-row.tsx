@@ -1,35 +1,9 @@
 import Link from "next/link";
 
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { RecentResultsDots } from "@/components/primitives/recent-results-dots";
+import { formatTeamType } from "@/lib/format";
 import type { RankedTeam } from "@/lib/ranking";
-
-function RecentResultsDots({ results, teamName }: { results: RankedTeam["lastFiveResults"]; teamName: string }) {
-  const slots = [...results, ...Array.from({ length: Math.max(0, 5 - results.length) }, () => "none" as const)];
-
-  return (
-    <div className="flex items-center justify-center gap-1.5" aria-label={`Últimas 5 partidas de ${teamName}`}>
-      {slots.map((result, index) => (
-        <span
-          key={`${teamName}-${index}`}
-          aria-label={
-            result === "win"
-              ? `Partida ${index + 1}: vitória`
-              : result === "loss"
-                ? `Partida ${index + 1}: derrota`
-                : `Partida ${index + 1}: sem histórico`
-          }
-          className={cn(
-            "block h-2.5 w-2.5 rounded-full border",
-            result === "win" && "border-primary/70 bg-primary",
-            result === "loss" && "border-danger/70 bg-danger",
-            result === "none" && "border-border bg-surface-muted",
-          )}
-        />
-      ))}
-    </div>
-  );
-}
 
 export function StandingsRow({ team }: { team: RankedTeam }) {
   return (
@@ -42,7 +16,7 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
         <p className="label-wide text-center text-muted-foreground">#{team.rank}</p>
         <p className="truncate font-semibold">{team.name}</p>
         <Badge variant="outline" className="justify-self-start">
-          {team.type === "solo" ? "Solo" : "Duplas"}
+          {formatTeamType(team.type)}
         </Badge>
         <div className="text-center">
           <p className="caption text-muted-foreground">V</p>
@@ -73,7 +47,7 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
           <p className="truncate text-sm font-semibold">{team.name}</p>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              {team.type === "solo" ? "Solo" : "Duplas"}
+              {formatTeamType(team.type)}
             </Badge>
             <p className="text-xs text-muted-foreground">
               {team.wins}V · {team.losses}D · {team.winRate.toFixed(1)}%

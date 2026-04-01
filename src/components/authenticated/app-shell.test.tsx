@@ -37,6 +37,14 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+// Wave 0: @/lib/auth-client mock ready for Wave 3 (app-shell.tsx migration)
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    signOut: (...args: unknown[]) => signOutMock(...args),
+  },
+}));
+
+// Wave 0 compat: keep next-auth/react mock until app-shell.tsx is migrated in Wave 3
 vi.mock("next-auth/react", () => ({
   signOut: (...args: unknown[]) => signOutMock(...args),
 }));
@@ -58,7 +66,7 @@ vi.mock("@/components/theme/theme-toggle", () => ({
 describe("AppShell", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    usePathnameMock.mockReturnValue("/dashboard");
+    usePathnameMock.mockReturnValue("/times");
   });
 
   it("renders the shared navigation and highlights the active page", () => {
@@ -78,7 +86,7 @@ describe("AppShell", () => {
     expect(screen.getByText("Conteudo interno")).toBeInTheDocument();
     expect(
       screen
-        .getAllByRole("link", { name: "Dashboard" })
+        .getAllByRole("link", { name: "Times" })
         .some((link) => link.getAttribute("aria-current") === "page"),
     ).toBe(true);
     expect(screen.getByRole("navigation", { name: "Navegacao principal" })).toHaveClass(
@@ -125,11 +133,12 @@ describe("AppShell", () => {
 
     await user.click(screen.getByRole("button", { name: "Sair" }));
 
-    expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/login" });
+    expect(signOutMock).toHaveBeenCalledTimes(1);
   });
 
   it("uses client navigation when a different sidebar route is clicked", async () => {
     const user = userEvent.setup();
+    usePathnameMock.mockReturnValue("/ranking");
 
     render(
       <AppShell
@@ -147,5 +156,6 @@ describe("AppShell", () => {
     await user.click(screen.getAllByRole("link", { name: "Times" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/times");
+    expect(screen.getByRole("status")).toHaveTextContent("Carregando rota");
   });
 });

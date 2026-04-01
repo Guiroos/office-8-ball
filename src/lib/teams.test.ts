@@ -4,8 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockTeamMemberFindUnique = vi.fn();
 const mockTeamMemberFindMany = vi.fn();
 const mockTeamMemberCreate = vi.fn();
+const mockTeamMemberDeleteMany = vi.fn();
 const mockTeamMemberDelete = vi.fn();
+const mockTeamCreate = vi.fn();
 const mockTeamFindUnique = vi.fn();
+const mockTeamUpdate = vi.fn();
+const mockTeamDelete = vi.fn();
 const mockMatchFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -14,10 +18,14 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...args: unknown[]) => mockTeamMemberFindUnique(...args),
       findMany: (...args: unknown[]) => mockTeamMemberFindMany(...args),
       create: (...args: unknown[]) => mockTeamMemberCreate(...args),
+      deleteMany: (...args: unknown[]) => mockTeamMemberDeleteMany(...args),
       delete: (...args: unknown[]) => mockTeamMemberDelete(...args),
     },
     team: {
+      create: (...args: unknown[]) => mockTeamCreate(...args),
       findUnique: (...args: unknown[]) => mockTeamFindUnique(...args),
+      update: (...args: unknown[]) => mockTeamUpdate(...args),
+      delete: (...args: unknown[]) => mockTeamDelete(...args),
     },
     match: {
       findMany: (...args: unknown[]) => mockMatchFindMany(...args),
@@ -54,9 +62,151 @@ describe("teams.ts — member management", () => {
     mockTeamMemberFindUnique.mockReset();
     mockTeamMemberFindMany.mockReset();
     mockTeamMemberCreate.mockReset();
+    mockTeamMemberDeleteMany.mockReset();
     mockTeamMemberDelete.mockReset();
+    mockTeamCreate.mockReset();
     mockTeamFindUnique.mockReset();
+    mockTeamUpdate.mockReset();
+    mockTeamDelete.mockReset();
     mockMatchFindMany.mockReset();
+  });
+
+  describe("createTeam", () => {
+    it("creates a solo team with creator membership in sequential writes", async () => {
+      const { createTeam } = await import("@/lib/teams");
+
+      mockTeamCreate.mockResolvedValueOnce({
+        id: "team-1",
+      });
+      mockTeamMemberCreate.mockResolvedValueOnce({});
+      mockTeamFindUnique.mockResolvedValueOnce(makeTeam());
+
+      const result = await createTeam({
+        name: " Team Alpha ",
+        createdBy: "user-creator",
+        type: "solo",
+      });
+
+      expect(result.id).toBe("team-1");
+      expect(mockTeamCreate).toHaveBeenCalledWith({
+        data: {
+          name: "team alpha",
+          type: "solo",
+          createdBy: "user-creator",
+        },
+      });
+      expect(mockTeamMemberCreate).toHaveBeenCalledTimes(1);
+      expect(mockTeamMemberCreate).toHaveBeenCalledWith({
+        data: {
+          teamId: "team-1",
+          userId: "user-creator",
+        },
+      });
+      expect(mockTeamFindUnique).toHaveBeenCalledWith({
+        where: { id: "team-1" },
+        include: { members: true },
+      });
+    });
+
+    it("creates duo second member without nested relation writes", async () => {
+      const { createTeam } = await import("@/lib/teams");
+
+      mockTeamCreate.mockResolvedValueOnce({
+        id: "team-1",
+      });
+      mockTeamMemberCreate.mockResolvedValue({});
+      mockTeamFindUnique.mockResolvedValueOnce(
+        makeTeam({
+          members: [
+            { userId: "user-creator", joinedAt: new Date("2026-01-01T00:00:00.000Z") },
+            { userId: "user-second", joinedAt: new Date("2026-01-02T00:00:00.000Z") },
+          ],
+        }),
+      );
+
+      const result = await createTeam({
+        name: "dupla",
+        createdBy: "user-creator",
+        type: "duo",
+        secondMemberUserId: "user-second",
+      });
+
+      expect(result.members).toHaveLength(2);
+      expect(mockTeamMemberCreate).toHaveBeenCalledTimes(2);
+      expect(mockTeamMemberCreate).toHaveBeenNthCalledWith(1, {
+        data: {
+          teamId: "team-1",
+          userId: "user-creator",
+        },
+      });
+      expect(mockTeamMemberCreate).toHaveBeenNthCalledWith(2, {
+        data: {
+          teamId: "team-1",
+          userId: "user-second",
+        },
+      });
+    });
+
+    it("rolls back created records when membership creation fails", async () => {
+      const { createTeam } = await import("@/lib/teams");
+
+      const expectedError = new Error("membership insert failed");
+      mockTeamCreate.mockResolvedValueOnce({ id: "team-1" });
+      mockTeamMemberCreate.mockRejectedValueOnce(expectedError);
+      mockTeamMemberDeleteMany.mockResolvedValueOnce({ count: 0 });
+      mockTeamDelete.mockResolvedValueOnce({});
+
+      await expect(
+        createTeam({
+          name: "team alpha",
+          createdBy: "user-creator",
+          type: "solo",
+        }),
+      ).rejects.toThrow("membership insert failed");
+
+      expect(mockTeamMemberDeleteMany).toHaveBeenCalledWith({
+        where: { teamId: "team-1" },
+      });
+      expect(mockTeamDelete).toHaveBeenCalledWith({
+        where: { id: "team-1" },
+      });
+      expect(mockTeamFindUnique).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("archiveTeam", () => {
+    it("archives with update and then loads members in a separate query", async () => {
+      const { archiveTeam } = await import("@/lib/teams");
+
+      mockTeamUpdate.mockResolvedValueOnce({});
+      mockTeamFindUnique.mockResolvedValueOnce({
+        ...makeTeam(),
+        status: "archived",
+      });
+
+      const result = await archiveTeam("team-1");
+
+      expect(mockTeamUpdate).toHaveBeenCalledWith({
+        where: { id: "team-1" },
+        data: { status: "archived" },
+      });
+      expect(mockTeamFindUnique).toHaveBeenCalledWith({
+        where: { id: "team-1" },
+        include: { members: true },
+      });
+      expect(result.status).toBe("archived");
+    });
+
+    it("throws when team cannot be loaded after archiving", async () => {
+      const { archiveTeam } = await import("@/lib/teams");
+
+      mockTeamUpdate.mockResolvedValueOnce({});
+      mockTeamFindUnique.mockResolvedValueOnce(null);
+
+      await expect(archiveTeam("team-1")).rejects.toThrow(
+        "Time não encontrado após arquivamento.",
+      );
+    });
   });
 
   describe("listUserTeamsWithPartners", () => {

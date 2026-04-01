@@ -55,9 +55,6 @@ export function PeriodTabs({
         showDescriptionInTrigger={false}
         options={TABS}
       />
-      <p className="text-xs text-muted-foreground">
-        {isPending ? "Atualizando período..." : "A janela muda na hora e o ranking confirma em seguida."}
-      </p>
     </div>
   );
 }

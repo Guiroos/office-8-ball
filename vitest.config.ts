@@ -5,14 +5,14 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "next/image": path.resolve(__dirname, "__mocks__/next-image.tsx"),
+      "@": path.resolve(import.meta.dirname, "src"),
+      "next/image": path.resolve(import.meta.dirname, "__mocks__/next-image.tsx"),
     },
   },
   test: {
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
-    exclude: ["e2e/**", "node_modules/**", ".next/**", ".worktrees/**"],
+    exclude: ["e2e/**", "node_modules/**", ".next/**", ".worktrees/**", ".claude/worktrees/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],

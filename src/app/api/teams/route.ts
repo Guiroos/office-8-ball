@@ -7,7 +7,7 @@ import {
   hasDatabaseUrl,
   getAuthUnavailableResponse,
 } from "@/lib/auth";
-import { createTeam, listUserTeams, findUserById } from "@/lib/teams";
+import { createTeam, listUserTeams, listActiveTeams, findUserById } from "@/lib/teams";
 import type { ApiErrorResponse, TeamsResponse, TeamResponse } from "@/lib/types";
 
 const createTeamSchema = z.object({
@@ -29,9 +29,13 @@ export async function GET(request: Request) {
   if (!user) return getAuthRequiredResponse();
 
   const url = new URL(request.url);
+  const scope = url.searchParams.get("scope");
   const includeArchived = url.searchParams.get("includeArchived") === "true";
 
-  const teams = await listUserTeams(user.id, includeArchived);
+  const teams =
+    scope === "all"
+      ? await listActiveTeams()
+      : await listUserTeams(user.id, includeArchived);
 
   return NextResponse.json<TeamsResponse>({ teams });
 }

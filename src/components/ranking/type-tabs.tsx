@@ -55,9 +55,6 @@ export function TypeTabs({
         showDescriptionInTrigger={false}
         options={TYPE_VALUES}
       />
-      <p className="text-xs text-muted-foreground">
-        {isPending ? "Atualizando categoria..." : "Troque a modalidade sem resetar o restante do ranking."}
-      </p>
     </div>
   );
 }

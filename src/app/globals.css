@@ -131,8 +131,9 @@
   --tracking-label: 0.22em;
   --tracking-label-wide: 0.28em;
 
-  /* Font families — generates: font-body, font-display */
-  --font-body: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  /* Font families — generates: font-sans, font-body, font-display */
+  --font-sans: var(--font-geist-sans), "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: var(--font-sans);
   --font-display: "Copperplate", "Impact", "Arial Narrow Bold", sans-serif;
 
 }

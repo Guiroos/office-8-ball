@@ -4,59 +4,9 @@ import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { RecentResultsDots } from "@/components/primitives/recent-results-dots";
+import { formatLastPlayedAt, formatTeamType, getInitials } from "@/lib/format";
 import type { UserTeamOverview } from "@/lib/teams";
-import { cn } from "@/lib/utils";
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function formatLastPlayedAt(value: string | null) {
-  if (!value) return "Sem partidas ainda";
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-  }).format(new Date(value));
-}
-
-function RecentResultsDots({
-  results,
-  teamName,
-}: {
-  results: UserTeamOverview["summary"]["lastFiveResults"];
-  teamName: string;
-}) {
-  const slots = [...results, ...Array.from({ length: Math.max(0, 5 - results.length) }, () => "none" as const)];
-
-  return (
-    <div className="flex items-center gap-1.5" aria-label={`Últimas 5 partidas de ${teamName}`}>
-      {slots.map((result, index) => (
-        <span
-          key={`${teamName}-${index}`}
-          aria-label={
-            result === "win"
-              ? `Partida ${index + 1}: vitória`
-              : result === "loss"
-                ? `Partida ${index + 1}: derrota`
-                : `Partida ${index + 1}: sem histórico`
-          }
-          className={cn(
-            "block h-2.5 w-2.5 rounded-full border",
-            result === "win" && "border-primary/70 bg-primary",
-            result === "loss" && "border-danger/70 bg-danger",
-            result === "none" && "border-border bg-surface-muted",
-          )}
-        />
-      ))}
-    </div>
-  );
-}
 
 export function TeamCard({ team }: { team: UserTeamOverview }) {
   const partnerLabel =
@@ -80,7 +30,7 @@ export function TeamCard({ team }: { team: UserTeamOverview }) {
               <div className="flex items-center gap-2">
                 <p className="truncate text-sm font-semibold leading-none">{team.name}</p>
                 <Badge variant="outline" className="shrink-0 text-xs">
-                  {team.type === "solo" ? "Solo" : "Duplas"}
+                  {formatTeamType(team.type)}
                 </Badge>
               </div>
               <p className="truncate text-xs text-muted-foreground">{partnerLabel}</p>

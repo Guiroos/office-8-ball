@@ -47,6 +47,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare
+.wrangler/
+.dev.vars
+.dev.vars.*
+
 # typescript
 *.tsbuildinfo
 
@@ -54,3 +59,5 @@ yarn-error.log*
 .worktrees
 
 .codex
+/dist/
+/src/generated/prisma/client/

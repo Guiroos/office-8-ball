@@ -127,7 +127,7 @@ Sequencia:
 3. Atualizar a versao do projeto se necessario
 4. Criar a tag anotada no commit aprovado
 5. Enviar a tag para o remoto
-6. Aguardar o workflow `Deploy Production Tag` publicar a producao na Vercel
+6. Aguardar o workflow `Deploy Production Tag` publicar a producao no Cloudflare Workers
 7. Publicar um GitHub Release apontando para a tag
 
 Comandos base:
@@ -142,7 +142,7 @@ git push origin v1.0.0
 
 Depois da tag:
 
-- o GitHub Actions executa o deploy de producao na Vercel
+- o GitHub Actions executa o deploy de producao no Cloudflare Workers
 - criar o GitHub Release com titulo `v1.0.0`
 - resumir features, correcoes e eventuais notas operacionais
 
@@ -162,17 +162,16 @@ Depois da tag:
 Para o workflow de producao funcionar, o repositorio precisa ter estes secrets configurados no GitHub:
 
 - `DATABASE_URL`
-- `NEXTAUTH_SECRET`
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
 
 Com essa estrategia:
 
-- o workflow de producao aplica `prisma migrate deploy` antes do build na Vercel
-- a Vercel nao publica automaticamente a cada commit
+- o workflow de producao aplica `prisma migrate deploy` antes do build
+- o Cloudflare Workers nao publica automaticamente a cada commit
 - a publicacao em producao fica amarrada a tags `v*`
-- previews automaticos por push e PR deixam de existir ate que o time crie um fluxo dedicado para isso
 
 ## Fora do padrao
 

@@ -10,26 +10,25 @@ let currentUser: { id: string; username: string } | null = {
   username: "test.user",
 };
 
-vi.mock("@/lib/auth", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/auth")>("@/lib/auth");
-  return {
-    ...actual,
-    hasDatabaseUrl: vi.fn(() => hasDatabaseUrlReturnValue),
-    getAuthenticatedUser: vi.fn(async () => currentUser),
-  };
-});
+vi.mock("@/lib/auth", () => ({
+  hasDatabaseUrl: vi.fn(() => hasDatabaseUrlReturnValue),
+  getAuthenticatedUser: vi.fn(async () => currentUser),
+  getAuthUnavailableResponse: vi.fn(() => new Response(JSON.stringify({ error: "unavailable" }), { status: 503 })),
+  getAuthRequiredResponse: vi.fn(() => new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 })),
+}));
 
 // ── Mock teams ─────────────────────────────────────────────────────────────────
 
-const mockListUserTeams = vi.fn<() => Promise<TeamRecord[]>>();
+const { mockListUserTeams, mockListMatches } = vi.hoisted(() => ({
+  mockListUserTeams: vi.fn<() => Promise<TeamRecord[]>>(),
+  mockListMatches: vi.fn<() => Promise<MatchRecord[]>>(),
+}));
 
 vi.mock("@/lib/teams", () => ({
   listUserTeams: mockListUserTeams,
 }));
 
 // ── Mock data (matches) ────────────────────────────────────────────────────────
-
-const mockListMatches = vi.fn<() => Promise<MatchRecord[]>>();
 
 vi.mock("@/lib/data", () => ({
   listMatches: mockListMatches,

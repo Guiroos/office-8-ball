@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 08 shipped — PR #78"
-last_updated: "2026-03-27T03:30:44.849Z"
+status: completed
+last_updated: "2026-03-29T23:07:05.845Z"
 progress:
-  total_phases: 8
+  total_phases: 9
   completed_phases: 8
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 21
+  completed_plans: 23
 ---
 
 # STATE.md — Office Sinuca Tracker v1 Roadmap
 
 **Project:** Office Sinuca Tracker — dynamic team leaderboard for office billiards tracking
-**Status:** Phase 08 shipped — PR #78
-**Last updated:** 2026-03-27 — Phase 08 shipped (PR #78) — v1.0 milestone complete
+**Status:** Milestone complete
+**Last updated:** 2026-03-31 — Completed quick task 260330-wnc: Fix 10 failing tests (vi.mock hoisting violations + login redirect)
 
 ---
 
@@ -23,7 +23,7 @@ progress:
 
 **Core Value:** O ranking de times sempre atualizado — qualquer colega abre o app e vê imediatamente quem está ganhando.
 
-**Current Focus:** Phase 08 — ranking-team-verification-recovery (Complete — traceability recovery closed Phase 4 audit blocker)
+**Current Focus:** Phase 09 — auth-migration-next-auth-to-better-auth
 
 **Scope Boundaries:**
 
@@ -35,8 +35,8 @@ progress:
 
 ## Current Position
 
-Phase: 08 — COMPLETE (all phases done, v1.0 milestone shipped)
-Plan: All plans complete (19/19)
+Phase: 09
+Plan: Not started
 
 ## Roadmap Summary
 
@@ -181,6 +181,14 @@ Plan: All plans complete (19/19)
     - Rationale: page.tsx is server component and single auth authority; client components receive only what they need
     - Implication: InviteMemberDialog and MemberList have no session dependency; testable in isolation with mock props
 
+26. **Wave 0 dual-mock pattern: keep next-auth/react as compat relay alongside @/lib/auth-client mock** (Plan 09-01)
+
+27. **better-auth migration hook via createAuthMiddleware** (Plan 09-02)
+    - Rationale: The username plugin reads account.password BEFORE calling password.verify. Existing next-auth users have no account record — hook intercepts /sign-in/username and seeds account row from User.passwordHash on first sign-in
+    - Implication: Seamless migration without password resets; password.verify is standard bcrypt after hook populates account record
+    - Rationale: Production components (login-screen.tsx, app-shell.tsx) still import from next-auth/react until Wave 3 migration. Removing the next-auth/react mock causes signIn-dependent tests to fail. Dual-mock wires both to the same signInMock/signOutMock for zero-failure Wave 0 baseline.
+    - Implication: When Plan 03 migrates production components to @/lib/auth-client, the next-auth/react vi.mock blocks are removed from those test files
+
 **Pitfalls to Avoid:**
 
 - **Pitfall 1: Silent scoreboard corruption via query limits** → Enforce "no limits on scoreboard" rule in Phase 2; test with 100+ matches
@@ -218,6 +226,21 @@ Plan: All plans complete (19/19)
 
 ---
 
+### Roadmap Evolution
+
+- Phase 9 added: Auth migration next-auth to better-auth (prerequisite for vinext migration)
+
+---
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260330-hnu | Trocar driver pg TCP para neon serverless | 2026-03-30 | f9e521f | [260330-hnu-trocar-driver-pg-tcp-para-neon-serverles](./quick/260330-hnu-trocar-driver-pg-tcp-para-neon-serverles/) |
+| 260330-w0w | Update Vercel references to Cloudflare Workers in docs | 2026-03-31 | d69dd1f | [260330-w0w-update-vercel-references-to-cloudflare-w](./quick/260330-w0w-update-vercel-references-to-cloudflare-w/) |
+| 260330-wfk | Update stale next-auth references to better-auth in docs | 2026-03-31 | c7737bb | [260330-wfk-update-stale-next-auth-references-to-bet](./quick/260330-wfk-update-stale-next-auth-references-to-bet/) |
+| 260330-wnc | Fix 10 failing tests: vi.mock hoisting violations + login redirect | 2026-03-31 | 2370955 | [260330-wnc-fix-10-failing-tests-vitest-mock-factory](./quick/260330-wnc-fix-10-failing-tests-vitest-mock-factory/) |
+
 *STATE.md created: 2026-03-23*
 *Last session: 2026-03-26 — Completed 05-02-PLAN.md (profile server-side wiring: async RSC assembler + ProfilePage props migration, 2 tasks, 4 files, 11 tests)*
 *Last session: 2026-03-26 — Completed 05-03-PLAN.md (ranking period filter: period=all|month|week in listAllTeamsWithStats and /ranking page, 3 new tests)*
@@ -229,3 +252,9 @@ Plan: All plans complete (19/19)
 *Last session: 2026-03-27 — Completed 06-02-PLAN.md (team-creation-flow-wiring E2E spec: create solo team flow Playwright test passes against real runtime, 2 tasks, 1 file, TEAM-01 gate closed)*
 *Last session: 2026-03-26 — Completed 07-01-PLAN.md (team-detail membership gate: TeamDetailResult discriminated union, isTeamMember gate before heavy queries, TeamDetailAccessDenied component, 11 tests, TEAM-02 access hardening)*
 *Last session: 2026-03-26 — Completed 07-02-PLAN.md (team member actions: InviteMemberDialog username lookup + POST, MemberList inline Confirmar/Cancelar + DELETE, 19 new component+route tests, E2E spec, TEAM-02 fully validated)*
+*Last session: 2026-03-29 — Completed 09-01-PLAN.md (Wave 0 test mock updates: auth.test.ts better-auth mocks, login-screen.test.tsx + app-shell.test.tsx @/lib/auth-client mocks, 2 tasks, 3 files, 21 tests, stopped at Plan 2 of 4)*
+*Last session: 2026-03-29 — Completed 09-02-PLAN.md (better-auth core library swap: package swap + Prisma Session/Account models + auth.ts rewrite with betterAuth singleton + migration hook, 2 tasks, 5 files, 5 tests, stopped at Plan 3 of 4)*
+*Last session: 2026-03-29 — Completed 09-03-PLAN.md (auth client module + component migration: auth-client.ts created, login-screen.tsx + app-shell.tsx migrated from next-auth/react to authClient, 2 tasks, 3 files, 16 tests pass, stopped at Plan 4 of 4)*
+*Last session: 2026-03-29 — Completed 09-04-PLAN.md (final better-auth wiring: proxy.ts replaces middleware.ts, [...all] route handler replaces [...nextauth], NEXTAUTH_SECRET renamed to BETTER_AUTH_SECRET in env+CI, next-auth fully removed from runtime codebase, human-verified end-to-end, 4 tasks, 10 files, Phase 09 complete)*
+*Last session: 2026-03-30 — Completed quick/260330-hnu (neon serverless driver migration: pg TCP driver replaced with @neondatabase/serverless WebSocket driver, PrismaNeon adapter, ws polyfill for Node.js, 2 tasks, 4 files, 297 tests pass)*
+*Last activity: 2026-03-31 — Completed quick task 260330-wnc: Fix 10 failing tests (vi.mock hoisting violations in head-to-head + ranking-view, login redirect /profile → /dashboard, vitest.config.ts worktree exclude — 306 tests passing)*

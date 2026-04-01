@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:e2e": "next dev --hostname 127.0.0.1 --port 3000",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vinext dev",
+    "dev:e2e": "vinext dev --hostname 127.0.0.1 --port 3000",
+    "build": "vinext build",
+    "start": "vinext start",
+    "deploy:cloudflare": "wrangler deploy",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -28,23 +29,25 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^7.6.0",
     "@prisma/client": "^6.19.2",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/postcss": "^4.2.1",
-    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
+    "better-auth": "^1.5.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "geist": "^1.7.0",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
-    "next-auth": "^4.24.13",
     "next-themes": "^0.4.6",
     "prisma": "^6.19.2",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "shadcn": "^4.0.8",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
@@ -53,6 +56,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.30.2",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -60,12 +64,22 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-rsc": "^0.5.21",
     "@vitest/coverage-v8": "^4.1.0",
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",
+    "react-server-dom-webpack": "^19.2.4",
     "typescript": "^5",
-    "vitest": "^4.1.0"
-  }
+    "vinext": "^0.0.38",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.78.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module"
 }
