@@ -7,6 +7,8 @@ import { ProfileStatsSection } from "@/components/profile/profile-stats-section"
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Perfil | Office 8 Ball",
   description: "Página de perfil do usuário autenticado.",

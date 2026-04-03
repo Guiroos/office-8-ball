@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { HeadToHeadView } from "@/components/head-to-head/head-to-head-view";
+
+export const revalidate = 0;
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
 import { resolveHeadToHeadData } from "@/lib/head-to-head";

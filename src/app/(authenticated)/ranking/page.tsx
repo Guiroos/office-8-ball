@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { RankingView } from "@/components/ranking/ranking-view";
+
+export const revalidate = 0;
 import { hasDatabaseUrl } from "@/lib/auth";
 import { listAllTeamsWithStats } from "@/lib/ranking";
 

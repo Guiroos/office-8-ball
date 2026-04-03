@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { PlaceholderPage } from "@/components/authenticated/placeholder-page";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Configuracoes | Office 8 Ball",
   description: "Pagina inicial de configuracoes da area autenticada.",

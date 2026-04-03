@@ -6,6 +6,8 @@ import { TeamH2HSection } from "@/components/teams/team-h2h-section";
 import { TeamMainSection } from "@/components/teams/team-main-section";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Detalhe do Time | Office 8 Ball",
   description: "Detalhes do time, estatísticas, membros e confrontos diretos.",
