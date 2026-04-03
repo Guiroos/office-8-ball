@@ -21,10 +21,6 @@ function formatCurrentStreakLabel(
 }
 
 export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
-  const teamNameById = Object.fromEntries([
-    [data.team.id, data.team.name],
-    ...data.rivals.map((rival) => [rival.id, rival.name]),
-  ]);
   const teamTypeLabel = formatTeamType(data.team.type);
   const summaryText = `${data.stats.wins} vitórias, ${data.stats.losses} derrotas e ${data.stats.winRate.toFixed(1)}% de aproveitamento.`;
 
@@ -53,8 +49,12 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end sm:pt-1">
-            <InviteMemberDialog teamId={data.team.id} />
-            <TeamArchiveButton teamId={data.team.id} />
+            {data.viewerCanManage ? (
+              <>
+                <InviteMemberDialog teamId={data.team.id} />
+                <TeamArchiveButton teamId={data.team.id} />
+              </>
+            ) : null}
           </div>
         </CardHeader>
       </Card>
@@ -86,6 +86,7 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
               teamType={data.team.type}
               createdBy={data.team.createdBy}
               viewerId={data.viewerId}
+              canManageMembers={data.viewerCanManage}
             />
           </CardContent>
         </Card>
@@ -100,7 +101,6 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
             <RecentMatchesList
               matches={data.recentMatches}
               teamId={data.team.id}
-              teamNameById={teamNameById}
             />
           </CardContent>
         </Card>

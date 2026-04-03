@@ -15,6 +15,7 @@ type MemberListProps = {
   teamType: "solo" | "duo";
   createdBy: string;
   viewerId: string;
+  canManageMembers: boolean;
 };
 
 function getInitials(name: string) {
@@ -33,7 +34,14 @@ function mapErrorStatus(status: number, fallbackMessage: string): string {
   return fallbackMessage;
 }
 
-export function MemberList({ members, teamId, teamType, createdBy, viewerId }: MemberListProps) {
+export function MemberList({
+  members,
+  teamId,
+  teamType,
+  createdBy,
+  viewerId,
+  canManageMembers,
+}: MemberListProps) {
   const router = useRouter();
   const [isRefreshing, startRefresh] = useTransition();
   const [confirmingUserId, setConfirmingUserId] = useState<string | null>(null);
@@ -45,9 +53,10 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
   const minMembersForRemoval = teamType === "solo" ? 1 : 2;
   const canRemoveAny = visibleMembers.length > minMembersForRemoval;
   const hasNonCreatorMember = visibleMembers.some((member) => member.userId !== createdBy);
-  const showMinMembersHint = !canRemoveAny && hasNonCreatorMember;
+  const showMinMembersHint = canManageMembers && !canRemoveAny && hasNonCreatorMember;
 
   function isRemovable(member: TeamMemberView): boolean {
+    if (!canManageMembers) return false;
     if (member.userId === createdBy) return false;
     if (!canRemoveAny) return false;
     return true;
@@ -96,6 +105,12 @@ export function MemberList({ members, teamId, teamType, createdBy, viewerId }: M
 
   return (
     <div className="space-y-3">
+      {!canManageMembers ? (
+        <p className="text-sm text-muted-foreground">
+          Somente membros do time podem convidar ou remover integrantes.
+        </p>
+      ) : null}
+
       {showMinMembersHint ? (
         <p className="text-sm text-muted-foreground">
           {teamType === "solo"

@@ -47,6 +47,7 @@ const defaultProps = {
   teamType: "duo" as const,
   createdBy: creatorId,
   viewerId: creatorId,
+  canManageMembers: true,
 };
 
 describe("MemberList", () => {
@@ -94,6 +95,14 @@ describe("MemberList", () => {
     render(<MemberList {...defaultProps} teamType="solo" />);
     // solo team with 2 members (> 1), non-creator should be removable
     expect(screen.getAllByRole("button", { name: /remover/i }).length).toBeGreaterThan(0);
+  });
+
+  it("hides member management actions in read-only mode", () => {
+    render(<MemberList {...defaultProps} canManageMembers={false} teamType="solo" />);
+    expect(screen.queryByRole("button", { name: /remover/i })).toBeNull();
+    expect(
+      screen.getByText("Somente membros do time podem convidar ou remover integrantes."),
+    ).toBeInTheDocument();
   });
 
   it("shows inline Confirmar / Cancelar when Remover is clicked", async () => {

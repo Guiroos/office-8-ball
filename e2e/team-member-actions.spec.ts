@@ -116,7 +116,7 @@ test.describe("team member actions", () => {
 
   });
 
-  test("team details authorization blocks non-members", async ({ page }) => {
+  test("team details allow non-members in read-only mode", async ({ page }) => {
     const owner = createCredentials("authowner");
     const outsider = createCredentials("outsider");
     const teamName = `auth-test-${Date.now()}`;
@@ -135,18 +135,15 @@ test.describe("team member actions", () => {
     await login(page, outsider);
     await page.goto(teamUrl);
 
-    const accessDeniedHeading = page.getByRole("heading", {
-      level: 1,
-      name: /Voce nao faz parte deste time\./i,
-    });
-
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      if (await accessDeniedHeading.isVisible().catch(() => false)) {
+      const hasTeamName = await page.getByText(teamName, { exact: true }).isVisible().catch(() => false);
+      if (hasTeamName) {
         break;
       }
 
       await recoverFromTransientRouteFailure(page);
-      if (await accessDeniedHeading.isVisible().catch(() => false)) {
+      const recoveredHasTeamName = await page.getByText(teamName, { exact: true }).isVisible().catch(() => false);
+      if (recoveredHasTeamName) {
         break;
       }
 
@@ -154,10 +151,9 @@ test.describe("team member actions", () => {
       await page.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => undefined);
     }
 
-    // Should see the access denied screen
-    await expect(accessDeniedHeading).toBeVisible({
-      timeout: 15000,
-    });
-    await expect(page.getByRole("link", { name: "Voltar para meus times" })).toBeVisible();
+    await expect(page.getByText(teamName, { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("button", { name: "Convidar Membro" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Excluir Time" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Remover/i })).toHaveCount(0);
   });
 });
