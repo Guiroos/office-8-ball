@@ -1,4 +1,3 @@
-import { H2HSection } from "@/components/teams/h2h-section";
 import { TeamArchiveButton } from "@/components/teams/team-archive-button";
 import { InviteMemberDialog } from "@/components/teams/invite-member-dialog";
 import { MemberList } from "@/components/teams/member-list";
@@ -8,10 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeader } from "@/components/primitives/section-header";
 import { StatTile } from "@/components/primitives/stat-tile";
 import { formatTeamType } from "@/lib/format";
-import type { TeamDetailData } from "@/lib/team-details";
+import type { TeamMainData } from "@/lib/team-details";
 
 function formatCurrentStreakLabel(
-  streak: TeamDetailData["stats"]["currentStreak"],
+  streak: TeamMainData["stats"]["currentStreak"],
 ) {
   if (streak.type === "none" || streak.count === 0) {
     return "-";
@@ -20,12 +19,12 @@ function formatCurrentStreakLabel(
   return `${streak.count}${streak.type === "win" ? "V" : "D"}`;
 }
 
-export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
+export function TeamDetailView(data: TeamMainData & { viewerId: string }) {
   const teamTypeLabel = formatTeamType(data.team.type);
   const summaryText = `${data.stats.wins} vitórias, ${data.stats.losses} derrotas e ${data.stats.winRate.toFixed(1)}% de aproveitamento.`;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <>
       <Card className="border-border-strong bg-surface-emphasis shadow-sm shadow-foreground/10">
         <CardHeader className="gap-5 p-5 sm:p-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-4">
@@ -60,7 +59,7 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
       </Card>
 
       {/* per D-07 */}
-      <section className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <StatTile label="Vitórias" value={data.stats.wins} />
         <StatTile label="Derrotas" value={data.stats.losses} />
         <StatTile label="Partidas jogadas" value={data.stats.totalMatches} />
@@ -72,7 +71,7 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
         />
       </section>
 
-      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 lg:grid-cols-2">
         <Card className="border-border bg-surface">
           <CardContent className="space-y-4 p-6">
             <SectionHeader
@@ -105,25 +104,6 @@ export function TeamDetailView(data: TeamDetailData & { viewerId: string }) {
           </CardContent>
         </Card>
       </section>
-
-      {/* per D-09/D-10 */}
-      <section className="mt-6">
-        <Card className="border-border bg-surface">
-          <CardContent className="space-y-4 p-6">
-            <SectionHeader
-              eyebrow="Comparação"
-              title="Confrontos Diretos"
-              description="Compare o desempenho do time contra cada adversário disponível."
-            />
-            {/* addresses review concern: server-side H2H summary */}
-            <H2HSection
-              rivals={data.rivals}
-              h2hByRival={data.h2hByRival}
-              defaultRivalId={data.primaryRivalId}
-            />
-          </CardContent>
-        </Card>
-      </section>
-    </main>
+    </>
   );
 }

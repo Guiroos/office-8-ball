@@ -39,21 +39,24 @@ export type TeamDetailMatch = MatchRecord & {
   loserTeam: TeamMatchView;
 };
 
-export type TeamDetailData = {
+export type TeamMainData = {
   team: TeamRecord;
   viewerCanManage: boolean;
   rankingPosition: number | null;
   stats: TeamStats;
   recentMatches: TeamDetailMatch[];
   members: TeamMemberView[];
+};
+
+export type TeamMainResult =
+  | { kind: "not-found" }
+  | { kind: "detail"; data: TeamMainData };
+
+export type TeamH2HData = {
   rivals: { id: string; name: string; type: "solo" | "duo"; memberLabels: string[] }[];
   h2hByRival: Record<string, TeamH2HSummary>;
   primaryRivalId: string | null;
 };
-
-export type TeamDetailResult =
-  | { kind: "not-found" }
-  | { kind: "detail"; data: TeamDetailData };
 
 function normalizeTeam(team: {
   id: string;
@@ -135,10 +138,10 @@ function buildUnknownTeamMatchView(teamId: string): TeamMatchView {
   };
 }
 
-export async function getTeamDetailData(
+export async function getTeamMainData(
   teamId: string,
   viewerId: string,
-): Promise<TeamDetailResult> {
+): Promise<TeamMainResult> {
   const teamRow = await prisma.team.findUnique({
     where: { id: teamId },
     include: { members: true },
@@ -151,9 +154,8 @@ export async function getTeamDetailData(
   const viewerCanManage = teamRow.members.some((member) => member.userId === viewerId);
   const team = normalizeTeam(teamRow);
 
-  const [ranking, viewerTeams, teamMatchRows] = await Promise.all([
+  const [ranking, teamMatchRows] = await Promise.all([
     listAllTeamsWithStats(),
-    viewerCanManage ? listUserTeams(viewerId) : Promise.resolve<TeamRecord[]>([]),
     prisma.match.findMany({
       where: {
         OR: [{ teamAId: teamId }, { teamBId: teamId }],
@@ -163,25 +165,15 @@ export async function getTeamDetailData(
   ]);
 
   const rankingPosition = ranking.find((entry) => entry.id === teamId)?.rank ?? null;
-  const normalizedRecentMatches = teamMatchRows.map(normalizeMatch);
-  const stats = computeTeamStats(teamId, normalizedRecentMatches);
+  const normalizedMatches = teamMatchRows.map(normalizeMatch);
+  const stats = computeTeamStats(teamId, normalizedMatches);
 
-  const memberIds = Array.from(
-    new Set([
-      ...team.members.map((member) => member.userId),
-      ...viewerTeams.flatMap((rival) => rival.members.map((member) => member.userId)),
-    ]),
-  );
+  const memberIds = team.members.map((member) => member.userId);
   const users = await prisma.user.findMany({
     where: { id: { in: memberIds } },
     select: { id: true, username: true, displayName: true },
   });
   const userById = new Map(users.map((user) => [user.id, user]));
-  const getMemberLabel = (userId: string) => {
-    const user = userById.get(userId);
-    const username = user?.username ?? userId;
-    return user?.displayName ?? username;
-  };
 
   const members: TeamMemberView[] = team.members.map((member) => {
     const user = userById.get(member.userId);
@@ -205,16 +197,106 @@ export async function getTeamDetailData(
             members: {
               include: {
                 user: {
-                  select: {
-                    username: true,
-                    displayName: true,
-                  },
+                  select: { username: true, displayName: true },
                 },
               },
             },
           },
         })
       : [];
+  const recentMatchTeamById = new Map(
+    recentMatchTeams.map((matchTeam) => [matchTeam.id, normalizeTeamMatchView(matchTeam)]),
+  );
+
+  const recentMatches: TeamDetailMatch[] = normalizedMatches.map((match) => {
+    const teamA =
+      recentMatchTeamById.get(match.teamAId) ?? buildUnknownTeamMatchView(match.teamAId);
+    const teamB =
+      recentMatchTeamById.get(match.teamBId) ?? buildUnknownTeamMatchView(match.teamBId);
+    const winnerTeam =
+      recentMatchTeamById.get(match.winnerTeamId) ??
+      (match.winnerTeamId === teamA.id
+        ? teamA
+        : teamB.id === match.winnerTeamId
+          ? teamB
+          : buildUnknownTeamMatchView(match.winnerTeamId));
+    const loserTeam =
+      recentMatchTeamById.get(match.loserTeamId) ??
+      (match.loserTeamId === teamA.id
+        ? teamA
+        : teamB.id === match.loserTeamId
+          ? teamB
+          : buildUnknownTeamMatchView(match.loserTeamId));
+
+    return { ...match, teamA, teamB, winnerTeam, loserTeam };
+  });
+
+  return {
+    kind: "detail",
+    data: { team, viewerCanManage, rankingPosition, stats, members, recentMatches },
+  };
+}
+
+export async function getTeamH2HData(
+  teamId: string,
+  viewerId: string,
+): Promise<TeamH2HData> {
+  const teamRow = await prisma.team.findUnique({
+    where: { id: teamId },
+    include: { members: true },
+  });
+
+  if (!teamRow || teamRow.status !== "active") {
+    return { rivals: [], h2hByRival: {}, primaryRivalId: null };
+  }
+
+  const viewerCanManage = teamRow.members.some((member) => member.userId === viewerId);
+
+  const [viewerTeams, teamMatchRows] = await Promise.all([
+    viewerCanManage ? listUserTeams(viewerId) : Promise.resolve<TeamRecord[]>([]),
+    prisma.match.findMany({
+      where: {
+        OR: [{ teamAId: teamId }, { teamBId: teamId }],
+      },
+      orderBy: { playedAt: "desc" },
+    }),
+  ]);
+
+  const recentMatchTeamIds = Array.from(
+    new Set(teamMatchRows.flatMap((match) => [match.teamAId, match.teamBId])),
+  );
+
+  const [recentMatchTeams, viewerTeamUsers] = await Promise.all([
+    recentMatchTeamIds.length > 0
+      ? prisma.team.findMany({
+          where: { id: { in: recentMatchTeamIds } },
+          include: {
+            members: {
+              include: {
+                user: { select: { username: true, displayName: true } },
+              },
+            },
+          },
+        })
+      : Promise.resolve([]),
+    viewerTeams.length > 0
+      ? prisma.user.findMany({
+          where: {
+            id: {
+              in: viewerTeams.flatMap((rival) => rival.members.map((member) => member.userId)),
+            },
+          },
+          select: { id: true, username: true, displayName: true },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const userById = new Map(viewerTeamUsers.map((user) => [user.id, user]));
+  const getMemberLabel = (userId: string) => {
+    const user = userById.get(userId);
+    return user?.displayName ?? user?.username ?? userId;
+  };
+
   const recentMatchTeamById = new Map(
     recentMatchTeams.map((matchTeam) => [matchTeam.id, normalizeTeamMatchView(matchTeam)]),
   );
@@ -226,7 +308,6 @@ export async function getTeamDetailData(
 
   for (const rival of viewerTeams) {
     if (rival.id === teamId || rival.status !== "active") continue;
-
     rivalById.set(rival.id, {
       id: rival.id,
       name: rival.name,
@@ -255,36 +336,12 @@ export async function getTeamDetailData(
 
     const existing = rivalById.get(matchTeam.id);
     if (existing && existing.memberLabels.length === 0 && recentMemberLabels.length > 0) {
-      rivalById.set(matchTeam.id, {
-        ...existing,
-        memberLabels: recentMemberLabels,
-      });
+      rivalById.set(matchTeam.id, { ...existing, memberLabels: recentMemberLabels });
     }
   }
 
   const rivals = Array.from(rivalById.values());
   const rivalIds = rivals.map((rival) => rival.id);
-
-  const recentMatches: TeamDetailMatch[] = normalizedRecentMatches.map((match) => {
-    const teamA =
-      recentMatchTeamById.get(match.teamAId) ?? buildUnknownTeamMatchView(match.teamAId);
-    const teamB =
-      recentMatchTeamById.get(match.teamBId) ?? buildUnknownTeamMatchView(match.teamBId);
-    const winnerTeam =
-      recentMatchTeamById.get(match.winnerTeamId) ??
-      (match.winnerTeamId === teamA.id ? teamA : teamB.id === match.winnerTeamId ? teamB : buildUnknownTeamMatchView(match.winnerTeamId));
-    const loserTeam =
-      recentMatchTeamById.get(match.loserTeamId) ??
-      (match.loserTeamId === teamA.id ? teamA : teamB.id === match.loserTeamId ? teamB : buildUnknownTeamMatchView(match.loserTeamId));
-
-    return {
-      ...match,
-      teamA,
-      teamB,
-      winnerTeam,
-      loserTeam,
-    };
-  });
 
   const h2hMatchRows =
     rivalIds.length > 0
@@ -307,7 +364,7 @@ export async function getTeamDetailData(
     rivals.map((rival) => {
       const h2h = computeHeadToHead(teamId, rival.id, h2hMatches);
       const lastMatchId = h2h.recentMatchIds[0] ?? null;
-      const lastMatchDate = lastMatchId ? matchById.get(lastMatchId)?.playedAt ?? null : null;
+      const lastMatchDate = lastMatchId ? (matchById.get(lastMatchId)?.playedAt ?? null) : null;
       const winRate = h2h.totalMatches === 0 ? 0 : (h2h.teamAWins / h2h.totalMatches) * 100;
 
       return [
@@ -329,7 +386,6 @@ export async function getTeamDetailData(
   if (rivals.length > 0) {
     primaryRivalId = rivals[0].id;
     let maxMatches = h2hByRival[primaryRivalId]?.totalMatches ?? 0;
-
     for (const rival of rivals) {
       const totalMatches = h2hByRival[rival.id]?.totalMatches ?? 0;
       if (totalMatches > maxMatches) {
@@ -339,18 +395,5 @@ export async function getTeamDetailData(
     }
   }
 
-  return {
-    kind: "detail",
-    data: {
-      team,
-      viewerCanManage,
-      rankingPosition,
-      stats,
-      recentMatches,
-      members,
-      rivals,
-      h2hByRival,
-      primaryRivalId,
-    },
-  };
+  return { rivals, h2hByRival, primaryRivalId };
 }

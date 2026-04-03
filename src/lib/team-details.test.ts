@@ -38,7 +38,7 @@ vi.mock("@/lib/ranking", async () => {
   };
 });
 
-describe("getTeamDetailData", () => {
+describe("getTeamMainData", () => {
   beforeEach(() => {
     vi.resetModules();
     mockTeamFindUnique.mockReset();
@@ -57,8 +57,8 @@ describe("getTeamDetailData", () => {
 
   it("returns kind=not-found for missing team", async () => {
     mockTeamFindUnique.mockResolvedValue(null);
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "viewer-1");
+    const { getTeamMainData } = await import("@/lib/team-details");
+    const result = await getTeamMainData("team-a", "viewer-1");
     expect(result).toEqual({ kind: "not-found" });
   });
 
@@ -74,8 +74,8 @@ describe("getTeamDetailData", () => {
       members: [],
     });
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "viewer-1");
+    const { getTeamMainData } = await import("@/lib/team-details");
+    const result = await getTeamMainData("team-a", "viewer-1");
     expect(result).toEqual({ kind: "not-found" });
   });
 
@@ -96,8 +96,8 @@ describe("getTeamDetailData", () => {
       { id: "user-1", username: "owner", displayName: "Owner Name" },
     ]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "viewer-2");
+    const { getTeamMainData } = await import("@/lib/team-details");
+    const result = await getTeamMainData("team-a", "viewer-2");
 
     expect(result?.kind).toBe("detail");
     if (result?.kind !== "detail") return;
@@ -127,12 +127,11 @@ describe("getTeamDetailData", () => {
       { id: "user-1", username: "owner", displayName: "Owner Name" },
       { id: "user-2", username: "member", displayName: null },
     ]);
-    mockListUserTeams.mockResolvedValue([]);
     mockListAllTeamsWithStats.mockResolvedValue([]);
     mockMatchFindMany.mockResolvedValue([]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "user-1");
+    const { getTeamMainData } = await import("@/lib/team-details");
+    const result = await getTeamMainData("team-a", "user-1");
 
     expect(result?.kind).toBe("detail");
     if (result?.kind !== "detail") return;
@@ -155,19 +154,37 @@ describe("getTeamDetailData", () => {
       members: [{ userId: "user-1", joinedAt: new Date("2026-01-01T00:00:00.000Z") }],
     });
     mockUserFindMany.mockResolvedValue([{ id: "user-1", username: "owner", displayName: "Owner Name" }]);
-    mockListUserTeams.mockResolvedValue([]);
     mockListAllTeamsWithStats.mockResolvedValue([
       { id: "team-z", rank: 1 },
       { id: "team-a", rank: 2 },
     ]);
     mockMatchFindMany.mockResolvedValue([]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "user-1");
+    const { getTeamMainData } = await import("@/lib/team-details");
+    const result = await getTeamMainData("team-a", "user-1");
 
     expect(result?.kind).toBe("detail");
     if (result?.kind !== "detail") return;
     expect(result.data.rankingPosition).toBe(2);
+  });
+});
+
+describe("getTeamH2HData", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockTeamFindUnique.mockReset();
+    mockTeamFindMany.mockReset();
+    mockUserFindMany.mockReset();
+    mockMatchFindMany.mockReset();
+    mockListUserTeams.mockReset();
+    mockListAllTeamsWithStats.mockReset();
+    process.env.DATABASE_URL = "postgresql://test";
+    mockTeamFindMany.mockResolvedValue([]);
+    mockUserFindMany.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    delete process.env.DATABASE_URL;
   });
 
   it("builds rivals from available opponents and picks primary by totalMatches", async () => {
@@ -181,8 +198,6 @@ describe("getTeamDetailData", () => {
       updatedAt: new Date("2026-01-01T00:00:00.000Z"),
       members: [{ userId: "user-1", joinedAt: new Date("2026-01-01T00:00:00.000Z") }],
     });
-    mockUserFindMany.mockResolvedValue([{ id: "user-1", username: "owner", displayName: null }]);
-    mockListAllTeamsWithStats.mockResolvedValue([]);
     mockListUserTeams.mockResolvedValue([
       { id: "team-a", name: "Time A", type: "duo", status: "active", members: [], createdBy: "u", createdAt: "", updatedAt: "" },
       { id: "team-b", name: "Time B", type: "solo", status: "active", members: [], createdBy: "u", createdAt: "", updatedAt: "" },
@@ -217,14 +232,12 @@ describe("getTeamDetailData", () => {
         },
       ]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "user-1");
+    const { getTeamH2HData } = await import("@/lib/team-details");
+    const result = await getTeamH2HData("team-a", "user-1");
 
-    expect(result?.kind).toBe("detail");
-    if (result?.kind !== "detail") return;
-    expect(result.data.rivals.map((rival) => rival.id)).toEqual(["team-b", "team-c"]);
-    expect(result.data.rivals.find((rival) => rival.id === "team-b")?.memberLabels).toEqual([]);
-    expect(result.data.primaryRivalId).toBe("team-c");
+    expect(result.rivals.map((rival) => rival.id)).toEqual(["team-b", "team-c"]);
+    expect(result.rivals.find((rival) => rival.id === "team-b")?.memberLabels).toEqual([]);
+    expect(result.primaryRivalId).toBe("team-c");
   });
 
   it("includes rivals from team match history even when viewer has only one team", async () => {
@@ -238,8 +251,6 @@ describe("getTeamDetailData", () => {
       updatedAt: new Date("2026-01-01T00:00:00.000Z"),
       members: [{ userId: "user-1", joinedAt: new Date("2026-01-01T00:00:00.000Z") }],
     });
-    mockUserFindMany.mockResolvedValue([{ id: "user-1", username: "owner", displayName: null }]);
-    mockListAllTeamsWithStats.mockResolvedValue([]);
     mockListUserTeams.mockResolvedValue([
       { id: "team-a", name: "Time A", type: "duo", status: "active", members: [], createdBy: "u", createdAt: "", updatedAt: "" },
     ]);
@@ -279,15 +290,13 @@ describe("getTeamDetailData", () => {
         },
       ]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "user-1");
+    const { getTeamH2HData } = await import("@/lib/team-details");
+    const result = await getTeamH2HData("team-a", "user-1");
 
-    expect(result?.kind).toBe("detail");
-    if (result?.kind !== "detail") return;
-    expect(result.data.rivals.map((rival) => rival.id)).toEqual(["team-b"]);
-    expect(result.data.rivals[0]?.memberLabels).toEqual([]);
-    expect(result.data.primaryRivalId).toBe("team-b");
-    expect(result.data.h2hByRival["team-b"]?.totalMatches).toBe(1);
+    expect(result.rivals.map((rival) => rival.id)).toEqual(["team-b"]);
+    expect(result.rivals[0]?.memberLabels).toEqual([]);
+    expect(result.primaryRivalId).toBe("team-b");
+    expect(result.h2hByRival["team-b"]?.totalMatches).toBe(1);
   });
 
   it("sets H2H lastMatchDate as ISO date when direct matches exist", async () => {
@@ -301,8 +310,6 @@ describe("getTeamDetailData", () => {
       updatedAt: new Date("2026-01-01T00:00:00.000Z"),
       members: [{ userId: "user-1", joinedAt: new Date("2026-01-01T00:00:00.000Z") }],
     });
-    mockUserFindMany.mockResolvedValue([{ id: "user-1", username: "owner", displayName: null }]);
-    mockListAllTeamsWithStats.mockResolvedValue([]);
     mockListUserTeams.mockResolvedValue([
       { id: "team-b", name: "Time B", type: "duo", status: "active", members: [], createdBy: "u", createdAt: "", updatedAt: "" },
     ]);
@@ -319,11 +326,9 @@ describe("getTeamDetailData", () => {
         },
       ]);
 
-    const { getTeamDetailData } = await import("@/lib/team-details");
-    const result = await getTeamDetailData("team-a", "user-1");
+    const { getTeamH2HData } = await import("@/lib/team-details");
+    const result = await getTeamH2HData("team-a", "user-1");
 
-    expect(result?.kind).toBe("detail");
-    if (result?.kind !== "detail") return;
-    expect(result.data.h2hByRival["team-b"]?.lastMatchDate).toBe("2026-01-15T12:00:00.000Z");
+    expect(result.h2hByRival["team-b"]?.lastMatchDate).toBe("2026-01-15T12:00:00.000Z");
   });
 });
