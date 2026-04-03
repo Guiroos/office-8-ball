@@ -11,6 +11,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    ".vercel/**",
+    ".wrangler/**",
     // vinext build artifacts
     "dist/**",
     "next-env.d.ts",
