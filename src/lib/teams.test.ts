@@ -7,6 +7,7 @@ const mockTeamMemberCreate = vi.fn();
 const mockTeamMemberDeleteMany = vi.fn();
 const mockTeamMemberDelete = vi.fn();
 const mockTeamCreate = vi.fn();
+const mockTeamFindMany = vi.fn();
 const mockTeamFindUnique = vi.fn();
 const mockTeamUpdate = vi.fn();
 const mockTeamDelete = vi.fn();
@@ -23,6 +24,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     team: {
       create: (...args: unknown[]) => mockTeamCreate(...args),
+      findMany: (...args: unknown[]) => mockTeamFindMany(...args),
       findUnique: (...args: unknown[]) => mockTeamFindUnique(...args),
       update: (...args: unknown[]) => mockTeamUpdate(...args),
       delete: (...args: unknown[]) => mockTeamDelete(...args),
@@ -65,6 +67,7 @@ describe("teams.ts — member management", () => {
     mockTeamMemberDeleteMany.mockReset();
     mockTeamMemberDelete.mockReset();
     mockTeamCreate.mockReset();
+    mockTeamFindMany.mockReset();
     mockTeamFindUnique.mockReset();
     mockTeamUpdate.mockReset();
     mockTeamDelete.mockReset();
@@ -206,6 +209,133 @@ describe("teams.ts — member management", () => {
       await expect(archiveTeam("team-1")).rejects.toThrow(
         "Time não encontrado após arquivamento.",
       );
+    });
+  });
+
+  describe("listUserTeams", () => {
+    it("returns teams with memberNames and fallback from displayName to username", async () => {
+      const { listUserTeams } = await import("@/lib/teams");
+
+      mockTeamMemberFindMany.mockResolvedValueOnce([
+        {
+          joinedAt: new Date("2026-01-10T00:00:00.000Z"),
+          team: {
+            ...makeTeam({
+              id: "team-duo",
+              name: "dupla afiada",
+              members: [
+                { userId: "user-creator", joinedAt: new Date("2026-01-01T00:00:00.000Z") },
+                { userId: "user-partner", joinedAt: new Date("2026-01-02T00:00:00.000Z") },
+              ],
+            }),
+            members: [
+              {
+                userId: "user-creator",
+                joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+                user: { username: "gui.dev", displayName: "Gui" },
+              },
+              {
+                userId: "user-partner",
+                joinedAt: new Date("2026-01-02T00:00:00.000Z"),
+                user: { username: "jean.dev", displayName: null },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const result = await listUserTeams("user-creator");
+
+      expect(mockTeamMemberFindMany).toHaveBeenCalledWith({
+        where: {
+          userId: "user-creator",
+          team: { status: "active" },
+        },
+        include: {
+          team: {
+            include: {
+              members: {
+                include: {
+                  user: {
+                    select: {
+                      username: true,
+                      displayName: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { joinedAt: "desc" },
+      });
+      expect(result).toEqual([
+        {
+          id: "team-duo",
+          name: "dupla afiada",
+          type: "duo",
+          status: "active",
+          createdBy: "user-creator",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+          members: [
+            { userId: "user-creator", joinedAt: "2026-01-01T00:00:00.000Z" },
+            { userId: "user-partner", joinedAt: "2026-01-02T00:00:00.000Z" },
+          ],
+          memberNames: ["Gui", "jean.dev"],
+        },
+      ]);
+    });
+  });
+
+  describe("listActiveTeams", () => {
+    it("returns active teams with memberNames", async () => {
+      const { listActiveTeams } = await import("@/lib/teams");
+
+      mockTeamFindMany.mockResolvedValueOnce([
+        {
+          ...makeTeam({
+            id: "team-active",
+            name: "time ativo",
+            members: [
+              { userId: "user-a", joinedAt: new Date("2026-01-01T00:00:00.000Z") },
+              { userId: "user-b", joinedAt: new Date("2026-01-02T00:00:00.000Z") },
+            ],
+          }),
+          members: [
+            {
+              userId: "user-a",
+              joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+              user: { username: "ana.dev", displayName: "Ana" },
+            },
+            {
+              userId: "user-b",
+              joinedAt: new Date("2026-01-02T00:00:00.000Z"),
+              user: { username: "bruno.dev", displayName: null },
+            },
+          ],
+        },
+      ]);
+
+      const result = await listActiveTeams();
+
+      expect(mockTeamFindMany).toHaveBeenCalledWith({
+        where: { status: "active" },
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  displayName: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+      expect(result[0]?.memberNames).toEqual(["Ana", "bruno.dev"]);
     });
   });
 

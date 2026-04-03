@@ -1,15 +1,13 @@
 import { Badge } from "@/components/ui/badge";
-import { formatMatchDate } from "@/lib/format";
-import type { MatchRecord } from "@/lib/types";
+import { formatMatchDate, formatTeamType } from "@/lib/format";
+import type { TeamDetailMatch } from "@/lib/team-details";
 
 export function RecentMatchesList({
   matches,
   teamId,
-  teamNameById,
 }: {
-  matches: MatchRecord[];
+  matches: TeamDetailMatch[];
   teamId: string;
-  teamNameById: Record<string, string>;
 }) {
   const topThree = matches.slice(0, 3);
 
@@ -21,8 +19,11 @@ export function RecentMatchesList({
     <div className="space-y-3">
       <ul className="space-y-3">
         {topThree.map((match) => {
-          const opponentId = match.teamAId === teamId ? match.teamBId : match.teamAId;
-          const opponentName = teamNameById[opponentId] ?? opponentId;
+          const opponent = match.teamAId === teamId ? match.teamB : match.teamA;
+          const opponentType = opponent.type ? formatTeamType(opponent.type) : "Tipo desconhecido";
+          const opponentMembers = opponent.members.length
+            ? opponent.members.map((member) => member.displayName).join(", ")
+            : "Integrantes não encontrados";
           const won = match.winnerTeamId === teamId;
 
           return (
@@ -30,22 +31,24 @@ export function RecentMatchesList({
               key={match.id}
               className="rounded-lg border border-border bg-surface-emphasis p-4 shadow-sm shadow-foreground/5"
             >
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                <div className="space-y-2">
-                  <Badge variant={won ? "default" : "outline"}>
-                    {won ? "Vitória" : "Derrota"}
-                  </Badge>
-                  <div>
-                    <p className="font-semibold">Contra {opponentName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {won
-                        ? "Resultado positivo no confronto mais recente."
-                        : "Esse foi o revés mais recente contra esse adversário."}
-                    </p>
-                  </div>
-                </div>
+              <div className="flex items-start justify-between gap-3">
+                <Badge variant={won ? "default" : "outline"}>
+                  {won ? "Vitória" : "Derrota"}
+                </Badge>
+                <p className="caption text-right text-muted-foreground">{formatMatchDate(match.playedAt)}</p>
+              </div>
 
-                <p className="caption text-muted-foreground sm:text-right">{formatMatchDate(match.playedAt)}</p>
+              <div className="mt-3 space-y-1">
+                <p className="font-semibold">Contra {opponent.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  Tipo: {opponentType}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Integrantes: {opponentMembers}
+                </p>
+                {match.note ? (
+                  <p className="text-sm text-muted-foreground">Observação: {match.note}</p>
+                ) : null}
               </div>
             </li>
           );

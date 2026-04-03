@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import type { TeamH2HSummary } from "@/lib/team-details";
 
-type RivalOption = { id: string; name: string; type: "solo" | "duo" };
+type RivalOption = { id: string; name: string; type: "solo" | "duo"; memberLabels: string[] };
 
 function formatTeamTypeLabel(type: "solo" | "duo") {
   return type === "solo" ? "Solo" : "Duplas";
@@ -31,6 +31,9 @@ export function H2HSection({
     () => rivals.find((rival) => rival.id === selectedId) ?? null,
     [rivals, selectedId],
   );
+  const selectedRivalMembers = selectedRival?.memberLabels.length
+    ? selectedRival.memberLabels.join(", ")
+    : "Integrantes não encontrados";
 
   if (rivals.length === 0) {
     return <p className="text-sm text-muted-foreground">Nenhuma partida entre estes times</p>;
@@ -69,6 +72,10 @@ export function H2HSection({
               {summary.totalMatches} {summary.totalMatches === 1 ? "partida" : "partidas"}
             </Badge>
           </div>
+
+          <p className="text-sm text-muted-foreground">
+            Integrantes: {selectedRivalMembers}
+          </p>
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile

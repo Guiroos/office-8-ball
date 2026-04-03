@@ -135,13 +135,13 @@ describe("RankingView", () => {
     expect(within(standings).queryByText("Time Cinco")).not.toBeInTheDocument();
   });
 
-  it("renders member display names as podium subtitle", () => {
+  it("renders member display names on podium and standings rows", () => {
     render(<RankingView teams={teams} activeType="all" mode="available" />);
 
     expect(screen.getByText("Ana • Bruno")).toBeInTheDocument();
     expect(screen.getByText("Carla")).toBeInTheDocument();
     expect(screen.getByText("Davi • Elisa")).toBeInTheDocument();
-    expect(screen.queryByText("Fábio • Gabi")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Fábio • Gabi")).toHaveLength(2);
   });
 
   it("renders a team type badge on podium cards", () => {

@@ -6,6 +6,8 @@ import { formatTeamType } from "@/lib/format";
 import type { RankedTeam } from "@/lib/ranking";
 
 export function StandingsRow({ team }: { team: RankedTeam }) {
+  const membersLabel = team.memberNames.join(" • ");
+
   return (
     <Link
       href={`/times/${team.id}`}
@@ -14,7 +16,12 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
       {/* Desktop layout */}
       <div className="hidden items-center gap-4 px-4 py-3 md:grid md:grid-cols-[2rem_1fr_auto_5rem_5rem_6rem_6rem]">
         <p className="label-wide text-center text-muted-foreground">#{team.rank}</p>
-        <p className="truncate font-semibold">{team.name}</p>
+        <div className="min-w-0">
+          <p className="truncate font-semibold">{team.name}</p>
+          {membersLabel ? (
+            <p className="truncate text-xs text-muted-foreground">{membersLabel}</p>
+          ) : null}
+        </div>
         <Badge variant="outline" className="justify-self-start">
           {formatTeamType(team.type)}
         </Badge>
@@ -45,6 +52,9 @@ export function StandingsRow({ team }: { team: RankedTeam }) {
         </p>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{team.name}</p>
+          {membersLabel ? (
+            <p className="truncate text-xs text-muted-foreground">{membersLabel}</p>
+          ) : null}
           <div className="mt-1 flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               {formatTeamType(team.type)}

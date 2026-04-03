@@ -48,8 +48,20 @@ function normalizeTeam(team: {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
-  members: { userId: string; joinedAt: Date }[];
+  members: Array<{
+    userId: string;
+    joinedAt: Date;
+    user?: {
+      username: string;
+      displayName: string | null;
+    } | null;
+  }>;
 }): TeamRecord {
+  const memberNames = team.members.flatMap((member) => {
+    if (!member.user) return [];
+    return [member.user.displayName ?? member.user.username];
+  });
+
   return {
     id: team.id,
     name: team.name,
@@ -62,6 +74,7 @@ function normalizeTeam(team: {
       userId: m.userId,
       joinedAt: m.joinedAt.toISOString(),
     })),
+    ...(memberNames.length > 0 ? { memberNames } : {}),
   };
 }
 
@@ -134,7 +147,22 @@ export async function listUserTeams(
       userId,
       ...(includeArchived ? {} : { team: { status: "active" } }),
     },
-    include: { team: { include: { members: true } } },
+    include: {
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  displayName: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     orderBy: { joinedAt: "desc" },
   });
 
@@ -144,7 +172,18 @@ export async function listUserTeams(
 export async function listActiveTeams(): Promise<TeamRecord[]> {
   const teams = await prisma.team.findMany({
     where: { status: "active" },
-    include: { members: true },
+    include: {
+      members: {
+        include: {
+          user: {
+            select: {
+              username: true,
+              displayName: true,
+            },
+          },
+        },
+      },
+    },
     orderBy: { createdAt: "asc" },
   });
 

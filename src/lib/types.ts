@@ -16,6 +16,7 @@ export type TeamRecord = {
   createdAt: string;
   updatedAt: string;
   members: TeamMemberRecord[];
+  memberNames?: string[];
 };
 
 // Match domain
