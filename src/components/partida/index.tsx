@@ -59,7 +59,7 @@ function TeamPanel({
   label: string;
   sublabel: string;
   variant: "alpha" | "beta";
-  teams: Array<{ id: string; name: string }>;
+  teams: Array<{ id: string; name: string; memberNames?: string[] }>;
   selectedId: string | null;
   onSelect: (id: string) => void;
   isWinner: boolean;
@@ -68,7 +68,11 @@ function TeamPanel({
   loading: boolean;
 }) {
   const selectedName = teams.find((t) => t.id === selectedId)?.name;
-  const selectOptions = teams.map((t) => ({ value: t.id, label: t.name }));
+  const selectOptions = teams.map((t) => ({
+    value: t.id,
+    label: t.name,
+    description: t.memberNames?.length ? t.memberNames.join(" • ") : undefined,
+  }));
 
   return (
     <div className={teamPanelVariants({ variant, winner: isWinner })}>
@@ -101,8 +105,8 @@ function TeamPanel({
             onValueChange={onSelect}
             options={selectOptions}
             placeholder={loading ? "Carregando..." : "Selecionar time"}
-            showDescriptionInTrigger={false}
-            className="h-10 rounded-lg px-3"
+            showDescriptionInTrigger
+            className="rounded-lg px-3"
           />
         )}
       </div>
