@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { TeamDetailAccessDenied } from "@/components/teams/team-detail-access-denied";
 import { TeamDetailView } from "@/components/teams/team-detail-view";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
 import { getTeamDetailData } from "@/lib/team-details";
@@ -36,10 +35,6 @@ export default async function TeamDetailPage({
 
   if (detail.kind === "not-found") {
     notFound();
-  }
-
-  if (detail.kind === "forbidden") {
-    return <TeamDetailAccessDenied />;
   }
 
   return <TeamDetailView viewerId={user.id} {...detail.data} />;

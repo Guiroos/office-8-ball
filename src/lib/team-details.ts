@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { listAllTeamsWithStats } from "@/lib/ranking";
 import { computeHeadToHead, computeTeamStats } from "@/lib/stats";
-import { isTeamMember, listUserTeams } from "@/lib/teams";
+import { listUserTeams } from "@/lib/teams";
 import type { MatchRecord, TeamRecord } from "@/lib/types";
 import type { TeamStats } from "@/lib/stats";
 
@@ -22,20 +22,37 @@ export type TeamMemberView = {
   role: "Criador" | "Membro";
 };
 
+export type TeamMatchView = {
+  id: string;
+  name: string;
+  type: "solo" | "duo" | null;
+  members: Array<{
+    userId: string;
+    displayName: string;
+  }>;
+};
+
+export type TeamDetailMatch = MatchRecord & {
+  teamA: TeamMatchView;
+  teamB: TeamMatchView;
+  winnerTeam: TeamMatchView;
+  loserTeam: TeamMatchView;
+};
+
 export type TeamDetailData = {
   team: TeamRecord;
+  viewerCanManage: boolean;
   rankingPosition: number | null;
   stats: TeamStats;
-  recentMatches: MatchRecord[];
+  recentMatches: TeamDetailMatch[];
   members: TeamMemberView[];
-  rivals: { id: string; name: string; type: "solo" | "duo" }[];
+  rivals: { id: string; name: string; type: "solo" | "duo"; memberLabels: string[] }[];
   h2hByRival: Record<string, TeamH2HSummary>;
   primaryRivalId: string | null;
 };
 
 export type TeamDetailResult =
   | { kind: "not-found" }
-  | { kind: "forbidden"; teamId: string }
   | { kind: "detail"; data: TeamDetailData };
 
 function normalizeTeam(team: {
@@ -83,6 +100,41 @@ function normalizeMatch(match: {
   };
 }
 
+function normalizeTeamMatchView(team: {
+  id: string;
+  name: string;
+  type: "solo" | "duo";
+  members: Array<{
+    userId: string;
+    user: {
+      username: string;
+      displayName: string | null;
+    } | null;
+  }>;
+}): TeamMatchView {
+  return {
+    id: team.id,
+    name: team.name,
+    type: team.type,
+    members: team.members.map((member) => {
+      const username = member.user?.username ?? member.userId;
+      return {
+        userId: member.userId,
+        displayName: member.user?.displayName ?? username,
+      };
+    }),
+  };
+}
+
+function buildUnknownTeamMatchView(teamId: string): TeamMatchView {
+  return {
+    id: teamId,
+    name: teamId,
+    type: null,
+    members: [],
+  };
+}
+
 export async function getTeamDetailData(
   teamId: string,
   viewerId: string,
@@ -96,17 +148,12 @@ export async function getTeamDetailData(
     return { kind: "not-found" };
   }
 
-  // Membership gate: runs before any heavy queries — prevents data leakage to non-members
-  const isMember = await isTeamMember(teamId, viewerId);
-  if (!isMember) {
-    return { kind: "forbidden", teamId };
-  }
-
+  const viewerCanManage = teamRow.members.some((member) => member.userId === viewerId);
   const team = normalizeTeam(teamRow);
 
   const [ranking, viewerTeams, teamMatchRows] = await Promise.all([
     listAllTeamsWithStats(),
-    listUserTeams(viewerId),
+    viewerCanManage ? listUserTeams(viewerId) : Promise.resolve<TeamRecord[]>([]),
     prisma.match.findMany({
       where: {
         OR: [{ teamAId: teamId }, { teamBId: teamId }],
@@ -116,15 +163,25 @@ export async function getTeamDetailData(
   ]);
 
   const rankingPosition = ranking.find((entry) => entry.id === teamId)?.rank ?? null;
-  const recentMatches = teamMatchRows.map(normalizeMatch);
-  const stats = computeTeamStats(teamId, recentMatches);
+  const normalizedRecentMatches = teamMatchRows.map(normalizeMatch);
+  const stats = computeTeamStats(teamId, normalizedRecentMatches);
 
-  const memberIds = team.members.map((member) => member.userId);
+  const memberIds = Array.from(
+    new Set([
+      ...team.members.map((member) => member.userId),
+      ...viewerTeams.flatMap((rival) => rival.members.map((member) => member.userId)),
+    ]),
+  );
   const users = await prisma.user.findMany({
     where: { id: { in: memberIds } },
     select: { id: true, username: true, displayName: true },
   });
   const userById = new Map(users.map((user) => [user.id, user]));
+  const getMemberLabel = (userId: string) => {
+    const user = userById.get(userId);
+    const username = user?.username ?? userId;
+    return user?.displayName ?? username;
+  };
 
   const members: TeamMemberView[] = team.members.map((member) => {
     const user = userById.get(member.userId);
@@ -137,11 +194,98 @@ export async function getTeamDetailData(
     };
   });
 
-  const rivals = viewerTeams
-    .filter((rival) => rival.id !== teamId && rival.status === "active")
-    .map((rival) => ({ id: rival.id, name: rival.name, type: rival.type }));
+  const recentMatchTeamIds = Array.from(
+    new Set(teamMatchRows.flatMap((match) => [match.teamAId, match.teamBId])),
+  );
+  const recentMatchTeams =
+    recentMatchTeamIds.length > 0
+      ? await prisma.team.findMany({
+          where: { id: { in: recentMatchTeamIds } },
+          include: {
+            members: {
+              include: {
+                user: {
+                  select: {
+                    username: true,
+                    displayName: true,
+                  },
+                },
+              },
+            },
+          },
+        })
+      : [];
+  const recentMatchTeamById = new Map(
+    recentMatchTeams.map((matchTeam) => [matchTeam.id, normalizeTeamMatchView(matchTeam)]),
+  );
 
+  const rivalById = new Map<
+    string,
+    { id: string; name: string; type: "solo" | "duo"; memberLabels: string[] }
+  >();
+
+  for (const rival of viewerTeams) {
+    if (rival.id === teamId || rival.status !== "active") continue;
+
+    rivalById.set(rival.id, {
+      id: rival.id,
+      name: rival.name,
+      type: rival.type,
+      memberLabels: rival.members.map((member) => getMemberLabel(member.userId)),
+    });
+  }
+
+  for (const matchTeam of recentMatchTeams) {
+    if (matchTeam.id === teamId) continue;
+
+    const matchTeamView = recentMatchTeamById.get(matchTeam.id);
+    const recentMemberLabels = matchTeamView
+      ? matchTeamView.members.map((member) => member.displayName)
+      : [];
+
+    if (!rivalById.has(matchTeam.id)) {
+      rivalById.set(matchTeam.id, {
+        id: matchTeam.id,
+        name: matchTeam.name,
+        type: matchTeam.type,
+        memberLabels: recentMemberLabels,
+      });
+      continue;
+    }
+
+    const existing = rivalById.get(matchTeam.id);
+    if (existing && existing.memberLabels.length === 0 && recentMemberLabels.length > 0) {
+      rivalById.set(matchTeam.id, {
+        ...existing,
+        memberLabels: recentMemberLabels,
+      });
+    }
+  }
+
+  const rivals = Array.from(rivalById.values());
   const rivalIds = rivals.map((rival) => rival.id);
+
+  const recentMatches: TeamDetailMatch[] = normalizedRecentMatches.map((match) => {
+    const teamA =
+      recentMatchTeamById.get(match.teamAId) ?? buildUnknownTeamMatchView(match.teamAId);
+    const teamB =
+      recentMatchTeamById.get(match.teamBId) ?? buildUnknownTeamMatchView(match.teamBId);
+    const winnerTeam =
+      recentMatchTeamById.get(match.winnerTeamId) ??
+      (match.winnerTeamId === teamA.id ? teamA : teamB.id === match.winnerTeamId ? teamB : buildUnknownTeamMatchView(match.winnerTeamId));
+    const loserTeam =
+      recentMatchTeamById.get(match.loserTeamId) ??
+      (match.loserTeamId === teamA.id ? teamA : teamB.id === match.loserTeamId ? teamB : buildUnknownTeamMatchView(match.loserTeamId));
+
+    return {
+      ...match,
+      teamA,
+      teamB,
+      winnerTeam,
+      loserTeam,
+    };
+  });
+
   const h2hMatchRows =
     rivalIds.length > 0
       ? await prisma.match.findMany({
@@ -199,6 +343,7 @@ export async function getTeamDetailData(
     kind: "detail",
     data: {
       team,
+      viewerCanManage,
       rankingPosition,
       stats,
       recentMatches,
