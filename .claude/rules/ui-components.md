@@ -46,6 +46,32 @@ When modifying tokens, CSS variables, or the theme system, read `techspec/theme-
 | Route handlers | Named exports matching HTTP verbs | `export async function GET()` |
 | Hooks | `use` prefix | `useDashboardData` |
 
+## Animations
+
+`framer-motion` is the project animation library. Use it for component entry animations — do not use CSS `@keyframes` or `animate-*` utilities for entry/exit motion.
+
+**Required pattern for every animated component:**
+
+```tsx
+import { motion, useReducedMotion } from "framer-motion";
+
+// Inside the component:
+const prefersReducedMotion = useReducedMotion();
+
+<motion.div
+  initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3, ease: "easeOut" }}
+>
+```
+
+**Rules:**
+- Always call `useReducedMotion()` and set `initial` = `animate` when it returns `true`. **Why:** Vestibular disorders and motion sensitivity — skipping the hook is an accessibility failure.
+- Duration: 200–300ms for entry animations; 150ms for micro-interactions (hover, press).
+- Animate `opacity` and `transform` (`y`, `x`, `scale`) only — never `width`, `height`, or `margin`. **Why:** Layout properties trigger reflow; transforms are GPU-composited.
+- Use `y: 16` (subtle lift) for cards/panels. Use `scale: 0.96` for modals/dialogs. Never exceed `y: 30` or `scale: 0.9` — exaggerated motion feels cheap.
+- `exit` animations require wrapping with `<AnimatePresence>`. Only add it when the element actually unmounts.
+
 ## Language in Code
 
 - Error messages and validation messages: **Brazilian Portuguese**
