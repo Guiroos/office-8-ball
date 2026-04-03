@@ -25,7 +25,7 @@ Uso esperado:
 - nao valida persistencia compartilhada
 - nao valida auth real
 
-### Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`
+### Com `DATABASE_URL` e sem `BETTER_AUTH_SECRET`
 
 - Persistencia de partidas usa Prisma + Postgres
 - Auth e tratado como configuracao invalida
@@ -42,7 +42,7 @@ Uso esperado:
 - estado invalido de ambiente
 - deve ser corrigido antes de usar login real
 
-### Com `DATABASE_URL` e `NEXTAUTH_SECRET`
+### Com `DATABASE_URL` e `BETTER_AUTH_SECRET`
 
 - Persistencia de partidas usa Prisma + Postgres
 - Login e signup ficam disponiveis
@@ -51,7 +51,7 @@ Uso esperado:
 - `src/app/scoreboard/page.tsx` so preserva o redirecionamento legado para `/dashboard`
 - As APIs do placar validam sessao e retornam `401` sem autenticacao
 - `/` redireciona por estado de sessao
-- cookies seguros sao usados em producao ou quando `NEXTAUTH_URL` comeca com `https://`
+- cookies seguros sao usados em producao ou quando `BETTER_AUTH_URL` comeca com `https://`
 
 Uso esperado:
 
@@ -63,7 +63,7 @@ Uso esperado:
 - O fallback em memoria existe apenas para desenvolvimento local
 - A ausencia de `DATABASE_URL` nao desabilita apenas o banco; ela inviabiliza auth real
 - No estado atual do codigo, a ausencia de `DATABASE_URL` tambem impede usar o fluxo autenticado de dashboard, mesmo com o dominio de placar ainda disponivel em memoria
-- A presenca de `DATABASE_URL` sem `NEXTAUTH_SECRET` e erro de configuracao, nao modo degradado aceitavel
+- A presenca de `DATABASE_URL` sem `BETTER_AUTH_SECRET` e erro de configuracao, nao modo degradado aceitavel
 - `/dashboard` permanece o fluxo funcional principal do produto
 - `/scoreboard` permanece acessivel apenas como rota legada de compatibilidade
 

@@ -26,7 +26,7 @@ For GSD work, also treat `.planning/ROADMAP.md`, `.planning/STATE.md`, and the r
 - React 19
 - TypeScript 5
 - Prisma + PostgreSQL
-- Auth.js v4 with credentials-only auth and JWT sessions
+- better-auth v1.5.6 with credentials-only auth and session-based auth
 - Tailwind CSS 4 + shadcn/ui
 - Vitest + Testing Library
 - Playwright
@@ -76,7 +76,7 @@ Use the narrowest verification that proves the change. For cross-cutting work, r
   - `delete process.env.DATABASE_URL`
   - `vi.resetModules()`
   - dynamic `await import(...)`
-- Route tests should mock `@/lib/auth` and should not call real Auth.js session resolution.
+- Route tests should mock `@/lib/auth` and should not call real better-auth session resolution.
 - Unit and route tests should not import Prisma directly.
 
 ## Consult These Before Editing

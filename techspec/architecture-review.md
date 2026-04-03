@@ -12,16 +12,8 @@ Auditoria realizada em março de 2026 para verificar aderência aos padrões de 
 
 #### 1. Migração Auth.js v4 → v5
 
-- **Status:** `[ ] pendente`
-- **Problema:** `next-auth@4.24.13` usa APIs legadas (rota catch-all `[...nextauth]`, config via `getAuthOptions()`). O Auth.js v5 é o padrão recomendado para Next.js 13+ e usa configuração centralizada em `auth.ts` na raiz sem a rota catch-all.
-- **Risco de manter v4:** acúmulo de dívida técnica; breaking changes maiores quanto mais tarde migrar.
-- **Arquivos afetados:**
-  - `src/lib/auth.ts`
-  - `src/app/api/auth/[...nextauth]/route.ts`
-  - `middleware.ts`
-  - `src/lib/auth-rate-limit.ts`
-- **Escopo de mudança:** médio — afeta auth inteiro, mas a lógica de negócio permanece a mesma.
-- **Referência:** [Auth.js v5 migration guide](https://authjs.dev/getting-started/migrating-to-v5)
+- **Status:** `[x] descartado`
+- **Justificativa:** O projeto migrou para `better-auth` v1.5.6 em vez de adotar Auth.js v5. A rota catch-all é agora `[...all]`, a configuração está em `src/lib/auth.ts` com `betterAuth()`, e a variável de ambiente é `BETTER_AUTH_SECRET`. O padrão de isolamento nos testes (`vi.mock("@/lib/auth")`) permanece o mesmo.
 
 ---
 

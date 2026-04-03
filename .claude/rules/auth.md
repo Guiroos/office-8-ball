@@ -11,7 +11,7 @@ paths:
 
 - Call `isAuthAvailable()` before any auth operation. It requires both `hasDatabaseUrl()` and `hasAuthSecret()`.
 - Missing `DATABASE_URL` → return 503 (service unavailable — DB is the dependency).
-- `DATABASE_URL` present without `NEXTAUTH_SECRET` → return 500 (misconfiguration — never treat as degraded mode). Middleware checks these at module level and throws on misconfiguration.
+- `DATABASE_URL` present without `BETTER_AUTH_SECRET` → return 500 (misconfiguration — never treat as degraded mode). Middleware checks these at module level and throws on misconfiguration.
 - **Why:** The client error-handling branches on these specific codes. Silently degrading breaks the UX flow and masks real configuration errors in production.
 
 ## Rate Limiting

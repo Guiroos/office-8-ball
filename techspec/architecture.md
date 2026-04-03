@@ -10,10 +10,10 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - UI e API deployadas juntas
 - Persistencia primaria em `Prisma + Postgres`
 - Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
-- Autenticacao por credenciais com `Auth.js`
+- Autenticacao por credenciais com `better-auth`
 - Protecao contra brute force em auth persistida via Prisma
 - `middleware.ts` na raiz protege a area autenticada no nivel de roteamento
-- `NEXTAUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
+- `BETTER_AUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
 - Testes automatizados com `Vitest`, Testing Library e `Playwright`
 
 ## Rotas principais
@@ -40,8 +40,8 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - leitura e criacao de partidas
 - `/api/auth/register`
   - cadastro de usuario
-- `/api/auth/[...nextauth]`
-  - sessao e login via `Auth.js`
+- `/api/auth/[...all]`
+  - sessao e login via `better-auth`
 
 ## Camadas principais
 

@@ -6,7 +6,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 
 ## Estado atual
 
-- Auth via `Auth.js` com credenciais
+- Auth via `better-auth` com credenciais
 - Login com `username + password`
 - Cadastro com `username + password`; `email` e opcional
 - Usuarios persistidos via Prisma em `users`
@@ -33,7 +33,7 @@ Registrar como o fluxo de autenticacao funciona hoje, quais dependencias ele tem
 Para auth funcionar de verdade, o ambiente precisa de:
 
 - `DATABASE_URL`
-- `NEXTAUTH_SECRET`
+- `BETTER_AUTH_SECRET`
 
 Sem `DATABASE_URL`:
 
@@ -42,7 +42,7 @@ Sem `DATABASE_URL`:
 - a shell autenticada e as APIs de scoreboard continuam inacessiveis porque ainda exigem sessao valida
 - isso significa que o fallback em memoria ajuda dominio e desenvolvimento isolado, mas nao reabre o fluxo autenticado completo
 
-Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
+Com `DATABASE_URL` e sem `BETTER_AUTH_SECRET`:
 
 - o ambiente passa a ser tratado como configuracao invalida de auth
 - o app nao deve cair em secret implicito para cookies ou sessao
@@ -64,7 +64,7 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 - `src/app/(authenticated)/layout.tsx` reforca a protecao da shell autenticada por redirecionamento server-side
 - `src/app/scoreboard/page.tsx` preserva compatibilidade por redirecionamento legado
 - `src/app/api/auth/register/route.ts` persiste o usuario
-- `src/app/api/auth/[...nextauth]/route.ts` executa o login por credenciais
+- `src/app/api/auth/[...all]/route.ts` executa o login por credenciais
 - `src/app/api/scoreboard/route.ts` e `src/app/api/matches/route.ts` retornam `401` sem sessao valida
 
 ## Gaps conhecidos
@@ -73,7 +73,7 @@ Com `DATABASE_URL` e sem `NEXTAUTH_SECRET`:
 
 ## Proximos passos relacionados
 
-- Monitorar o auth endurecido em preview/producao com `NEXTAUTH_SECRET` obrigatorio
+- Monitorar o auth endurecido em preview/producao com `BETTER_AUTH_SECRET` obrigatorio
 - Adicionar testes integrados com Prisma real para validar o rate limit fora de mocks
 - Definir se o produto precisara de RBAC antes de expandir o dominio
 - Evitar qualquer extensao de auth que complique o v1 sem necessidade real

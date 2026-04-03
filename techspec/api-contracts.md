@@ -7,7 +7,6 @@ Documentar os contratos publicos atuais das APIs internas usadas pela UI, preser
 ## Regras gerais
 
 - Todos os contratos seguem os tipos compartilhados em `src/lib/types.ts`
-- Os ids validos de time continuam limitados a `frontend` e `backend`
 - O placar continua derivado de `matches`
 - As APIs do placar exigem sessao autenticada no estado atual do codigo
 - Sem sessao valida, `GET /api/scoreboard`, `GET /api/matches` e `POST /api/matches` retornam `401`
@@ -82,7 +81,7 @@ Payload:
 
 Regras:
 
-- `winnerTeamId` deve ser `frontend` ou `backend`
+- `winnerTeamId` deve ser o id de um time valido no banco
 - `note` e opcional
 - `note`, quando enviado, deve ser string com no maximo 140 caracteres
 - `note` e normalizado com trim e vazio vira `null` na persistencia
@@ -135,7 +134,7 @@ Erros:
 - conflito de username retorna `409`
 - bloqueio temporario por rate limit retorna `429` com `retryAfterSeconds`
 - auth indisponivel retorna `503` sem `DATABASE_URL`
-- auth configurado de forma invalida retorna `500` quando falta `NEXTAUTH_SECRET`
+- auth configurado de forma invalida retorna `500` quando falta `BETTER_AUTH_SECRET`
 
 Exemplo de bloqueio:
 

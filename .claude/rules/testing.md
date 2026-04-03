@@ -26,7 +26,7 @@ vi.mock("@/lib/auth", async () => {
 });
 ```
 
-Real Auth.js session resolution is never exercised in unit/route tests. Omitting this mock causes `getAuthenticatedUser` to call `getServerSession`, which fails in jsdom and produces false negatives. The rest of `@/lib/auth` is spread from `importActual` to preserve other exports like `getAuthRequiredResponse`.
+Real better-auth session resolution is never exercised in unit/route tests. Omitting this mock causes `getAuthenticatedUser` to attempt a real session lookup, which fails in jsdom and produces false negatives. The rest of `@/lib/auth` is spread from `importActual` to preserve other exports like `getAuthRequiredResponse`.
 
 ## General Conventions
 

@@ -160,13 +160,13 @@ export const revalidate = 3600
 ## Checklist de melhorias
 
 ### Alta prioridade
-- [ ] Extrair lógica de parceiros de `/times/page.tsx` → `src/lib/teams.ts` (`buildPartnerMap`)
-- [ ] Mover query do Prisma de `profile-hero-section.tsx` → `src/lib/profile.ts` (`getUserProfile`)
+- [x] Extrair lógica de parceiros de `/times/page.tsx` → `src/lib/teams.ts` (`buildPartnerOptions`)
+- [x] Mover query do Prisma de `profile-hero-section.tsx` → `src/lib/profile.ts` (`getUserProfile`)
 
 ### Média prioridade
-- [ ] Adicionar `export const revalidate = 0` em todas as páginas autenticadas
-- [ ] Criar `src/app/(authenticated)/times/[id]/error.tsx` para fallback granular
-- [ ] Criar `src/app/(authenticated)/profile/error.tsx` para fallback granular
+- [x] Adicionar `export const revalidate = 0` em todas as páginas autenticadas
+- [x] Criar `src/app/(authenticated)/times/[id]/error.tsx` para fallback granular
+- [x] Criar `src/app/(authenticated)/profile/error.tsx` para fallback granular
 
 ### Baixa prioridade (polish)
 - [ ] Avaliar `generateStaticParams` em `/times/[id]` para ISR

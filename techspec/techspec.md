@@ -9,22 +9,21 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
 ## Resumo tecnico atual
 
 - App unico em `Next.js` com `App Router`
-- Dominio v1 fixo em dois times: `frontend` e `backend`
+- Times criados dinamicamente pelos usuarios; sem times hardcoded
 - Placar sempre derivado do historico de partidas
 - Persistencia em `Prisma + Postgres` com fallback em memoria para desenvolvimento local
-- Autenticacao por credenciais com `Auth.js` e usuarios salvos via Prisma
+- Autenticacao por credenciais com `better-auth` e usuarios salvos via Prisma
 - Fluxo principal atual em `/login` -> `/dashboard`
 - Sistema de tema compartilhado entre login, dashboard e shell autenticada, com foundation tokens, tokens de shell e bootstrap inicial consistente
 
 ## Invariantes
 
-- Apenas `frontend` e `backend` sao ids de time validos em v1
 - Contadores agregados nao sao persistidos; o placar e calculado a partir de `matches`
 - `leaderTeamId` deve ser `null` em empate
 - `leadBy` e a diferenca absoluta de vitorias
 - `currentStreak` considera as vitorias consecutivas mais recentes do ultimo vencedor
 - O fallback em memoria nao substitui persistencia real compartilhada
-- Login e signup dependem de `DATABASE_URL` e `NEXTAUTH_SECRET`
+- Login e signup dependem de `DATABASE_URL` e `BETTER_AUTH_SECRET`
 
 ## Como navegar
 

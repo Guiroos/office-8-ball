@@ -38,7 +38,7 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 
 ## Directory Structure
 
-- `src/lib/` — domain layer: `types.ts`, `data.ts`, `teams.ts`, `team-details.ts`, `stats.ts`, `ranking.ts`, `profile-stats.ts`, `head-to-head.ts`, `time-period.ts`; auth: `auth.ts`, `auth-validation.ts`, `auth-rate-limit.ts`; Prisma client: `prisma.ts`
+- `src/lib/` — domain layer: `types.ts`, `data.ts`, `teams.ts`, `team-details.ts`, `stats.ts`, `ranking.ts`, `profile-stats.ts`, `head-to-head.ts`, `time-period.ts`, `profile.ts`; auth: `auth.ts`, `auth-validation.ts`, `auth-rate-limit.ts`; Prisma client: `prisma.ts`
 - `src/components/ui/` — shadcn primitives
 - `src/components/primitives/` — domain reusables (StatTile, SectionHeader, IconCallout, FormField)
 - `src/components/dashboard/` — main scoreboard feature
@@ -53,7 +53,7 @@ npm run prisma:generate   # Regenerate Prisma client (runs on postinstall)
 
 ## Routes
 
-**Pages:** `/login` · `/(authenticated)/dashboard` · `/times` · `/times/[id]` · `/ranking` · `/head-to-head` · `/profile` · `/settings`
+**Pages:** `/login` · `/(authenticated)/dashboard` · `/times` · `/times/[id]` · `/ranking` · `/head-to-head` · `/profile` · `/settings` · `/partida`
 
 **API:** `/api/auth/register` · `/api/matches` · `/api/scoreboard` · `/api/teams` · `/api/teams/[id]` · `/api/teams/[id]/members` · `/api/teams/[id]/archive` · `/api/profile` · `/api/users`
 

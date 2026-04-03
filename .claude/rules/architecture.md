@@ -35,6 +35,7 @@ When touching GitHub Actions, release flow, or Cloudflare Workers config, read `
 | Domain — core | `src/lib/types.ts`, `src/lib/data.ts` |
 | Domain — teams | `src/lib/teams.ts`, `src/lib/team-details.ts` |
 | Domain — stats | `src/lib/stats.ts`, `src/lib/ranking.ts`, `src/lib/profile-stats.ts`, `src/lib/head-to-head.ts` |
+| Domain — profile | `src/lib/profile.ts` |
 | Domain — utils | `src/lib/time-period.ts` |
 | Auth | `src/lib/auth.ts`, `src/lib/auth-validation.ts`, `src/lib/auth-rate-limit.ts` |
 | Middleware | `middleware.ts` |

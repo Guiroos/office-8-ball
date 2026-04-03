@@ -87,6 +87,6 @@ Ferramentas atuais:
 
 - Se o contrato de API mudar, validar tambem a UI consumidora
 - Se `src/lib/data.ts` mudar, considerar sempre os modos com e sem `DATABASE_URL`
-- Se auth mudar, verificar explicitamente o comportamento sem `DATABASE_URL` e sem `NEXTAUTH_SECRET`
+- Se auth mudar, verificar explicitamente o comportamento sem `DATABASE_URL` e sem `BETTER_AUTH_SECRET`
 - Nao tratar sucesso em fallback em memoria como prova de persistencia real compartilhada
 - Os E2E usam Postgres temporario no GitHub Actions; nao exigem banco dedicado no Neon

@@ -8,7 +8,7 @@ Organizar os proximos passos tecnicos do projeto sem misturar backlog futuro com
 
 - Prisma ja foi adotado
 - A UI principal ja usa `Tailwind CSS` com primitives locais no estilo `shadcn/ui`
-- Auth.js por credenciais ja protege a shell autenticada em `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings` e as APIs do placar
+- `better-auth` por credenciais ja protege a shell autenticada em `/dashboard`, `/times`, `/ranking`, `/profile`, `/settings` e as APIs do placar
 - O cadastro inicial de usuarios ja existe via Postgres
 - A pagina de perfil ja existe com edicao de `displayName`, `email`, `avatarUrl` e `bio`; avatar exibe identicon via Gravatar como fallback
 - Login migrou de email para username como identificador principal; email e opcional no cadastro
@@ -56,14 +56,9 @@ Prioridade: media
 - Nao abrir CRUD completo de partidas — apenas reverter o ultimo registro do usuario autenticado
 - Requer nova rota de API e verificacao de ownership da partida no backend
 
-### 5. Adocao de times (user <-> team)
+### 5. ~~Adocao de times~~ — implementado
 
-Prioridade: media
-
-- Permitir que cada usuario escolha seu time (`frontend` ou `backend`) no perfil ou no cadastro
-- Abre caminho para o `/times` sair de placeholder e mostrar membros por time
-- Futuramente permite filtrar partidas ou estatisticas por membro
-- Os ids de time continuam fixos em `constants.ts`; nao generalizar para multi-team
+Times sao totalmente dinamicos e criados pelos usuarios. Cada usuario pode criar times solo ou duo, gerenciar membros e visualizar estatisticas em `/times` e `/times/[id]`. O modelo de memberships substitui a associacao fixa de usuario a time.
 
 ### 6. Troca de senha
 
@@ -81,20 +76,16 @@ Prioridade: baixa
 - Introducir paginacao ou limite com "ver mais" no `RecentMatchesCard` seria preventivo
 - O calculo do placar deve continuar derivado de todas as partidas; apenas a exibicao e paginada
 
-### 8. Pagina /times funcional
+### 8. ~~Pagina /times funcional~~ — implementado
 
-Prioridade: futura (depende do item 5)
-
-- Substituir o placeholder atual por view real com membros de cada time e estatisticas
-- So iniciar apos adocao de times estar implementada e estavel
+`/times` exibe times do usuario com filtro por parceiro, estatisticas de cada time e criacao de novos times. `/times/[id]` mostra detalhe com historico e head-to-head.
 
 ### 9. Paginas /ranking e /settings funcionais
 
 Prioridade: futura
 
-- `/ranking`: historico de partidas com possibilidade de filtros e evolucao do placar ao longo do tempo
-- `/settings`: preferencias de usuario (tema, notificacoes); troca de senha pode vir antes via item 6
-- Ambas sao placeholders atualmente; podem evoluir de forma independente
+- `/ranking`: implementado com ranking dinamico por periodo e tipo; filtros de evolucao historica sao ainda futuros
+- `/settings`: ainda placeholder; troca de senha pode ser implementada de forma independente via item 6
 
 ### 10. Expansao de dominio
 
