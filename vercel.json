@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run prisma:generate && npm run build",
+  "installCommand": "npm ci --ignore-scripts",
+  "regions": ["gru1"]
+}
