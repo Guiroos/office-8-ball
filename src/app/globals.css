@@ -122,6 +122,9 @@
 
   /* shadcn primary stays green */
   --primary: var(--green-700);
+  /* --primary stays dark green in both modes, so its foreground must always be light.
+     Without this override it inherits --foreground-inverse which becomes #0b1510 (black) in dark mode. */
+  --primary-foreground: var(--neutral-50);
 }
 
 @theme {
@@ -293,6 +296,14 @@
 
 @utility bg-gold-gradient {
   background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-300) 100%);
+}
+
+@utility text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold-300) 0%, var(--gold-500) 60%, var(--gold-400) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 @utility bg-brand-gradient {

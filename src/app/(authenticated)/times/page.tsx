@@ -83,7 +83,7 @@ export default async function TeamsPage({ searchParams }: TeamsPageProps) {
               <TeamCreateDialog>
                 <button
                   type="button"
-                  className="inline-flex rounded-pill border border-primary bg-primary px-4 py-2 text-sm text-foreground-inverse transition-colors hover:opacity-90"
+                  className="inline-flex rounded-pill border border-primary bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:opacity-90"
                 >
                   Criar primeiro time
                 </button>
@@ -101,7 +101,7 @@ export default async function TeamsPage({ searchParams }: TeamsPageProps) {
             <TeamCreateDialog>
               <button
                 type="button"
-                className="mt-4 inline-flex rounded-pill border border-primary bg-primary px-4 py-2 text-sm text-foreground-inverse transition-colors hover:opacity-90"
+                className="mt-4 inline-flex rounded-pill border border-primary bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:opacity-90"
               >
                 Criar Novo Time
               </button>

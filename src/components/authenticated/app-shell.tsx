@@ -108,7 +108,7 @@ function SidebarBrand() {
         </div>
 
         <div className="min-w-0">
-          <p className="font-display text-2xl font-black uppercase leading-none tracking-label-sm text-sidebar-foreground">
+          <p className="font-display text-2xl font-black uppercase leading-none tracking-label-sm text-gradient-gold">
             Sinuca Club
           </p>
         </div>
