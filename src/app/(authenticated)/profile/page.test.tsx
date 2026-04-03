@@ -48,11 +48,17 @@ vi.mock("@/lib/data", () => ({
   listMatches: vi.fn(async () => []),
 }));
 
-// ── Mock ProfilePage client component ────────────────────────────────────────
+// ── Mock section components ───────────────────────────────────────────────────
 
-vi.mock("@/components/profile/profile-page", () => ({
-  ProfilePage: (props: { data: unknown }) => (
-    <div data-testid="profile-page">{JSON.stringify(props.data)}</div>
+vi.mock("@/components/profile/profile-hero-section", () => ({
+  ProfileHeroSection: ({ userId }: { userId: string }) => (
+    <div data-testid="profile-hero-section" data-user-id={userId} />
+  ),
+}));
+
+vi.mock("@/components/profile/profile-stats-section", () => ({
+  ProfileStatsSection: ({ userId }: { userId: string }) => (
+    <div data-testid="profile-stats-section" data-user-id={userId} />
   ),
 }));
 
@@ -74,17 +80,6 @@ const MOCK_DB_USER = {
   avatarUrl: null,
   bio: null,
   createdAt: new Date("2025-01-01T00:00:00.000Z"),
-};
-
-const MOCK_PROFILE_DATA = {
-  userId: "user-1",
-  username: "gui.dev",
-  displayName: "Guilherme",
-  avatarUrl: null,
-  bio: null,
-  createdAt: "2025-01-01T00:00:00.000Z",
-  aggregate: { wins: 3, losses: 1, winRate: 75, totalMatches: 4 },
-  teamRows: [],
 };
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
@@ -128,23 +123,17 @@ describe("ProfileRoute", () => {
     expect(screen.getByTestId("icon-callout")).toBeInTheDocument();
   });
 
-  it("renders ProfilePage with assembled payload for authenticated user", async () => {
-    mockComputeProfilePageData.mockReturnValue({
-      ...MOCK_PROFILE_DATA,
-      username: "", // will be overridden by RSC assembler
-    });
-
+  it("renders section components with correct userId for authenticated user", async () => {
     const { default: ProfileRoute } = await import(
       "@/app/(authenticated)/profile/page"
     );
     const element = await ProfileRoute();
     render(element);
 
-    const profilePage = screen.getByTestId("profile-page");
-    expect(profilePage).toBeInTheDocument();
-    const payload = JSON.parse(profilePage.textContent ?? "{}");
-    expect(payload.username).toBe("gui.dev");
-    expect(payload.userId).toBe("user-1");
+    expect(screen.getByTestId("profile-hero-section")).toBeInTheDocument();
+    expect(screen.getByTestId("profile-stats-section")).toBeInTheDocument();
+    expect(screen.getByTestId("profile-hero-section").dataset.userId).toBe("user-1");
+    expect(screen.getByTestId("profile-stats-section").dataset.userId).toBe("user-1");
   });
 
   it("returns unavailable callout when user is not authenticated", async () => {
