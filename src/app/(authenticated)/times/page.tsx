@@ -7,7 +7,9 @@ import { TeamCard } from "@/components/teams/team-card";
 import { TeamCreateDialog } from "@/components/teams/team-create-dialog";
 import { IconCallout } from "@/components/primitives/icon-callout";
 import { getAuthenticatedUser, hasDatabaseUrl } from "@/lib/auth";
-import { listUserTeamsWithPartners } from "@/lib/teams";
+import { buildPartnerOptions, listUserTeamsWithPartners } from "@/lib/teams";
+
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Times | Office 8 Ball",
@@ -26,25 +28,7 @@ export default async function TeamsPage({ searchParams }: TeamsPageProps) {
     databaseReady && user
       ? await listUserTeamsWithPartners(user.id)
       : [];
-  const partnerTotals = new Map<string, { displayName: string; teamCount: number }>();
-
-  for (const team of teams) {
-    for (const partner of team.partners) {
-      const current = partnerTotals.get(partner.userId);
-      partnerTotals.set(partner.userId, {
-        displayName: partner.displayName,
-        teamCount: (current?.teamCount ?? 0) + 1,
-      });
-    }
-  }
-
-  const partners = Array.from(partnerTotals.entries())
-    .map(([userId, partner]) => ({
-      userId,
-      displayName: partner.displayName,
-      teamCount: partner.teamCount,
-    }))
-    .sort((left, right) => left.displayName.localeCompare(right.displayName, "pt-BR"));
+  const partners = buildPartnerOptions(teams);
   const requestedPartnerId = resolved.partner;
   const activePartnerId = requestedPartnerId && partners.some((partner) => partner.userId === requestedPartnerId)
     ? requestedPartnerId

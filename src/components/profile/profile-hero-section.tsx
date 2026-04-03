@@ -1,19 +1,8 @@
 import { ProfileHeroClient } from "@/components/profile/profile-hero-client";
-import { prisma } from "@/lib/prisma";
+import { getUserProfile } from "@/lib/profile";
 
 export async function ProfileHeroSection({ userId }: { userId: string }) {
-  const dbUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      displayName: true,
-      avatarUrl: true,
-      bio: true,
-      createdAt: true,
-    },
-  });
+  const dbUser = await getUserProfile(userId);
 
   if (!dbUser) return null;
 

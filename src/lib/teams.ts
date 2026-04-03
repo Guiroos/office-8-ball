@@ -261,6 +261,30 @@ export async function listUserTeamsWithPartners(
   });
 }
 
+export type PartnerOption = {
+  userId: string;
+  displayName: string;
+  teamCount: number;
+};
+
+export function buildPartnerOptions(teams: UserTeamOverview[]): PartnerOption[] {
+  const totals = new Map<string, { displayName: string; teamCount: number }>();
+
+  for (const team of teams) {
+    for (const partner of team.partners) {
+      const current = totals.get(partner.userId);
+      totals.set(partner.userId, {
+        displayName: partner.displayName,
+        teamCount: (current?.teamCount ?? 0) + 1,
+      });
+    }
+  }
+
+  return Array.from(totals.entries())
+    .map(([userId, partner]) => ({ userId, displayName: partner.displayName, teamCount: partner.teamCount }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, "pt-BR"));
+}
+
 export async function getTeamById(teamId: string): Promise<TeamRecord | null> {
   const team = await prisma.team.findUnique({
     where: { id: teamId },
