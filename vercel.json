@@ -1,5 +1,3 @@
 {
-  "buildCommand": "npm run prisma:generate && npm run build:vercel",
-  "installCommand": "npm ci --ignore-scripts",
   "regions": ["gru1"]
 }
