@@ -2,48 +2,50 @@
 
 ## Estado atual
 
-- `/dashboard` é a home autenticada oficial
-- `/scoreboard` existe como rota legada com redirecionamento para `/dashboard`
-- `middleware.ts` protege a área autenticada completa
-- Shell compartilhada em `src/app/(authenticated)/layout.tsx`
-- `ThemeToggle` e `logout` vivem no menu do usuário da sidebar
-- `Times`, `Ranking`, `Perfil` e `Configurações` existem como placeholders
+- `/times` e a entrada autenticada principal atual
+- `/dashboard` e `/scoreboard` existem como rotas legadas com redirecionamento para `/times`
+- `proxy.ts` protege a area autenticada no nivel de roteamento
+- shell compartilhada em `src/app/(authenticated)/layout.tsx`
+- `ThemeToggle` e `logout` vivem no menu do usuario da sidebar
+- `times`, `ranking` e `profile` ja sao rotas funcionais
+- `/settings` continua placeholder
 
 ## Estrutura de rotas
 
-```
+```text
 src/app/(authenticated)/
-  layout.tsx           ← shell compartilhada (sidebar + área de conteúdo)
-  dashboard/page.tsx   ← home autenticada funcional
-  times/page.tsx       ← placeholder
-  ranking/page.tsx     ← placeholder
-  profile/page.tsx     ← placeholder (dados da sessão atual)
+  layout.tsx           ← shell compartilhada (sidebar + area de conteudo)
+  dashboard/page.tsx   ← legado, redireciona para /times
+  times/page.tsx       ← home autenticada atual
+  ranking/page.tsx     ← pagina funcional de ranking
+  profile/page.tsx     ← pagina funcional de perfil
   settings/page.tsx    ← placeholder
 ```
 
 ## Componentes centrais
 
 - `src/components/authenticated/app-shell.tsx` — sidebar + layout
-- `src/app/page.tsx` — redireciona por estado de sessão
-- `src/app/scoreboard/page.tsx` — redirecionamento legado para `/dashboard`
+- `src/app/page.tsx` — redireciona por estado de sessao
+- `src/app/(authenticated)/dashboard/page.tsx` — redirecionamento legado para `/times`
+- `src/app/scoreboard/page.tsx` — redirecionamento legado para `/times`
 
 ## Sidebar
 
-- Navegação principal: `Dashboard`, `Times`, `Ranking`
-- Menu do usuário (rodapé): `Ver perfil`, `Configurações`, `Alternar tema`, `Sair`
-- Item ativo baseado no pathname atual
-- Mobile: drawer lateral com mesmos itens e acesso ao menu do usuário
-- Tokens visuais próprios da shell em `globals.css` (`--app-shell-sidebar`, `--app-shell-sidebar-hover`, `--app-shell-sidebar-active`)
+- navegacao principal: `Times`, `Ranking`, `Partida`
+- menu do usuario: `Ver perfil`, `Alternar tema`, `Sair`
+- item ativo baseado no pathname atual
+- mobile: drawer lateral com os mesmos itens
+- tokens visuais proprios da shell vivem em `globals.css`
 
-## Decisões fechadas
+## Decisoes fechadas
 
-- Navegação principal é para produto; ações de conta ficam no menu do usuário
-- Avatar inicia como fallback textual por inicial, sem upload
-- `Times` e `Ranking` permanecem placeholders sem efeito no domínio
-- Proteção de rota não se restringe a um único ponto: `middleware.ts` + server-side em `layout.tsx`
+- navegacao principal e para fluxo de produto; acoes de conta ficam no menu do usuario
+- avatar usa fallback textual quando nao ha imagem
+- so `/settings` segue como placeholder visivel
+- protecao de rota nao se restringe a um unico ponto: `proxy.ts` + server-side em `layout.tsx`
 
 ## Invariantes
 
-- Não duplicar proteção de rota de forma inconsistente entre middleware e páginas
-- Não quebrar o redirecionamento legado de `/scoreboard`
-- Novos itens de navegação principal só entram quando a rota tiver conteúdo real
+- nao quebrar o redirecionamento legado de `/dashboard` e `/scoreboard`
+- novos itens de navegacao principal so entram quando a rota tiver conteudo real
+- manter consistencia entre a navegacao da sidebar e o comportamento real das rotas autenticadas

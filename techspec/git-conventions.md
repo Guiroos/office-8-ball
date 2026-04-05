@@ -2,164 +2,147 @@
 
 ## Objetivo
 
-Definir o fluxo oficial de Git do repositorio para branches, commits, pull requests, versionamento e releases.
-
-Este documento e normativo. Quando houver duvida sobre como preparar uma entrega, siga estas convencoes.
+Padronizar branch, commit, PR e release do repositório para manter previsibilidade no fluxo de trabalho.
 
 ## Branch principal
 
-- A branch principal do projeto e `master`
-- `master` representa o estado integravel e liberavel do produto
-- Nao deve haver push direto em `master`; o fluxo padrao e via pull request
+- a branch principal do repositório é `master`
+- toda branch de trabalho parte de `master`
+- PRs devem apontar para `master`
 
 ## Naming de branches
 
-Use nomes curtos, descritivos e em lowercase com hifens.
+Padrão recomendado:
 
-Padroes oficiais:
-
-- `feat/<nome-curto>`
-- `fix/<nome-curto>`
-- `docs/<nome-curto>`
-- `refactor/<nome-curto>`
-- `test/<nome-curto>`
-- `chore/<nome-curto>`
-- `ci/<nome-curto>`
-- `hotfix/<nome-curto>`
+```text
+<tipo>/<nome-curto>
+```
 
 Exemplos:
 
-- `feat/login-error-states`
-- `fix/scoreboard-tie-copy`
-- `docs/release-process`
-- `hotfix/auth-session-cookie`
+- `feat/first-run-onboarding`
+- `fix/authenticated-home-routing`
+- `docs/align-product-flow`
+- `test/critical-team-match-integration`
 
-Regras:
-
-- prefira um unico objetivo por branch
-- evite nomes genericos como `ajustes-finais` ou `teste`
-- use `hotfix/` apenas para correcoes urgentes apos uma release publicada
-
-## Convencao de commits
-
-O repositorio usa `Conventional Commits`.
-
-Formato:
+Quando fizer sentido vincular a branch a uma issue, o número pode entrar no nome:
 
 ```text
-tipo: descricao curta
+<tipo>/<issue>-<nome-curto>
 ```
-
-Tipos padrao:
-
-- `feat`: nova funcionalidade
-- `fix`: correcao de bug
-- `docs`: documentacao
-- `refactor`: refatoracao sem mudanca funcional intencional
-- `test`: testes
-- `chore`: manutencao geral
-- `ci`: pipeline, workflows e automacoes
 
 Exemplos:
 
-```text
-feat: add protected scoreboard redirect
-fix: prevent empty auth field errors from sticking
-docs: document release and versioning flow
-ci: run workflow on master pushes
-```
+- `fix/95-authenticated-home-routing`
+- `feat/101-first-recorded-match-flow`
+
+## Commits
+
+Usar Conventional Commits:
+
+- `feat: ...`
+- `fix: ...`
+- `refactor: ...`
+- `test: ...`
+- `docs: ...`
+- `chore: ...`
 
 Regras:
 
-- use mensagens objetivas e no imperativo
-- evite commits grandes com mudancas sem relacao
-- prefira squash merge quando o PR tiver historico intermediario ruidoso
+- escrever em inglês
+- ser curto e específico
+- refletir o resultado principal da mudança
+- evitar commits genéricos como `update stuff`
+
+Exemplos:
+
+- `fix: redirect authenticated home to teams`
+- `feat: add duo team partner filter`
+- `docs: align techspecs with current runtime behavior`
 
 ## Pull requests
 
-Fluxo esperado:
-
-1. Criar branch a partir de `master`
-2. Implementar a mudanca
-3. Rodar a validacao minima adequada ao escopo
-4. Abrir PR para `master`
-5. Aguardar checks obrigatorios e review
-6. Fazer merge somente com os checks verdes
-
-Regras operacionais:
-
-- mantenha a branch atualizada com `master` antes do merge quando necessario
-- nao use force-push em `master`
-- resolva conversas pendentes antes do merge
-- mantenha o PR focado em um objetivo claro
-
-Checks obrigatorios atuais:
-
-- `CI`
-- `Dependency Review`
-- `CodeQL`
-
-## Versionamento
-
-O projeto usa `Semantic Versioning` com tags no formato `vX.Y.Z`.
-
-Interpretacao:
-
-- `MAJOR`: quebra de compatibilidade
-- `MINOR`: nova funcionalidade compativel
-- `PATCH`: correcao compativel
-
 Regras:
 
-- a versao publicada e representada pela tag, nao por branch de release
-- use tags anotadas
-- nao reutilize nem mova tags ja publicadas
-- se uma release publicada precisar de ajuste, publique uma nova versao
+- PR deve manter um único objetivo principal
+- PR deve referenciar a issue correspondente quando existir
+- título do PR segue Conventional Commits em inglês
+- corpo do PR deve ser em português
 
-## Fluxo oficial de release
+Estrutura recomendada do corpo:
 
-O fluxo padrao de release parte de `master` e nao usa branch `release/*`.
+```md
+## O que muda
+- ...
+- ...
 
-Sequencia:
+## Como testar
+- ...
+- ...
+```
 
-1. Garantir que as mudancas desejadas ja foram mergeadas em `master`
-2. Confirmar que a validacao necessaria esta verde
-3. Atualizar a versao do projeto se necessario
-4. Criar a tag anotada no commit aprovado
-5. Enviar a tag para o remoto
-6. Aguardar o workflow `Deploy Production Tag` publicar a producao no Cloudflare Workers
-7. Publicar um GitHub Release apontando para a tag
+Fechamento automático recomendado:
+
+```md
+Closes #123
+```
+
+## Validação antes do PR
+
+Rodar a menor bateria que cubra a mudança.
+
+Exemplos comuns:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test`
+- `npm run e2e`
+
+A seleção depende do tipo de alteração.
+
+## Releases
+
+O fluxo oficial de release é por tag anotada `v*` na `master`.
+
+Sequência base:
+
+1. garantir que `master` contém apenas o que deve entrar na release
+2. rodar a validação combinada apropriada para a entrega
+3. conferir a versão atual em `package.json`
+4. criar a tag anotada da versão atual
+5. enviar a tag para o remoto
+6. aguardar o workflow `Deploy Production Tag` publicar no Cloudflare Workers
+7. publicar um GitHub Release apontando para a tag
 
 Comandos base:
 
 ```bash
 git checkout master
 git pull origin master
-git tag -a v1.0.0 -m "Release v1.0.0"
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
 git push origin master
-git push origin v1.0.0
+git push origin vX.Y.Z
 ```
 
 Depois da tag:
 
-- o GitHub Actions executa o deploy de producao no Cloudflare Workers
-- criar o GitHub Release com titulo `v1.0.0`
-- resumir features, correcoes e eventuais notas operacionais
+- o GitHub Actions executa o deploy de produção no Cloudflare Workers
+- criar o GitHub Release com título `vX.Y.Z`
+- resumir features, correções e eventuais notas operacionais
 
-## Checklist de release v1.0.0
+## Checklist de release
 
-1. Confirmar que `master` contem apenas o que deve entrar na release
-2. Rodar a validacao combinada para a entrega
-3. Confirmar a versao `1.0.0` no projeto
-4. Fazer o merge final em `master`
-5. Criar a tag anotada `v1.0.0`
-6. Enviar a tag para o remoto
-7. Confirmar a execucao do workflow `Deploy Production Tag`
-8. Publicar o GitHub Release com notas da versao
+1. confirmar que `master` contém apenas o que deve entrar na release
+2. rodar a validação combinada da entrega
+3. confirmar a versão atual em `package.json`
+4. criar a tag anotada `vX.Y.Z`
+5. enviar a tag para o remoto
+6. confirmar a execução do workflow `Deploy Production Tag`
+7. publicar o GitHub Release com notas da versão
 
-## Secrets e pre-requisitos de deploy
+## Secrets e pré-requisitos de deploy
 
-Para o workflow de producao funcionar, o repositorio precisa ter estes secrets configurados no GitHub:
+Para o workflow de produção funcionar, o repositório precisa ter estes secrets configurados no GitHub:
 
 - `DATABASE_URL`
 - `BETTER_AUTH_SECRET`
@@ -167,18 +150,18 @@ Para o workflow de producao funcionar, o repositorio precisa ter estes secrets c
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
-Com essa estrategia:
+Com essa estratégia:
 
-- o workflow de producao aplica `prisma migrate deploy` antes do build
-- o Cloudflare Workers nao publica automaticamente a cada commit
-- a publicacao em producao fica amarrada a tags `v*`
+- o workflow de produção aplica `prisma migrate deploy` antes do build
+- o Cloudflare Workers não publica automaticamente a cada commit
+- a publicação em produção fica amarrada a tags `v*`
 
-## Fora do padrao
+## Fora do padrão
 
-Este repositorio nao usa, por padrao:
+Este repositório não usa, por padrão:
 
 - branch `release/*` para toda entrega
-- branch nomeada como `v1.0.0`
+- branch nomeada como versão
 - versionamento baseado em branch
 
-Esses fluxos so devem ser introduzidos se houver uma necessidade operacional nova e documentada.
+Esses fluxos só devem ser introduzidos se houver necessidade operacional nova e documentada.

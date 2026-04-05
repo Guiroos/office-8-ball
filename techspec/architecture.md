@@ -2,38 +2,39 @@
 
 ## Objetivo
 
-Descrever a arquitetura atual do app, suas camadas principais e os pontos que devem permanecer estaveis enquanto o produto continuar no escopo v1.
+Descrever a arquitetura atual do app, suas camadas principais e os pontos que devem permanecer estaveis enquanto o produto continuar no escopo atual.
 
 ## Estado atual
 
-- Projeto unico em `Next.js` com `App Router`
+- projeto unico em `Next.js` com `App Router`
 - UI e API deployadas juntas
-- Persistencia primaria em `Prisma + Postgres`
-- Fallback em memoria para desenvolvimento local sem `DATABASE_URL`
-- Autenticacao por credenciais com `better-auth`
-- Protecao contra brute force em auth persistida via Prisma
-- `middleware.ts` na raiz protege a area autenticada no nivel de roteamento
-- `BETTER_AUTH_SECRET` e obrigatorio sempre que `DATABASE_URL` estiver configurado
-- Testes automatizados com `Vitest`, Testing Library e `Playwright`
+- persistencia em `Prisma + Postgres`
+- autenticacao por credenciais com `better-auth`
+- protecao contra brute force em auth persistida via Prisma
+- `proxy.ts` na raiz protege a area autenticada no nivel de roteamento quando `DATABASE_URL` existe
+- `BETTER_AUTH_SECRET` e obrigatorio para auth real quando `DATABASE_URL` estiver configurado
+- testes automatizados com `Vitest`, Testing Library e `Playwright`
 
 ## Rotas principais
 
 - `/`
-  - redireciona conforme estado de sessao
+  - redireciona para `/times` quando ha sessao e para `/login` quando nao ha
 - `/login`
   - entrada real de login e cadastro
-- `/dashboard`
-  - fluxo principal autenticado do produto dentro da shell compartilhada
 - `/times`
-  - placeholder autenticado para futura evolucao de times
+  - home autenticada atual para listagem, filtro e criacao de times
+- `/partida`
+  - fluxo autenticado de registro de partidas
 - `/ranking`
-  - placeholder autenticado para futura leitura de ranking
+  - ranking funcional com filtros por tipo e periodo
 - `/profile`
-  - placeholder autenticado de conta acessivel pelo menu do usuario
+  - pagina funcional de perfil e estatisticas pessoais
 - `/settings`
-  - placeholder autenticado para configuracoes da shell
+  - placeholder autenticado para futuras acoes de conta/preferencias
+- `/dashboard`
+  - rota legada que redireciona para `/times`
 - `/scoreboard`
-  - rota legada que redireciona para `/dashboard`
+  - rota legada que redireciona para `/times`
 - `/api/scoreboard`
   - leitura do placar agregado
 - `/api/matches`
@@ -42,6 +43,8 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
   - cadastro de usuario
 - `/api/auth/[...all]`
   - sessao e login via `better-auth`
+- `/api/profile`
+  - leitura e atualizacao do perfil
 
 ## Camadas principais
 
@@ -50,57 +53,69 @@ Descrever a arquitetura atual do app, suas camadas principais e os pontos que de
 - `src/components/login/*`
   - fluxo visual e interacoes de login/signup
 - `src/components/dashboard/*`
-  - tela principal de placar, historico e registro de vitoria
+  - componentes herdados/compartilhados ligados a scoreboard e historico
+- `src/components/teams/*`
+  - listagem, criacao, detalhe e gestao de membros dos times
+- `src/components/ranking/*`
+  - ranking, podium e filtros
+- `src/components/profile/*`
+  - hero, estatisticas e edicao de perfil
 - `src/components/authenticated/*`
-  - shell compartilhada, sidebar, menu de conta e placeholders autenticados
+  - shell compartilhada, sidebar e menu de conta
 - `src/components/theme/*`
-  - provider, toggle, helper compartilhado de bootstrap/resolve e comportamento de tema
+  - provider, toggle e bootstrap de tema
 - `src/components/ui/*`
-  - primitives locais reutilizaveis e composicao visual compartilhada
+  - primitives locais reutilizaveis
 
 ### Dominio e regras
 
-- `src/lib/constants.ts`
-  - definicao fixa dos times e mensagens
 - `src/lib/types.ts`
   - tipos compartilhados do dominio e da API
 - `src/lib/data.ts`
-  - regras de negocio, leitura/escrita, agregacao do placar e fallback
+  - leitura/escrita de partidas e agregacao do placar
+- `src/lib/teams.ts`
+  - operacoes principais de times e memberships
+- `src/lib/team-details.ts`
+  - montagem de dados detalhados de time
+- `src/lib/ranking.ts`
+  - agregacao e filtros do ranking
+- `src/lib/profile.ts` e `src/lib/profile-stats.ts`
+  - montagem do perfil e stats pessoais
 - `src/lib/auth-validation.ts`
   - schemas `zod`, normalizacao e mapeamento de erros
 - `src/lib/auth.ts`
   - configuracao e helpers de auth
 - `src/lib/auth-rate-limit.ts`
-  - estado e regras de rate limit por `email + ip`
-- `middleware.ts`
-  - protecao de rota para a area autenticada com `withAuth`
+  - estado e regras de rate limit por `action + username + ip`
+- `proxy.ts`
+  - protecao de rota para a area autenticada no nivel de roteamento
 
 ### Persistencia
 
 - `prisma/schema.prisma`
   - schema atual do banco, incluindo `auth_rate_limits`
 - `prisma/seed.mjs`
-  - seed dos dois times fixos
+  - seed UAT com usuarios, times, memberships e partidas de exemplo
 - `src/lib/prisma.ts`
   - cliente Prisma compartilhado
 
 ## Regras arquiteturais
 
-- Nao introduzir servico backend separado sem mudanca explicita de produto/arquitetura
-- Nao generalizar para multi-team ou multi-league no v1
-- Nao persistir counters agregados do placar
-- Nao tratar times do banco como fonte unica de verdade; o v1 ainda os espelha em codigo
-- Nao quebrar o fallback em memoria sem aprovacao explicita
-- Nao documentar o fallback em memoria como se ele reabrisse o fluxo autenticado sem sessao; hoje ele permanece restrito ao dominio e ao desenvolvimento isolado
+- nao introduzir servico backend separado sem mudanca explicita de produto/arquitetura
+- nao persistir counters agregados do placar
+- nao reintroduzir times hardcoded no codigo
+- times, memberships e partidas devem continuar vindo do banco como fonte de verdade
+- `getScoreboard()` deve continuar derivando o placar a partir do historico completo relevante
+- ausencia de `DATABASE_URL` nao abre modo degradado autenticado; as rotas dependentes ficam indisponiveis
 
 ## Gaps conhecidos
 
-- Ainda nao ha testes integrados com Prisma real
-- A cobertura E2E ainda nao cobre rate limit de auth nem variantes negativas mais profundas
-- O dominio continua deliberadamente estreito e nao cobre RBAC ou ligas
+- ainda nao ha testes integrados suficientes com Prisma real para todos os fluxos criticos
+- a cobertura E2E ainda nao cobre rate limit de auth nem o fluxo completo de registrar partida e refletir no placar
+- `/settings` segue sem funcionalidade propria
 
-## Proximos passos relacionados
+## Proximos cuidados
 
-- Manter a documentacao tecnica sincronizada com o estado do codigo
-- Priorizar testes integrados com Prisma real para validar auth e rate limit sem mocks
-- So considerar expansao de dominio apos fechar os gaps operacionais do v1
+- manter a documentacao tecnica sincronizada com o estado do codigo
+- priorizar testes integrados com Prisma real para auth e fluxos de partidas/times
+- evitar expandir o dominio sem necessidade concreta de produto

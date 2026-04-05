@@ -8,34 +8,28 @@ Centralizar como o app se comporta em cada combinacao relevante de ambiente, com
 
 ### Sem `DATABASE_URL`
 
-- Persistencia de partidas usa fallback em memoria
-- Login e signup ficam indisponiveis
+- auth fica indisponivel
 - `getAuthenticatedUser()` retorna `null`
-- `middleware.ts` atua como no-op
+- `proxy.ts` atua como no-op
 - `/` redireciona para `/login`
-- `/dashboard` redireciona para `/login`
-- `/scoreboard` redireciona para `/login`
-- `/api/scoreboard` e `/api/matches` retornam `401`
-- `POST /api/auth/register` retorna indisponibilidade de auth
-- O fallback em memoria continua existindo no dominio, mas nao fica exposto pela UI autenticada nem pelas APIs protegidas no estado atual
+- rotas protegidas server-side redirecionam para `/login` quando tentadas sem sessao
+- `/api/scoreboard` e `/api/matches` retornam `503`
+- `POST /api/auth/register` retorna `503`
+- nao existe fallback em memoria para persistencia compartilhada nem para reabrir o fluxo autenticado
 
 Uso esperado:
 
-- desenvolvimento local de componentes isolados e dominio do placar
+- desenvolvimento isolado de componentes e partes do dominio puro
 - nao valida persistencia compartilhada
 - nao valida auth real
 
 ### Com `DATABASE_URL` e sem `BETTER_AUTH_SECRET`
 
-- Persistencia de partidas usa Prisma + Postgres
-- Auth e tratado como configuracao invalida
-- `middleware.ts` falha na inicializacao para impedir secret implicito
-- `/` continua resolvendo sessao como ausente e redireciona para `/login`
-- `/dashboard` redireciona para `/login`
-- `/scoreboard` redireciona para `/login`
-- `/api/scoreboard` e `/api/matches` retornam `401`
-- `POST /api/auth/register` retorna erro de configuracao de auth
+- persistencia de dados segue apontando para Prisma + Postgres
+- auth e tratado como configuracao invalida
+- `getAuthUnavailableResponse()` retorna `500` nas rotas de auth/DB que dependem de configuracao completa de auth
 - o app nao deve usar secret implicito para cookies ou sessao
+- `proxy.ts` continua verificando cookie de sessao, mas auth real permanece indisponivel
 
 Uso esperado:
 
@@ -44,14 +38,14 @@ Uso esperado:
 
 ### Com `DATABASE_URL` e `BETTER_AUTH_SECRET`
 
-- Persistencia de partidas usa Prisma + Postgres
-- Login e signup ficam disponiveis
-- `middleware.ts` protege a area autenticada com `withAuth`
+- persistencia usa Prisma + Postgres
+- login e signup ficam disponiveis
+- `proxy.ts` protege a area autenticada por cookie de sessao
 - `src/app/(authenticated)/layout.tsx` reforca a validacao de sessao no server component
-- `src/app/scoreboard/page.tsx` so preserva o redirecionamento legado para `/dashboard`
-- As APIs do placar validam sessao e retornam `401` sem autenticacao
+- `/dashboard` e `/scoreboard` so preservam redirecionamento legado para `/times`
+- as APIs protegidas validam sessao e retornam `401` sem autenticacao
 - `/` redireciona por estado de sessao
-- cookies seguros sao usados em producao ou quando `BETTER_AUTH_URL` comeca com `https://`
+- cookies seguros sao usados em producao
 
 Uso esperado:
 
@@ -60,16 +54,15 @@ Uso esperado:
 
 ## Regras de runtime
 
-- O fallback em memoria existe apenas para desenvolvimento local
-- A ausencia de `DATABASE_URL` nao desabilita apenas o banco; ela inviabiliza auth real
-- No estado atual do codigo, a ausencia de `DATABASE_URL` tambem impede usar o fluxo autenticado de dashboard, mesmo com o dominio de placar ainda disponivel em memoria
-- A presenca de `DATABASE_URL` sem `BETTER_AUTH_SECRET` e erro de configuracao, nao modo degradado aceitavel
-- `/dashboard` permanece o fluxo funcional principal do produto
-- `/scoreboard` permanece acessivel apenas como rota legada de compatibilidade
+- ausencia de `DATABASE_URL` inviabiliza o runtime autenticado
+- ausencia de `BETTER_AUTH_SECRET` com banco presente e erro de configuracao, nao modo degradado aceitavel
+- `/times` e a entrada autenticada atual do produto
+- `/dashboard` e `/scoreboard` sao rotas legadas de compatibilidade
+- nao documentar fallback em memoria para partidas/auth, porque ele nao existe no estado atual
 
 ## Fontes de verdade
 
-- `middleware.ts`
+- `proxy.ts`
 - `src/lib/auth.ts`
 - `src/lib/data.ts`
 - `src/app/page.tsx`

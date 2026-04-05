@@ -2,15 +2,16 @@
 
 ## Objetivo
 
-Documentar os contratos publicos atuais das APIs internas usadas pela UI, preservando compatibilidade com o dashboard e com o fluxo de auth.
+Documentar os contratos publicos atuais das APIs internas usadas pela UI, preservando compatibilidade com o fluxo autenticado e com os tipos compartilhados em `src/lib/types.ts`.
 
 ## Regras gerais
 
-- Todos os contratos seguem os tipos compartilhados em `src/lib/types.ts`
-- O placar continua derivado de `matches`
-- As APIs do placar exigem sessao autenticada no estado atual do codigo
-- Sem sessao valida, `GET /api/scoreboard`, `GET /api/matches` e `POST /api/matches` retornam `401`
-- O fallback em memoria de `src/lib/data.ts` continua existindo para o dominio, mas nao muda esse contrato HTTP protegido
+- todos os contratos seguem os tipos compartilhados em `src/lib/types.ts`
+- o placar continua derivado de `matches`
+- rotas protegidas dependentes de banco retornam `503` quando `DATABASE_URL` nao existe
+- rotas protegidas retornam `401` quando nao ha sessao valida
+- `POST /api/auth/register` retorna `500` quando `DATABASE_URL` existe mas `BETTER_AUTH_SECRET` esta ausente
+- nao existe fallback em memoria para o contrato HTTP autenticado
 
 ## `GET /api/scoreboard`
 
@@ -22,29 +23,24 @@ Sucesso:
 ```json
 {
   "scoreboard": {
-    "teams": [],
-    "leaderTeamId": "frontend",
+    "teams": [
+      {
+        "id": "team-a",
+        "wins": 3,
+        "losses": 1
+      }
+    ],
+    "leaderTeamId": "team-a",
     "leadBy": 1,
-    "totalMatches": 3,
-    "currentStreak": {
-      "teamId": "frontend",
-      "teamName": "Frontend",
-      "count": 2
-    }
+    "totalMatches": 4
   }
 }
 ```
 
-Erro:
+Erros:
 
+- sem `DATABASE_URL` retorna `503`
 - sem sessao valida retorna `401`
-- body:
-
-```json
-{
-  "error": "Autenticacao obrigatoria."
-}
-```
 
 ## `GET /api/matches`
 
@@ -55,17 +51,28 @@ Sucesso:
 
 ```json
 {
-  "matches": []
+  "matches": [
+    {
+      "id": "match-1",
+      "teamAId": "team-a",
+      "teamBId": "team-b",
+      "winnerTeamId": "team-a",
+      "loserTeamId": "team-b",
+      "playedAt": "2026-04-05T18:30:00.000Z",
+      "note": "Partida equilibrada"
+    }
+  ]
 }
 ```
 
 Comportamento:
 
-- retorna historico recente em ordem do mais novo para o mais antigo
-- cada item inclui `id`, `winnerTeamId`, `winnerName`, `winnerRoster`, `playedAt` e `note`
+- retorna historico em ordem do mais novo para o mais antigo
+- so inclui partidas dos times aos quais o usuario pertence
 
-Erro:
+Erros:
 
+- sem `DATABASE_URL` retorna `503`
 - sem sessao valida retorna `401`
 
 ## `POST /api/matches`
@@ -74,28 +81,50 @@ Payload:
 
 ```json
 {
-  "winnerTeamId": "frontend",
+  "teamAId": "team-a",
+  "teamBId": "team-b",
+  "winnerTeamId": "team-a",
   "note": "optional"
 }
 ```
 
 Regras:
 
-- `winnerTeamId` deve ser o id de um time valido no banco
-- `note` e opcional
-- `note`, quando enviado, deve ser string com no maximo 140 caracteres
-- `note` e normalizado com trim e vazio vira `null` na persistencia
+- `teamAId` e `teamBId` sao obrigatorios
+- `winnerTeamId` e obrigatorio e deve ser um dos dois times informados
+- `teamAId` e `teamBId` nao podem ser iguais
+- `note` e opcional e deve ter no maximo 140 caracteres
+- os dois times precisam existir
+- os dois times precisam estar ativos
+- o usuario autenticado precisa ser membro de pelo menos um dos dois times
 
 Sucesso:
 
 - retorna `201`
 - body segue `CreateMatchResponse`
-- inclui `match` criado e `message`
+
+```json
+{
+  "match": {
+    "id": "match-1",
+    "teamAId": "team-a",
+    "teamBId": "team-b",
+    "winnerTeamId": "team-a",
+    "loserTeamId": "team-b",
+    "playedAt": "2026-04-05T18:30:00.000Z",
+    "note": "optional"
+  }
+}
+```
 
 Erros:
 
+- sem `DATABASE_URL` retorna `503`
 - sem sessao valida retorna `401`
 - payload invalido retorna `400`
+- usuario fora dos times retorna `403`
+- time inexistente retorna `404`
+- time inativo retorna `422`
 
 ## `POST /api/auth/register`
 
@@ -111,8 +140,9 @@ Payload:
 Regras:
 
 - validacao usa os schemas compartilhados de `src/lib/auth-validation.ts`
-- `username` deve ser unico; `password` precisa ter no minimo 8 caracteres
-- quando auth esta habilitado, falhas repetidas usam rate limit por `username + ip`
+- `username` deve ser unico
+- `password` precisa atender as regras compartilhadas de validacao
+- falhas repetidas usam rate limit por `action + username + ip`
 
 Sucesso:
 
@@ -123,7 +153,9 @@ Sucesso:
 {
   "user": {
     "id": "uuid",
-    "username": "gui"
+    "username": "gui",
+    "displayName": null,
+    "avatarUrl": null
   }
 }
 ```
@@ -135,15 +167,6 @@ Erros:
 - bloqueio temporario por rate limit retorna `429` com `retryAfterSeconds`
 - auth indisponivel retorna `503` sem `DATABASE_URL`
 - auth configurado de forma invalida retorna `500` quando falta `BETTER_AUTH_SECRET`
-
-Exemplo de bloqueio:
-
-```json
-{
-  "error": "Muitas tentativas seguidas. Aguarde um pouco antes de tentar novamente.",
-  "retryAfterSeconds": 900
-}
-```
 
 ## `GET /api/profile`
 
@@ -170,11 +193,13 @@ Os campos `email`, `displayName`, `avatarUrl` e `bio` podem ser `null`.
 
 Erros:
 
+- sem `DATABASE_URL` retorna `503`
 - sem sessao valida retorna `401`
+- usuario sem perfil correspondente retorna `404`
 
 ## `PUT /api/profile`
 
-Requer sessao autenticada. Atualiza parcialmente o perfil do usuario logado (patch — apenas os campos enviados sao alterados).
+Requer sessao autenticada. Atualiza parcialmente o perfil do usuario logado.
 
 Payload (todos os campos sao opcionais):
 
@@ -189,10 +214,11 @@ Payload (todos os campos sao opcionais):
 
 Regras:
 
-- `displayName`: quando enviado, deve ter entre 2 e 50 caracteres
+- `displayName`: quando enviado, deve ter entre 2 e 50 caracteres; aceita `null`
 - `email`: quando enviado, deve ser email valido; aceita `null` para remover
-- `avatarUrl`: quando enviado, deve ser URL valida (max 500 chars); aceita `null` para remover
-- `bio`: quando enviado, max 200 chars; aceita `null` para remover
+- `avatarUrl`: quando enviado, deve ser URL valida; aceita `null` para remover
+- `bio`: quando enviado, deve ter no maximo 200 caracteres; aceita `null`
+- email duplicado de outro usuario retorna conflito
 - campos ausentes no payload nao sao alterados
 
 Sucesso:
@@ -201,13 +227,14 @@ Sucesso:
 
 Erros:
 
+- sem `DATABASE_URL` retorna `503`
 - sem sessao valida retorna `401`
-- payload invalido retorna `400` com `fieldErrors`
+- payload invalido retorna `400`
+- email em uso retorna `409`
 
 ## Compatibilidade com a UI atual
 
-- O dashboard busca `/api/scoreboard` e `/api/matches` separadamente
-- Apos registrar vitoria, a UI reconsulta ambos os endpoints
-- A UI atual pode enviar `note` opcional no `POST /api/matches`
-- A UI atual renderiza `note` no historico quando esse dado ja existe
-- Mudancas de wire shape exigem atualizacao coordenada entre API e dashboard
+- a UI autenticada busca `/api/scoreboard` e `/api/matches`
+- apos registrar partida, a UI reconsulta os endpoints afetados
+- a UI atual pode enviar `note` opcional em `POST /api/matches`
+- mudancas de wire shape exigem atualizacao coordenada entre API e consumidores

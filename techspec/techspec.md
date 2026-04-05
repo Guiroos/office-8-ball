@@ -4,33 +4,34 @@
 
 Esta pasta concentra a documentacao tecnica viva do `Office 8 Ball`.
 
-Use este indice como ponto de entrada para entender o estado tecnico atual, as invariantes do sistema e os proximos passos por dominio. O `PRD.md` continua sendo a referencia principal de produto.
+Use este indice como ponto de entrada para entender o estado tecnico atual, as invariantes do sistema e como cada dominio esta organizado. O `PRD.md` continua sendo a referencia principal de produto. Planejamento futuro agora vive no GitHub, via milestones e issues.
 
 ## Resumo tecnico atual
 
 - App unico em `Next.js` com `App Router`
-- Times criados dinamicamente pelos usuarios; sem times hardcoded
-- Placar sempre derivado do historico de partidas
-- Persistencia em `Prisma + Postgres` com fallback em memoria para desenvolvimento local
-- Autenticacao por credenciais com `better-auth` e usuarios salvos via Prisma
-- Fluxo principal atual em `/login` -> `/dashboard`
-- Sistema de tema compartilhado entre login, dashboard e shell autenticada, com foundation tokens, tokens de shell e bootstrap inicial consistente
+- Times sao dinamicos e criados pelos usuarios; nao existem IDs hardcoded de time
+- Placar e ranking continuam derivados do historico de partidas
+- Persistencia em `Prisma + Postgres`
+- Auth por credenciais com `better-auth`
+- Fluxo autenticado atual entra por `/times`
+- `/dashboard` e `/scoreboard` permanecem como rotas legadas com redirecionamento para `/times`
+- Sistema de tema compartilhado entre login e shell autenticada
 
 ## Invariantes
 
 - Contadores agregados nao sao persistidos; o placar e calculado a partir de `matches`
 - `leaderTeamId` deve ser `null` em empate
 - `leadBy` e a diferenca absoluta de vitorias
-- `currentStreak` considera as vitorias consecutivas mais recentes do ultimo vencedor
-- O fallback em memoria nao substitui persistencia real compartilhada
-- Login e signup dependem de `DATABASE_URL` e `BETTER_AUTH_SECRET`
+- `DATABASE_URL` e obrigatorio para o runtime autenticado
+- Sem `DATABASE_URL`, as rotas protegidas e APIs dependentes de auth/DB ficam indisponiveis; nao existe fallback em memoria para o fluxo autenticado
+- `BETTER_AUTH_SECRET` e obrigatorio para auth real quando `DATABASE_URL` estiver presente
 
 ## Como navegar
 
 - `architecture.md`
   - stack, rotas, persistencia, camadas e fonte de verdade tecnica
 - `scoreboard.md`
-  - dominio, invariantes de placar, APIs e fluxo de atualizacao
+  - dominio de partidas e placar, invariantes e contratos centrais
 - `auth.md`
   - fluxo de autenticacao, validacao compartilhada e dependencias de ambiente
 - `runtime-environments.md`
@@ -40,17 +41,17 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
 - `testing-strategy.md`
   - cobertura atual, gaps reais e validacao minima por tipo de mudanca
 - `persistence-and-migrations.md`
-  - relacao entre schema, seed, fallback em memoria e invariantes de persistencia
+  - relacao entre schema, seed, migrations e invariantes de persistencia
 - `theme-system.md`
   - estado atual do sistema de tema, gaps e ordem recomendada de evolucao
 - `sidebar-layout.md`
-  - estado atual da shell autenticada com sidebar, menu do usuario e consolidacao da home logada em `/dashboard`
+  - estado atual da shell autenticada, navegacao e rotas legadas
 - `github-operations.md`
-  - workflows, checks obrigatorios, integracao com Vercel e endurecimento operacional do repositorio
+  - workflows, checks obrigatorios e fluxo operacional do repositorio
 - `git-conventions.md`
-  - branch principal, naming de branches, Conventional Commits e fluxo oficial de release por tag
-- `roadmap.md`
-  - proximos passos tecnicos e evolucao planejada
+  - branch principal, naming de branches, Conventional Commits e release por tag
+- `roadmap-workflow.md`
+  - processo para organizar milestones, issues, labels, dependencias e iniciar execucao
 
 ## Quando consultar cada documento
 
@@ -64,18 +65,18 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
   - leia `api-contracts.md`
 - Se a mudanca mexe em estrutura geral, rotas, runtime ou persistencia:
   - leia `architecture.md`
-- Se a mudanca mexe em schema, seed, migrations ou fallback em memoria:
+- Se a mudanca mexe em schema, seed, migrations ou invariantes de banco:
   - leia `persistence-and-migrations.md`
 - Se a mudanca mexe em tokens, provider, toggle, primitives ou visual system:
   - leia `theme-system.md`
-- Se a mudanca mexe em shell autenticada, navegacao lateral, layout compartilhado ou migracao de `/scoreboard` para `/dashboard`:
+- Se a mudanca mexe em shell autenticada, navegacao lateral, layout compartilhado ou rotas legadas:
   - leia `sidebar-layout.md`
-- Se a mudanca mexe em CI, GitHub Actions, checks de PR, Dependabot ou integracao operacional com Vercel:
+- Se a mudanca mexe em CI, GitHub Actions, checks de PR ou operacao do repositorio:
   - leia `github-operations.md`
 - Se a mudanca mexe em fluxo de branch, convencao de commit, versionamento ou release:
   - leia `git-conventions.md`
-- Se a mudanca precisa ser posicionada na evolucao tecnica futura:
-  - leia `roadmap.md`
+- Se a mudanca precisa ser posicionada no planejamento futuro:
+  - consulte as milestones e issues no GitHub e use `roadmap-workflow.md` como processo
 - Se a mudanca mexe em estrategia de validacao, lacunas de cobertura ou bateria minima de checks:
   - leia `testing-strategy.md`
 
@@ -83,4 +84,4 @@ Use este indice como ponto de entrada para entender o estado tecnico atual, as i
 
 - `PRD.md` continua sendo a referencia de produto e escopo
 - `README.md` continua sendo onboarding, setup e status geral
-- `techspec/` e a fonte unica da documentacao tecnica viva do projeto
+- `techspec/` e a fonte principal da documentacao tecnica viva do projeto

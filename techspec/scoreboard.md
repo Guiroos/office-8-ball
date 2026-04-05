@@ -2,91 +2,121 @@
 
 ## Objetivo
 
-Documentar o dominio do placar, os contratos atuais e as invariantes que nao devem ser quebradas em mudancas futuras.
+Documentar o dominio de partidas e placar, os contratos atuais e as invariantes que nao devem ser quebradas em mudancas futuras.
 
 ## Dominio atual
 
-Os times validos em v1 sao fixos:
-
-- `frontend`
-- `backend`
+Os times sao dinamicos e criados pelos usuarios. Nao existem IDs fixos de time no codigo.
 
 Os dados persistidos relevantes hoje sao:
 
 - `teams`
+- `team_members`
 - `matches`
 
-O placar exibido na UI e sempre derivado de `matches`.
+O placar exibido na UI continua sendo derivado de `matches`.
 
 ## Invariantes de negocio
 
-- `winnerTeamId` deve ser `frontend` ou `backend`
+- `winnerTeamId` deve ser um dos dois times da partida
+- `teamAId` e `teamBId` devem ser diferentes
+- os dois times precisam existir
+- os dois times precisam estar com status `active` para registrar uma partida
+- o usuario autenticado precisa ser membro de pelo menos um dos dois times
 - `note`, quando presente, deve ter no maximo 140 caracteres
-- `note` deve ser normalizado com trim e vazio deve virar `null`
+- `note` deve ser normalizado com `trim()` e vazio deve virar `null`
 - `leaderTeamId` deve ser `null` em empate
 - `leadBy` deve ser a diferenca absoluta entre as vitorias
-- `currentStreak` deve refletir as vitorias consecutivas mais recentes do ultimo vencedor
-- Historico recente deve ser retornado do mais novo para o mais antigo
+- o historico exibido deve vir do mais novo para o mais antigo
+- `getScoreboard()` precisa buscar todas as partidas relevantes; nao pode limitar o calculo do placar para a UI
 
 ## APIs atuais
 
 ### `GET /api/scoreboard`
 
-Retorna o agregado do placar, incluindo:
+Retorna o agregado do placar do usuario autenticado, incluindo:
 
 - total de vitorias por time
+- total de derrotas por time
 - lider atual
-- streak atual
 - diferenca de vitorias
-- exige sessao autenticada no estado atual da API
+- total de partidas consideradas
+
+Comportamento atual:
+
+- sem `DATABASE_URL`, retorna `503`
+- sem sessao valida, retorna `401`
+- com sessao valida, retorna `200`
 
 ### `GET /api/matches`
 
-Retorna partidas recentes em ordem decrescente por data.
-- exige sessao autenticada no estado atual da API
+Retorna o historico de partidas visivel para o usuario autenticado em ordem decrescente por data.
+
+Cada item atual inclui:
+
+- `id`
+- `teamAId`
+- `teamBId`
+- `winnerTeamId`
+- `loserTeamId`
+- `playedAt`
+- `note`
+
+Comportamento atual:
+
+- sem `DATABASE_URL`, retorna `503`
+- sem sessao valida, retorna `401`
+- com sessao valida, retorna `200`
 
 ### `POST /api/matches`
 
-Payload:
+Payload atual:
 
 ```json
 {
-  "winnerTeamId": "frontend",
+  "teamAId": "team-a",
+  "teamBId": "team-b",
+  "winnerTeamId": "team-a",
   "note": "optional"
 }
 ```
 
-Comportamento:
+Comportamento atual:
 
-- valida `winnerTeamId`
-- aceita `note` opcional
+- valida shape com Zod
+- garante que `teamAId` e `teamBId` sejam diferentes
+- garante que `winnerTeamId` seja um dos dois times informados
+- garante que os dois times existam
+- garante que os dois times estejam ativos
+- exige que o usuario autenticado seja membro de pelo menos um dos times
 - persiste a partida
-- retorna erro claro em caso de falha
-- exige sessao autenticada no estado atual da API
+- revalida `/ranking` e `/times`
 
 ## Fluxo atual da UI
 
-- A dashboard faz fetch de `/api/scoreboard` e `/api/matches`
-- Ao registrar uma vitoria, a UI reconsulta ambos os endpoints
-- Nao existe update otimista antes da persistencia concluir
-- A UI atual expõe um campo opcional de `note` em cada card de time no fluxo de registrar vitoria
-- A UI atual renderiza `note` no historico recente quando esse dado existe
+- a area autenticada consome `/api/scoreboard` e `/api/matches`
+- o fluxo de registrar partida vive em `/partida`
+- `note` e opcional no registro de partida
+- `note` aparece no historico quando presente
+- nao existe desfazer/exclusao de partida no estado atual
 
 ## Persistencia
 
 - Com `DATABASE_URL`:
   - leitura e escrita via Prisma/Postgres
 - Sem `DATABASE_URL`:
-  - fallback em memoria, apenas para desenvolvimento local no dominio
-  - esse fallback nao fica exposto pela dashboard autenticada nem pelas rotas protegidas no estado atual
+  - o runtime autenticado fica indisponivel
+  - nao existe fallback em memoria para persistencia compartilhada de partidas
 
 ## Gaps conhecidos
 
-- Nao ha testes com banco real cobrindo o fluxo completo de scoreboard
-- O modelo segue fixo em dois times globais
+- `POST /api/matches` ainda nao tem rate limit proprio
+- nao existe undo/exclusao curta para o ultimo registro
+- a exibicao do historico ainda nao tem paginacao
+- a cobertura integrada com banco real ainda pode aumentar
 
-## Proximos passos relacionados
+## Proximos cuidados
 
-- Refinar a UX de `note` no registro apenas se isso trouxer ganho real de uso
-- Preservar compatibilidade entre API e dashboard em qualquer mudanca de contrato
-- Continuar tratando o placar como derivado, nao como estado salvo separadamente
+- preservar compatibilidade entre API e UI em qualquer mudanca de contrato
+- continuar tratando o placar como derivado, nao como estado salvo separadamente
+- nao reintroduzir times hardcoded no dominio
